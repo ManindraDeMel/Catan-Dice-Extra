@@ -1,7 +1,8 @@
 # COMP1110 Assignment 2 Group Tasks
 
-For each task or sub-task, record who is responsible, the deadline, and any dependencies.
-Use the entries below as an example.
+Mondays 6pm (Weekly). Friday 6pm (Week 4, one-off)
+
+Meetig
 
 ## Week 4
 
