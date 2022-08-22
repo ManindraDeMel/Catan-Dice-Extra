@@ -1,4 +1,4 @@
 package comp1140.ass2;
 
-public class LargestArmy {
+public class LargestArmy extends GamePiece{
 }

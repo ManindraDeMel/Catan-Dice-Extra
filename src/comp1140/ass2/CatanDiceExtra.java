@@ -1,7 +1,11 @@
 package comp1140.ass2;
 
 public class CatanDiceExtra {
+    Player Turn;
 
+    public void startGame() {
+
+    }
     /**
      * Check if the string encoding of a board state is well-formed.
      * Note that this does not mean checking if the state is valid
