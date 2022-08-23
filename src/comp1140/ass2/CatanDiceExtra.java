@@ -1,11 +1,13 @@
 package comp1140.ass2;
-
 public class CatanDiceExtra {
-    Player Turn;
-
     public void startGame() {
 
     }
+
+    public void newTurn() {
+
+    }
+
     /**
      * Check if the string encoding of a board state is well-formed.
      * Note that this does not mean checking if the state is valid
@@ -251,5 +253,9 @@ public class CatanDiceExtra {
         // FIXME: Task 13
         // FIXME: Task 14 Implement a "smart" generateAction()
         return null;
+    }
+
+    public void GameOver() {
+
     }
 }
