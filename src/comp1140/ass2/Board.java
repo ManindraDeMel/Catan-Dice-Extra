@@ -1,9 +1,19 @@
 package comp1140.ass2;
 
+import java.util.HashMap;
+
 public class Board {
-    GamePiece[] array = new GamePiece[19]; // will make jagged array once we discuss how to make it into rows and columns
+    HashMap <Tile, GamePiece>[][] pieces;
 
     public void instatiateBoard() {
 
+    }
+
+    public Tile getTile() {
+        return null;
+    }
+
+    public GamePiece getGamePiece() {
+        return null;
     }
 }

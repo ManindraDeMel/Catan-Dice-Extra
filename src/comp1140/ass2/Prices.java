@@ -1,4 +1,6 @@
 package comp1140.ass2;
-
-public enum Prices {
+import java.util.ArrayList;
+import java.util.HashMap;
+public class Prices {
+    public static final HashMap<ArrayList<Resource>, GamePiece> builds = new HashMap<>();
 }
