@@ -1,12 +1,13 @@
 # List the membership of this group.  (Remove entries if you have fewer
 # than three members.)
-#
 
 members:
-  - name: Jonte Deakin
-    uid: u7480977
+  - name: Arjun Raj
+    uid: u7526852
+    contact: u7526852@anu.edu.au
   - name: Manindra De Mel
     uid: u7156805
-    email: u7156805@anu.edu.au
+    contact: u7156805@anu.edu.au
   - name: Stephen Burg
     uid: u7145285
+    contact: u7145285@anu.edu.au
