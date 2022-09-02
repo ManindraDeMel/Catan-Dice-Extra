@@ -44,9 +44,10 @@ public class Prices {
         }
         return subsets;
     }
-    public static ArrayList<ArrayList<String>> findBuilds(ArrayList<Resource> resources) {
+    public static ArrayList<ArrayList<String>> findBuilds(ArrayList<Resource> resources) { // need to account for the case of two gold
         ArrayList<ArrayList<Resource>> possibleBuildsR = new ArrayList<>();
         ArrayList<ArrayList<String>> validBuilds = new ArrayList<>();
+
         Collections.sort(resources); // check for one case which is not account for (3 roads)
         if (resources.equals(new ArrayList<>(Arrays.asList(Resource.brick, Resource.brick, Resource.brick, Resource.wood, Resource.wood, Resource.wood)))) {
             return new ArrayList<>(Arrays.asList(
@@ -92,6 +93,7 @@ public class Prices {
                     }
                 }
         }
+        // next is case for 2 gold (trading)
         return validBuilds;
     }
 }
