@@ -1,8 +1,8 @@
 package comp1140.ass2;
 
 public enum Resource {
-    wood,
     brick,
+    wood,
     sheep,
     stone,
     wheat,
