@@ -39,9 +39,9 @@ declaration: >-
 # Sign *your* name and uids here. (Remove entries if you have fewer
 # than three members.)
 signatures:
-  - name: Stephen Burg
-    uid: u7146285
-  - name: Manindra De Mel
-    uid: u7156805
-  - name: Jonte Deakin
-    uid: u7480977
+  - name:Stephen Burg
+    uid:u7146285
+  - name:Manindra De Mel
+    uid:u7156805
+  - name:Jonte Deakin
+    uid:u7480977
