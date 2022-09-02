@@ -111,7 +111,7 @@ public class isPriceExchangeValid {
         test(input, expected);
     }
     @Test
-    public void testSettlementAndRoad(){
+    public void testSettlementAndRoad(){ // Not sure why this test is breaking (contents are identical)
         ArrayList<Resource> input = new ArrayList<>(
                 Arrays.asList(
                         Resource.brick,
@@ -126,7 +126,7 @@ public class isPriceExchangeValid {
         ArrayList<ArrayList<String>> expected =
                 new ArrayList<>(
                         Arrays.asList(
-                                new ArrayList<> (Arrays.asList("Road")),
+                                new ArrayList<>(Arrays.asList("Road")),
                                 new ArrayList<>(Arrays.asList("Settlement")),
                                 new ArrayList<>(Arrays.asList("Road, Road")),
                                 new ArrayList<>(Arrays.asList("Road", "Settlement"))

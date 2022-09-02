@@ -60,7 +60,14 @@ public class Prices {
             if (resource.size() > 1) {
                 Collections.sort(resource);
                 if (builds.containsKey(resource)) {
-                    possibleBuildsR.add(resource);
+                    if (builds.get(resource) != "Road" || builds.get(resource) != "Solider") {
+                        if (!(possibleBuildsR.contains(resource))) {
+                            possibleBuildsR.add(resource);
+                        }
+                    }
+                    else {
+                        possibleBuildsR.add(resource);
+                    }
                     if (!(validBuilds.contains(new ArrayList<>(Arrays.asList(builds.get(resource)))))) {
                         validBuilds.add(new ArrayList<>(Arrays.asList(builds.get(resource))));
                     }
@@ -71,8 +78,7 @@ public class Prices {
         for (ArrayList<Resource> resources1 : possibleBuildsR) { // Possible joint builds (as most two)
             secondElement:
                 for (ArrayList<Resource> resources2 : possibleBuildsR) {
-                    ArrayList<Resource> tmpResources = new ArrayList<>();
-                    tmpResources = resources;
+                    ArrayList<Resource> tmpResources = new ArrayList<>(resources);
                     for (Resource resourceItem : resources1) {
                         tmpResources.remove(resourceItem);
                     }
@@ -81,7 +87,9 @@ public class Prices {
                             continue secondElement;
                         }
                     }
-                    validBuilds.add(new ArrayList<String>(Arrays.asList(builds.get(resources1), builds.get(resources2))));
+                    if (!validBuilds.contains(new ArrayList<String>(Arrays.asList(builds.get(resources2), builds.get(resources1))))) {
+                        validBuilds.add(new ArrayList<String>(Arrays.asList(builds.get(resources1), builds.get(resources2))));
+                    }
                 }
         }
         return validBuilds;
