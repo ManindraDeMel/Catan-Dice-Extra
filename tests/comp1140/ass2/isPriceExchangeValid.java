@@ -13,6 +13,9 @@ public class isPriceExchangeValid {
     public void test(ArrayList<Resource> resources, ArrayList<ArrayList<String>> expected) {
         Assertions.assertEquals(expected, Prices.findBuilds(resources));
     }
+    public void testGold(ArrayList<Resource> resources, ArrayList<Resource> goldForResourceExchange, ArrayList<ArrayList<String>> expected) {
+        Assertions.assertEquals(expected, Prices.findBuildsWithManualGoldTrade(resources, goldForResourceExchange));
+    }
     @Test
     public void testRoadAndKnight(){
         ArrayList<Resource> input = new ArrayList<>(
@@ -128,7 +131,7 @@ public class isPriceExchangeValid {
                         Arrays.asList(
                                 new ArrayList<>(Arrays.asList("Road")),
                                 new ArrayList<>(Arrays.asList("Settlement")),
-                                new ArrayList<>(Arrays.asList("Road, Road")),
+                                new ArrayList<>(Arrays.asList("Road", "Road")),
                                 new ArrayList<>(Arrays.asList("Road", "Settlement"))
                         )
                 );
@@ -172,14 +175,15 @@ public class isPriceExchangeValid {
                 )
         );
 
+        ArrayList<Resource> goldTrade = new ArrayList<>(Arrays.asList(Resource.brick));
+
         ArrayList<ArrayList<String>> expected =
                 new ArrayList<>(
                         Arrays.asList(
-                                new ArrayList<> (Arrays.asList("Road")),
-                                new ArrayList<> (Arrays.asList("Solider"))
+                                new ArrayList<> (Arrays.asList("Road"))
                         )
                 );
 
-        test(input, expected);
+        testGold(input, goldTrade, expected);
     }
 }
