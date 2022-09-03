@@ -1,10 +1,20 @@
 package comp1140.ass2;
-public class CatanDiceExtra {
-    public void startGame() {
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class CatanDiceExtra {
+    ArrayList<Player> players = new ArrayList<>();
+    ArrayList<String> playersNames = new ArrayList<>(Arrays.asList("Manindra", "Stephen", "Arjun")); // changes when we add GUI stuff (max of 6 players?)
+    public void startGame() {
+        Board board = new Board();
+        board.instatiateBoard();
+        for (String name : playersNames) {
+            players.add(new Player(name));
+        }
     }
 
-    public void newTurn() {
+    public void newTurn(Player player) {
 
     }
 
@@ -262,6 +272,10 @@ public class CatanDiceExtra {
     public static String[] generateAction(String boardState) {
         // FIXME: Task 13
         // FIXME: Task 14 Implement a "smart" generateAction()
+        return null;
+    }
+
+    public Boolean isGameOver() {
         return null;
     }
 

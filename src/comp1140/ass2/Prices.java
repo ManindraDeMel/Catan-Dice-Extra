@@ -113,7 +113,7 @@ public class Prices {
         }
         return resources;
     }
-    public static ArrayList<ArrayList<String>> findBuildsWithManualGoldTrade(ArrayList<Resource> resources, ArrayList<Resource> resourcesAttainedFromGold) {
+    public static ArrayList<ArrayList<String>> findBuildsWithManualGoldTrade(ArrayList<Resource> resources, ArrayList<Resource> resourcesAttainedFromGold) { // resourcesAttainedFromGold is what the player decides when they want to exchange gold for materials
         if (validateGoldTrade(resources, resourcesAttainedFromGold)) {
             resources = removeGold(resources, (resourcesAttainedFromGold.size() * 2));
             resources.addAll(resourcesAttainedFromGold);
