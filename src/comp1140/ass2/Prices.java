@@ -16,13 +16,6 @@ public class Prices {
         put(new ArrayList<Resource>(Arrays.asList(Resource.stone, Resource.stone, Resource.stone, Resource.stone, Resource.stone)), "Castle");
         put(new ArrayList<Resource>(Arrays.asList(Resource.wheat, Resource.wheat, Resource.wheat, Resource.wheat, Resource.wheat)), "Castle");
     }};
-    public static final HashMap<ArrayList<Resource>, String> goldTrades = new HashMap<>() {{
-        put(new ArrayList<Resource>(Arrays.asList(Resource.gold, Resource.gold)), "Wood");
-        put(new ArrayList<Resource>(Arrays.asList(Resource.gold, Resource.gold)), "Stone");
-        put(new ArrayList<Resource>(Arrays.asList(Resource.gold, Resource.gold)), "Sheep");
-        put(new ArrayList<Resource>(Arrays.asList(Resource.gold, Resource.gold)), "Wheat");
-        put(new ArrayList<Resource>(Arrays.asList(Resource.gold, Resource.gold)), "Brick");
-    }};
 
     private static ArrayList<ArrayList<Resource>> powerset(ArrayList<Resource> resources, int index) {
         ArrayList<ArrayList<Resource>> subsets;
@@ -53,7 +46,7 @@ public class Prices {
             return new ArrayList<>(Arrays.asList(
                 new ArrayList<>(Arrays.asList("Road")),
                 new ArrayList<>(Arrays.asList("Road", "Road")),
-                new ArrayList<>(Arrays.asList("Road", "Road", "Road")  )
+                new ArrayList<>(Arrays.asList("Road", "Road", "Road"))
             ));
         }
 
@@ -93,7 +86,39 @@ public class Prices {
                     }
                 }
         }
-        // next is case for 2 gold (trading)
         return validBuilds;
     }
+
+    private static Boolean validateGoldTrade(ArrayList<Resource> resources, ArrayList<Resource> resourcesAttainedFromGold) {
+        int numGold = 0;
+        for (Resource resource : resources) {
+            if (resource == Resource.gold) {
+                numGold++;
+            }
+        }
+        if (resourcesAttainedFromGold.size() - (numGold / 2) >= 0) {
+            return true;
+        }
+        return false;
+    }
+
+    private static ArrayList<Resource> removeGold(ArrayList<Resource> resources, int goldToBeRemoved) {
+        for (int i = 0; i < resources.size(); i++) {
+            if (goldToBeRemoved == 0) {
+                break;
+            }
+            else if (resources.get(i) == Resource.gold) {
+                resources.remove(i);
+            }
+        }
+        return resources;
+    }
+    public static ArrayList<ArrayList<String>> findBuildsWithManualGoldTrade(ArrayList<Resource> resources, ArrayList<Resource> resourcesAttainedFromGold) {
+        if (validateGoldTrade(resources, resourcesAttainedFromGold)) {
+            resources = removeGold(resources, (resourcesAttainedFromGold.size() * 2));
+            resources.addAll(resourcesAttainedFromGold);
+        }
+        return findBuilds(resources);
+    }
+    // Create one which finds the most efficient gold trade automatically (for the AI)
 }
