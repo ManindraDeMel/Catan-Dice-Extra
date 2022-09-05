@@ -32,8 +32,34 @@ public class CatanDiceExtra {
      * a board state, false otherwise.
      */
     public static boolean isBoardStateWellFormed(String boardState) {
+        if (boardState.charAt(0)!='W' && boardState.charAt(0)!='X') {
+            return false;
+        }
+        boardState = boardState.substring(1);
+        if (boardState.charAt(0)=='C') {
+            String[] cities = boardState.split("C");
+            int t = 0;
+            for (int i=0; i<cities.length ;i++){
+                if (cities[i].length()==1) {
+                    try {
+                        int n = Integer.parseInt(cities[i]);
+                        if (n>t && n<=4) {
+                            t=n;
+                        } else {
+                            return false;
+                        }
+                    } catch (NumberFormatException e) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        } else if (boardState.charAt(0)=='J'); {
+
+        }
         // FIXME: Task 3
-	return false;
+	    return true;
     }
 
     /**
