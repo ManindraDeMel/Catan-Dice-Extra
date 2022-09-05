@@ -1,7 +1,6 @@
 package comp1140.ass2;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 public class CatanDiceExtra {
     ArrayList<Player> players = new ArrayList<>();
@@ -64,8 +63,26 @@ public class CatanDiceExtra {
      * 'b', 'l', 'w', 'g', 'o', 'm'.
      */
     public static String rollDice(int numOfDice) {
-        // FIXME: Task 5
-        return "";
+        HashMap<Integer, String> mapToDiceVal = new HashMap<>() {{
+            put(1, "b");
+            put(2, "l");
+            put(3, "w");
+            put(4, "g");
+            put(5, "o");
+            put(6, "m");
+        }};
+        Random random = new Random();
+        String resources = "";
+        for (int i = 0; i < numOfDice; i++) {
+            resources += String.format("%s", mapToDiceVal.get(random.nextInt(6) + 1));
+        }
+        char[] sortedResource = resources.toCharArray();
+        Arrays.sort(sortedResource);
+        String sortedResourcesStr = "";
+        for (int i = 0; i < sortedResource.length; i++) {
+            sortedResourcesStr += Character.toString(sortedResource[i]);
+        }
+        return sortedResourcesStr;
     }
 
     /**
