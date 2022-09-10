@@ -64,12 +64,12 @@ public class CatanDiceExtra {
      */
     public static String rollDice(int numOfDice) {
         HashMap<Integer, String> mapToDiceVal = new HashMap<>() {{
-            put(1, "b");
-            put(2, "l");
-            put(3, "w");
-            put(4, "g");
-            put(5, "o");
-            put(6, "m");
+            put(1, "b"); //brick
+            put(2, "l"); //lumber
+            put(3, "w"); //wool
+            put(4, "g"); //grain
+            put(5, "o"); //ore
+            put(6, "m"); //gold (money)
         }};
         Random random = new Random();
         String resources = "";
@@ -121,8 +121,32 @@ public class CatanDiceExtra {
      * @param action: string representation of the player action.
      * @return true iff the action is executable, false otherwise.
      */
+
     public static boolean isActionValid(String boardState, String action) {
-        // FIXME: Task 7
+        char[] characters = action.toCharArray();
+        String actionState = "";
+        for (int i = 0; i < 4; i++) {
+            actionState += characters[i];
+        }
+        return switch (actionState) {
+            case "keep" -> validateKeep(boardState, action);
+            case "buil" -> validateBuild(boardState, action);
+            case "trad" -> validateTrade(boardState, action);
+            case "swap" -> validateSwap(boardState, action);
+            default -> false;
+        };
+    }
+
+    public static boolean validateKeep(String boardState, String action) {
+        return false;
+    }
+    public static boolean validateBuild(String boardState, String action) {
+        return false;
+    }
+    public static boolean validateTrade(String boardState, String action) {
+        return false;
+    }
+    public static boolean validateSwap(String boardState, String action) {
         return false;
     }
 
