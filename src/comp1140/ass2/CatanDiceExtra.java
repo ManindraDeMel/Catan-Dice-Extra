@@ -137,27 +137,24 @@ public class CatanDiceExtra {
         };
     }
     private class validateClass {
-        private static List<Character> possibleResources = new ArrayList<>(Arrays.asList('b', 'g', 'l', 'm', 'o', 'w')); // helper constants and methods
+        private static final List<Character> possibleResources = new ArrayList<>(Arrays.asList('b', 'g', 'l', 'm', 'o', 'w')); // helper constants and methods
         //
+        private static ArrayList<Character> getResourcesFromBoardState(String boardState) {
+            ArrayList <Character> resources = new ArrayList<>();
+            for (Character c : boardState.toCharArray()) {
+                if (validateClass.possibleResources.contains(c)) { // might be less than 6 resources so we might cut into a players gamestate, this filters that out.
+                    resources.add(c);
+                }
+            }
+            return resources;
+        }
         public final static boolean validateKeep(String boardState, String action) {
             int numRolls = Integer.parseInt(Character.toString(boardState.toCharArray()[2]));
             if (numRolls < 3) {
-                List<Character> possibleValues = new ArrayList<>(validateClass.possibleResources);
-                possibleValues.addAll(new ArrayList<>(Arrays.asList('k', 'e', 'p'))); // checking for format
-                char[] boardStateChars = boardState.toCharArray(); // resources are valid, next check boardstate if the resources exist
-                boardStateChars =  Arrays.copyOfRange(boardStateChars, 0, 8);
-                ArrayList<String> turnBoardState = new ArrayList<>();
-                for (Character c : boardStateChars) {
-                    if (validateClass.possibleResources.contains(c)) {
-                        turnBoardState.add(Character.toString(c));
-                    }
-                }
-                ArrayList<Character> boardStateResources = new ArrayList<>();
-                for (Character c : ("keep" + String.join("", turnBoardState)).toCharArray()) {
-                    boardStateResources.add(c);
-                }
+                ArrayList<Character> turnBoardState = new ArrayList<>(Arrays.asList('k', 'e', 'e', 'p')); // resources are valid, next check boardstate if the resources exist
+                turnBoardState.addAll(validateClass.getResourcesFromBoardState(boardState));
                 for (Character c : action.toCharArray()) { // checking for format of keep[Resources] && check for if resources in gamestate too
-                    if (!possibleValues.contains(c) || !boardStateResources.contains(c)) {
+                    if (!turnBoardState.contains(c)) {
                         return false;
                     }
                 }
@@ -169,6 +166,22 @@ public class CatanDiceExtra {
             return false;
         }
         public static boolean validateTrade(String boardState, String action) {
+            for (Character c : action.toCharArray()) { // can't trade for gold.
+                if (c == 'm') {
+                    return false;
+                }
+            }
+            int numResources = action.length() - 4; // the -4 is for "keep"
+            ArrayList<Character> resources = validateClass.getResourcesFromBoardState(boardState);
+            int numGold = 0;
+            for (Character c : resources) {
+                if (c == 'm') {
+                    numGold++;
+                }
+            }
+            if (numResources * 2 - numGold >= 0) {
+                return true;
+            }
             return false;
         }
         public static boolean validateSwap(String boardState, String action) {
