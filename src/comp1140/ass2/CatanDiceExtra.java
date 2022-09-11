@@ -179,7 +179,7 @@ public class CatanDiceExtra {
                     numGold++;
                 }
             }
-            if (numResources * 2 - numGold >= 0) {
+            if (numGold >= numResources * 2) {
                 return true;
             }
             return false;
