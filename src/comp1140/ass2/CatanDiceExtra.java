@@ -162,7 +162,7 @@ public class CatanDiceExtra {
             }
             return false;
         }
-        public static boolean validateBuild(String boardState, String action) {
+        public static boolean validateBuild(String boardState, String action) { //TODO
             return false;
         }
         public static boolean validateTrade(String boardState, String action) {
@@ -186,7 +186,7 @@ public class CatanDiceExtra {
         }
         public static boolean validateSwap(String boardState, String action) {
             return false;
-        }
+        }//TODO
     }
 
     /**
