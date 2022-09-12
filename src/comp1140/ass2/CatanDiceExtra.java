@@ -172,7 +172,7 @@ public class CatanDiceExtra {
             return playerBoardState.subList(startOfPlayerBoardState+1, endOfPlayerBoardState).toString();
         }
         // #######################################################################################
-        public static boolean validateBuild(String boardState, String action) { //TODO
+        public static boolean validateBuild(String boardState, String action) { // TODO
             ArrayList<Character> validformat = new ArrayList<>(Arrays.asList(
                     'b',
                     'u',
@@ -200,17 +200,19 @@ public class CatanDiceExtra {
                     case 'K' -> validateKnightBuild(boardState, action);
                     case 'R' -> validateRoadBuild(boardState, action);
                     case 'S' -> validateSettlementBuild(boardState, action);
+                    default -> false;
                 };
             }
             return false;
         }
         private static boolean validateCastleBuild(String boardState, Character castlePosition) {
-            if (!boardState.contains("C" + castlePosition)) { // if this castle doesn't exist in the boardState.
-                return true;
-            }
-            return false;
+            return !checkIfExists(boardState, "C" + castlePosition); // check existence
         }
         private static boolean validateKnightBuild(String boardState, String action) { // These are harder because we have to check if they're connected to the player.
+            String build = new char[]{action.charAt(5), action.charAt(6), action.charAt(7)}.toString();
+            if (!checkIfExists(boardState, build)) {
+
+            }
             return false;
         }
         private static boolean validateRoadBuild(String boardState, String action) {
@@ -249,7 +251,13 @@ public class CatanDiceExtra {
             }
             return false;
         }
-        private static Boolean checkIfConnected(String boardState, String action) { // TODO
+        private static boolean checkIfExists(String boardState, String build) {
+            if (boardState.contains(build)) {
+                return true;
+            }
+            return false;
+        }
+        private static boolean checkIfConnected(String boardState, String action) { // TODO
             return false;
         }
         // #######################################################################################
