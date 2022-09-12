@@ -142,17 +142,37 @@ public class CatanDiceExtra {
         private static ArrayList<Character> getResourcesFromBoardState(String boardState) {
             ArrayList <Character> resources = new ArrayList<>();
             for (Character c : boardState.toCharArray()) {
-                if (validateClass.possibleResources.contains(c)) { // might be less than 6 resources so we might cut into a players gamestate, this filters that out.
+                if (possibleResources.contains(c)) { // might be less than 6 resources so we might cut into a players gamestate, this filters that out.
                     resources.add(c);
                 }
             }
             return resources;
         }
+
+        private static ArrayList<Character> StringToCharacterArrayList(String s) {
+            ArrayList<Character> l = new ArrayList<>();
+            for (Character c : s.toCharArray()) {
+                l.add(c);
+            }
+            return l;
+        }
+
+        private static String getPlayerBoardState(String boardState) {
+            HashMap<Character, String> switchPlayers = new HashMap<>(){{
+                put('W',"X");
+                put('X',"W");
+            }};
+            Character playerTurn = boardState.charAt(0);
+            int startOfPlayerBoardState = boardState.indexOf(Character.toString(playerTurn), 1);
+            int endOfPlayerBoardState = boardState.indexOf(switchPlayers.get(playerTurn), startOfPlayerBoardState);
+            List<Character> playerBoardState = StringToCharacterArrayList(boardState);
+            return playerBoardState.subList(startOfPlayerBoardState+1, endOfPlayerBoardState).toString();
+        }
         public final static boolean validateKeep(String boardState, String action) {
             int numRolls = Integer.parseInt(Character.toString(boardState.toCharArray()[2]));
             if (numRolls < 3) {
                 ArrayList<Character> turnBoardState = new ArrayList<>(Arrays.asList('k', 'e', 'e', 'p')); // resources are valid, next check boardstate if the resources exist
-                turnBoardState.addAll(validateClass.getResourcesFromBoardState(boardState));
+                turnBoardState.addAll(getResourcesFromBoardState(boardState));
                 for (Character c : action.toCharArray()) { // checking for format of keep[Resources] && check for if resources in gamestate too
                     if (!turnBoardState.contains(c)) {
                         return false;
@@ -172,7 +192,7 @@ public class CatanDiceExtra {
                 }
             }
             int numResources = action.length() - 4; // the -4 is for "keep"
-            ArrayList<Character> resources = validateClass.getResourcesFromBoardState(boardState);
+            ArrayList<Character> resources = getResourcesFromBoardState(boardState);
             int numGold = 0;
             for (Character c : resources) {
                 if (c == 'm') {
@@ -185,8 +205,58 @@ public class CatanDiceExtra {
             return false;
         }
         public static boolean validateSwap(String boardState, String action) {
+            HashMap<Integer, Character> coordinateToResource = new HashMap<>() {{
+                put(0, 'w');
+                put(1, 'g');
+                put(2, 'o');
+                put(3, 'o');
+                put(4, 'b');
+                put(5, 'l');
+                put(6, 'w');
+                put(7, 'g');
+                put(8, 'l');
+                put(11, 'b');
+                put(12, 'g');
+                put(13, 'w');
+                put(14, 'b');
+                put(15, 'l');
+                put(16, 'o');
+                put(17, 'o');
+                put(18, 'g');
+                put(19, 'w');
+
+            }};
+            ArrayList<Character> resources = getResourcesFromBoardState(boardState);
+            Character resourceIn = action.charAt(4);
+            Character resourceOut = action.charAt(5);
+            if (!resources.contains(resourceIn)) {
+                return false; // Player doesn't have resource to trade.
+            }
+            String playerBoardState = getPlayerBoardState(boardState);
+            if (playerBoardState == "[]") {
+                return false; // Player has no builds
+            }
+            int currentIndex = 0;
+            ArrayList<Character> boardStateChars = StringToCharacterArrayList(boardState);
+            ArrayList<Integer> locations = new ArrayList<>();
+            while (playerBoardState.indexOf(currentIndex) != -1) {
+                int newIndex = playerBoardState.indexOf("J", currentIndex);
+                locations.add(Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex+1)) + Character.toString(playerBoardState.charAt(newIndex+2))));
+                currentIndex = newIndex+1;
+            }
+            if (locations.size() == 0) {
+                return false; // Player has no usable knights
+            }
+            for (int location : locations) {
+                if (coordinateToResource.get(location) == resourceOut) {
+                    return true; // correct knight owned
+                }
+                else if (location == 9 || location == 10) {
+                    return true; // multi-purpose knight owned
+                }
+            }
             return false;
-        }//TODO
+        }
     }
 
     /**
