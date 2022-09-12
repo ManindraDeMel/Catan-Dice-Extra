@@ -341,7 +341,8 @@ public class CatanDiceExtra {
                 if (buildType == 'R' && validateRoadLength(action)) {
                     if (boardState == "W00WXW00X00" || boardState == "X00WXW00X00") {
                         return roadOnCoast(action);
-                    } else if (boardState.length() == 16 && boardState.contains("R")) { // 2nd turn check it doesn't overlap with another enemy road. Does it need to be 5 tiles away?
+                    }
+                    else if (boardState.length() == 16 && boardState.contains("R")) { // 2nd turn check it doesn't overlap with another enemy road. TODO Does it need to be 5 tiles away?
                         ArrayList<String> actionLocations = new ArrayList<>(Arrays.asList(
                                 Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)),
                                 Character.toString(action.charAt(action.length() - 4)) + Character.toString(action.charAt(action.length() - 3))
@@ -373,7 +374,7 @@ public class CatanDiceExtra {
                         "47",
                         "48",
                         "49",
-                        "40",
+                        "50",
                         "46",
                         "37",
                         "32",
@@ -409,7 +410,7 @@ public class CatanDiceExtra {
                 return false;
             }
 
-            private static boolean checkIfConnected(String boardState, String action) {
+            private static boolean checkIfConnected(String boardState, String action) { //TODO I think this can be written better, in a fashion similar to checkforSettlement();
                 String playerBoardState = Misc.getPlayerBoardState(boardState);
                 int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
                 int currentIndex = 0;
@@ -454,12 +455,32 @@ public class CatanDiceExtra {
                 return false;
             }
             private static boolean checkForSettlement(String boardState, String action) {
+                ArrayList<Integer> coordsWithoutSettlements = new ArrayList<>(Arrays.asList(
+                        3, 4, 5, 6, 11, 12, 13, 14, 15, 38, 39, 40, 41, 42, 47, 48, 49, 50
+                ));
+                for (int i = 21; i < 33; i++) {
+                    coordsWithoutSettlements.add(i); // add middle part
+                }
+                // ###
                 String[] coords = Misc.getRoadCoordsFromAction(action);
                 String playerBoardState = Misc.getPlayerBoardState(boardState);
+                // ##
+                int currentIndex = 0;
+                ArrayList<String> firstCoordsInPlayerState = new ArrayList<>();
+                while (playerBoardState.indexOf("R", currentIndex) != -1) {
+                    int newIndex = playerBoardState.indexOf("R", currentIndex);
+                    firstCoordsInPlayerState.add(Character.toString(playerBoardState.charAt(newIndex+1)) + Character.toString(playerBoardState.charAt(newIndex+2)));
+                    currentIndex = newIndex + 1;
+                }
                 for (String coord : coords) {
-                    if (playerBoardState.contains("R" + coord)) { // this means coord is the common coord to check for a settlement
-                        if (playerBoardState.contains("S" + coord)) {
-                            return true;
+                    for (String firstCoord : firstCoordsInPlayerState) {
+                        if (playerBoardState.contains("R" + coord) || playerBoardState.contains("R" + firstCoord + coord)) { // this means coord is the common coord to check for a settlement
+                            if (coordsWithoutSettlements.contains(Integer.parseInt(coord))) {
+                                return true;
+                            }
+                            else if (playerBoardState.contains("S" + coord)) {
+                                return true;
+                            }
                         }
                     }
                 }
