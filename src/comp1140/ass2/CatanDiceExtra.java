@@ -169,7 +169,11 @@ public class CatanDiceExtra {
             int startOfPlayerBoardState = boardState.indexOf(Character.toString(playerTurn), 1);
             int endOfPlayerBoardState = boardState.indexOf(switchPlayers.get(playerTurn), startOfPlayerBoardState);
             List<Character> playerBoardState = StringToCharacterArrayList(boardState);
-            return playerBoardState.subList(startOfPlayerBoardState+1, endOfPlayerBoardState).toString();
+            String result = "";
+            for (Character c : playerBoardState.subList(startOfPlayerBoardState+1, endOfPlayerBoardState)) {
+                result += Character.toString(c);
+            }
+            return result;
         }
         // #######################################################################################
         public static boolean validateBuild(String boardState, String action) { // TODO
@@ -193,34 +197,61 @@ public class CatanDiceExtra {
                 }
             }
             // ###########
-            Character buildtype = action.charAt(5);
-            if (sufficentResourcesForBuild(boardState, buildtype)) { // check for resources
-                return switch (buildtype) {
+            Character buildType = action.charAt(5);
+            if (checkBaseCase(boardState, action, buildType)) {
+                return true;
+            }
+            else if (sufficentResourcesForBuild(boardState, buildType)) { // check for resources
+                return switch (buildType) {
                     case 'C' -> validateCastleBuild(boardState, action.charAt(action.length() - 1));
                     case 'K' -> validateKnightBuild(boardState, action);
                     case 'R' -> validateRoadBuild(boardState, action);
                     case 'S' -> validateSettlementBuild(boardState, action);
+                    case 'T' -> validateCityBuild(boardState, action);
                     default -> false;
                 };
             }
             return false;
         }
         private static boolean validateCastleBuild(String boardState, Character castlePosition) {
-            return !checkIfExists(boardState, "C" + castlePosition); // check existence
+            if (boardState.contains("C" + castlePosition)) {
+                return false; // check existence
+            }
+            return true;
         }
-        private static boolean validateKnightBuild(String boardState, String action) { // These are harder because we have to check if they're connected to the player.
-            String build = new char[]{action.charAt(5), action.charAt(6), action.charAt(7)}.toString();
-            if (!checkIfExists(boardState, build)) {
-
+        private static boolean validateCityBuild(String boardState, String action) {
+            final ArrayList<Integer> validCityBuildLocations = new ArrayList<>(Arrays.asList(
+               1,
+               7,
+               10,
+               17,
+               18,
+               19,
+               34,
+               35,
+               36,
+               43,
+               46,
+               52
+            ));
+            String playerBoardState = getPlayerBoardState(boardState);
+            String settlement = "S" + Character.toString(action.charAt(6)) + Character.toString(action.charAt(7));
+            int location = Integer.parseInt(Character.toString(action.charAt(6)) + Character.toString(action.charAt(7)));
+            if (playerBoardState.contains(settlement) && validCityBuildLocations.contains(location)) { // settlement already built check && location is in a cityable location.
+                return true;
             }
             return false;
         }
-        private static boolean validateRoadBuild(String boardState, String action) {
+        private static boolean validateKnightBuild(String boardState, String action) {
             return false;
+        }
+        private static boolean validateRoadBuild(String boardState, String action) {
+            return !checkIfExists(boardState, action) && checkIfConnectedR(boardState, action);
         }
         private static boolean validateSettlementBuild(String boardState, String action) {
-            return false;
+            return !checkIfExists(boardState, action) && checkIfConnected(boardState, action);
         }
+        // ####################################################################################### More helper functions below
         private static boolean sufficentResourcesForBuild(String boardState, Character buildType) {
             final HashMap<Character, Resource> charToResource = new HashMap<>() {{ // maps to convert between our program and the assignment requirements.
                 put('b', Resource.brick);
@@ -251,16 +282,69 @@ public class CatanDiceExtra {
             }
             return false;
         }
-        private static boolean checkIfExists(String boardState, String build) {
+        private static boolean checkBaseCase(String boardState, String action, Character buildType) {
+            if (buildType == 'R' && validateRoadLength(action)) {
+                if ((boardState == "W00WXW00X00" || boardState == "X00WXW00X00" || boardState.length() == 16)) { //TODO (there needs to be a check for distance between starting roads)
+                    return true;
+                }
+            }
+            return false;
+        }
+        private static boolean checkIfExists(String boardState, String action) {
+            String build = new char[]{action.charAt(5), action.charAt(6), action.charAt(7)}.toString();
             if (boardState.contains(build)) {
                 return true;
             }
             return false;
         }
-        private static boolean checkIfConnected(String boardState, String action) { // TODO
+        private static boolean checkIfConnected(String boardState, String action) {
+            String playerBoardState = getPlayerBoardState(boardState);
+            int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() -2))+ Character.toString(action.charAt(action.length() -1)));
+            int currentIndex = 0;
+            while(playerBoardState.indexOf("R", currentIndex) != -1) {
+                int newIndex = playerBoardState.indexOf("R", currentIndex);
+                int firstCoord = Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex+1)) + Character.toString(playerBoardState.charAt(newIndex+2)));
+                int secondCoord = Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex+3)) + Character.toString(playerBoardState.charAt(newIndex+4)));
+                if (actionCoord == firstCoord || actionCoord == secondCoord) {
+                    return true;
+                }
+                currentIndex = newIndex + 1;
+            }
+            while(playerBoardState.indexOf("S", currentIndex) != -1) {
+                int newIndex = playerBoardState.indexOf("S", currentIndex);
+                int firstCoord = Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex+1)) + Character.toString(playerBoardState.charAt(newIndex+2)));
+                if (actionCoord == firstCoord) {
+                    return true;
+                }
+                currentIndex = newIndex + 1;
+            }
+            while(playerBoardState.indexOf("T", currentIndex) != -1) {
+                int newIndex = playerBoardState.indexOf("T", currentIndex);
+                int firstCoord = Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex+1)) + Character.toString(playerBoardState.charAt(newIndex+2)));
+                if (actionCoord == firstCoord) {
+                    return true;
+                }
+                currentIndex = newIndex + 1;
+            }
             return false;
         }
-        // #######################################################################################
+        private static boolean checkIfConnectedR(String boardState, String action) { // because roads have two coordinates we can check them both recursively.
+            String firstRoadCoord = Character.toString(action.charAt(6)) + Character.toString(action.charAt(7));
+            String secondRoadCoord = Character.toString(action.charAt(8)) + Character.toString(action.charAt(9));
+            if (validateRoadLength(action)) { // coordinates for the road can't be unreasonably far away.
+                return checkIfConnected(boardState, firstRoadCoord) || checkIfConnected(boardState, secondRoadCoord);
+            }
+            return false;
+        }
+        private static boolean validateRoadLength(String action) {
+            String firstRoadCoord = Character.toString(action.charAt(6)) + Character.toString(action.charAt(7));
+            String secondRoadCoord = Character.toString(action.charAt(8)) + Character.toString(action.charAt(9));
+            if (Math.abs(Integer.parseInt(firstRoadCoord) - Integer.parseInt(secondRoadCoord)) <= 6) { //TODO find better fix for this instead of approximating
+                return true;
+            }
+            return false;
+        }
+        // ####################################################################################### end of builder helper functions
         public static boolean validateTrade(String boardState, String action) {
             ArrayList<Character> validFormat = new ArrayList<>(Arrays.asList('t', 'r', 'a', 'd', 'e'));
             validFormat.addAll(possibleResources); // checks for format
@@ -330,9 +414,8 @@ public class CatanDiceExtra {
                 return false; // Player has no builds
             }
             int currentIndex = 0;
-            ArrayList<Character> boardStateChars = StringToCharacterArrayList(boardState);
             ArrayList<Integer> locations = new ArrayList<>();
-            while (playerBoardState.indexOf(currentIndex) != -1) {
+            while (playerBoardState.indexOf("J", currentIndex) != -1) {
                 int newIndex = playerBoardState.indexOf("J", currentIndex);
                 locations.add(Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex+1)) + Character.toString(playerBoardState.charAt(newIndex+2))));
                 currentIndex = newIndex+1;
