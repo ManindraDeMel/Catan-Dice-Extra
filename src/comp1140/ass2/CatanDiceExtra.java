@@ -1,5 +1,6 @@
 package comp1140.ass2;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class CatanDiceExtra {
@@ -168,26 +169,35 @@ public class CatanDiceExtra {
             List<Character> playerBoardState = StringToCharacterArrayList(boardState);
             return playerBoardState.subList(startOfPlayerBoardState+1, endOfPlayerBoardState).toString();
         }
-        public final static boolean validateKeep(String boardState, String action) {
-            int numRolls = Integer.parseInt(Character.toString(boardState.toCharArray()[2]));
-            if (numRolls < 3) {
-                ArrayList<Character> turnBoardState = new ArrayList<>(Arrays.asList('k', 'e', 'e', 'p')); // resources are valid, next check boardstate if the resources exist
-                turnBoardState.addAll(getResourcesFromBoardState(boardState));
-                for (Character c : action.toCharArray()) { // checking for format of keep[Resources] && check for if resources in gamestate too
-                    if (!turnBoardState.contains(c)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
+        // #######################################################################################
         public static boolean validateBuild(String boardState, String action) { //TODO
+            ArrayList<Character> validformat = new ArrayList<>(Arrays.asList(
+                    'b',
+                    'u',
+                    'i',
+                    'l',
+                    'd',
+                    'K',
+                    'R',
+                    'C',
+                    'S'
+            ));
+            for (int i = 0; i < 10; i++) {
+                validformat.add(Integer.toString(i).charAt(0));
+            }
+            for (Character c : action.toCharArray()) {
+                if (!validformat.contains(c)) {
+                    return false; // Check the format
+                }
+            }
+            // ###########
             return false;
         }
         public static boolean validateTrade(String boardState, String action) {
+            ArrayList<Character> validFormat = new ArrayList<>(Arrays.asList('t', 'r', 'a', 'd', 'e'));
+            validFormat.addAll(possibleResources); // checks for format
             for (Character c : action.toCharArray()) { // can't trade for gold.
-                if (c == 'm') {
+                if (c == 'm' || !validFormat.contains(c)) {
                     return false;
                 }
             }
@@ -204,8 +214,24 @@ public class CatanDiceExtra {
             }
             return false;
         }
+
+        public final static boolean validateKeep(String boardState, String action) {
+            int numRolls = Integer.parseInt(Character.toString(boardState.toCharArray()[2]));
+            if (numRolls < 3) {
+                ArrayList<Character> turnBoardState = new ArrayList<>(Arrays.asList('k', 'e', 'e', 'p')); // resources are valid, next check boardstate if the resources exist
+                turnBoardState.addAll(getResourcesFromBoardState(boardState));
+                for (Character c : action.toCharArray()) { // checking for format of keep[Resources] && check for if resources in gamestate too
+                    if (!turnBoardState.contains(c)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
         public static boolean validateSwap(String boardState, String action) {
-            Character[] coordinateToResource = new Character[]{
+            final Character[] coordinateToResource = new Character[]{
                     'w',
                     'g',
                     'o',
