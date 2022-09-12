@@ -205,27 +205,26 @@ public class CatanDiceExtra {
             return false;
         }
         public static boolean validateSwap(String boardState, String action) {
-            HashMap<Integer, Character> coordinateToResource = new HashMap<>() {{
-                put(0, 'w');
-                put(1, 'g');
-                put(2, 'o');
-                put(3, 'o');
-                put(4, 'b');
-                put(5, 'l');
-                put(6, 'w');
-                put(7, 'g');
-                put(8, 'l');
-                put(11, 'b');
-                put(12, 'g');
-                put(13, 'w');
-                put(14, 'b');
-                put(15, 'l');
-                put(16, 'o');
-                put(17, 'o');
-                put(18, 'g');
-                put(19, 'w');
-
-            }};
+            Character[] coordinateToResource = new Character[]{
+                    'w',
+                    'g',
+                    'o',
+                    'o',
+                    'b',
+                    'l',
+                    'w',
+                    'g',
+                    'l',
+                    'b',
+                    'g',
+                    'w',
+                    'b',
+                    'l',
+                    'o',
+                    'o',
+                    'g',
+                    'w'
+            };
             ArrayList<Character> resources = getResourcesFromBoardState(boardState);
             Character resourceIn = action.charAt(4);
             Character resourceOut = action.charAt(5);
@@ -248,11 +247,11 @@ public class CatanDiceExtra {
                 return false; // Player has no usable knights
             }
             for (int location : locations) {
-                if (coordinateToResource.get(location) == resourceOut) {
+                if (coordinateToResource[location] == resourceOut) {
                     return true; // correct knight owned
                 }
                 else if (location == 9 || location == 10) {
-                    return true; // multi-purpose knight owned
+                    return true; // multipurpose knight owned
                 }
             }
             return false;
