@@ -1,5 +1,7 @@
 package comp1140.ass2;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -194,7 +196,7 @@ public class CatanDiceExtra {
             Character buildtype = action.charAt(5);
             if (sufficentResourcesForBuild(boardState, buildtype)) { // check for resources
                 return switch (buildtype) {
-                    case 'C' -> validateCastleBuild(boardState, action);
+                    case 'C' -> validateCastleBuild(boardState, action.charAt(action.length() - 1));
                     case 'K' -> validateKnightBuild(boardState, action);
                     case 'R' -> validateRoadBuild(boardState, action);
                     case 'S' -> validateSettlementBuild(boardState, action);
@@ -202,10 +204,13 @@ public class CatanDiceExtra {
             }
             return false;
         }
-        private static boolean validateCastleBuild(String boardState, String action) {
-            return true; // Do we need to check if there is a castle available to build? I.e. check if C0 is available //TODO
+        private static boolean validateCastleBuild(String boardState, Character castlePosition) {
+            if (!boardState.contains("C" + castlePosition)) { // if this castle doesn't exist in the boardState.
+                return true;
+            }
+            return false;
         }
-        private static boolean validateKnightBuild(String boardState, String action) {
+        private static boolean validateKnightBuild(String boardState, String action) { // These are harder because we have to check if they're connected to the player.
             return false;
         }
         private static boolean validateRoadBuild(String boardState, String action) {
@@ -242,6 +247,9 @@ public class CatanDiceExtra {
                     }
                 }
             }
+            return false;
+        }
+        private static Boolean checkIfConnected(String boardState, String action) { // TODO
             return false;
         }
         // #######################################################################################
