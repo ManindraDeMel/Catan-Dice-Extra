@@ -191,8 +191,60 @@ public class CatanDiceExtra {
                 }
             }
             // ###########
+            Character buildtype = action.charAt(5);
+            if (sufficentResourcesForBuild(boardState, buildtype)) { // check for resources
+                return switch (buildtype) {
+                    case 'C' -> validateCastleBuild(boardState, action);
+                    case 'K' -> validateKnightBuild(boardState, action);
+                    case 'R' -> validateRoadBuild(boardState, action);
+                    case 'S' -> validateSettlementBuild(boardState, action);
+                };
+            }
             return false;
         }
+        private static boolean validateCastleBuild(String boardState, String action) {
+            return true; // Do we need to check if there is a castle available to build? I.e. check if C0 is available //TODO
+        }
+        private static boolean validateKnightBuild(String boardState, String action) {
+            return false;
+        }
+        private static boolean validateRoadBuild(String boardState, String action) {
+            return false;
+        }
+        private static boolean validateSettlementBuild(String boardState, String action) {
+            return false;
+        }
+        private static boolean sufficentResourcesForBuild(String boardState, Character buildType) {
+            final HashMap<Character, Resource> charToResource = new HashMap<>() {{ // maps to convert between our program and the assignment requirements.
+                put('b', Resource.brick);
+                put('g', Resource.wheat);
+                put('l', Resource.wood);
+                put('m', Resource.gold);
+                put('o', Resource.stone);
+                put('w', Resource.sheep);
+            }};
+            final HashMap<String, Character> nameToBuildID = new HashMap<>() {{
+                put("Road", 'R');
+                put("Solider", 'K');
+                put("Settlement", 'S');
+                put("Castle", 'C');
+            }};
+            // ###############
+            ArrayList<Resource> resources = new ArrayList<>();
+            for (Character c : getResourcesFromBoardState(boardState)) {
+                resources.add(charToResource.get(c)); // Convert to resource type
+            }
+            ArrayList<ArrayList<String>> possibleBuilds = Prices.findBuilds(resources);
+            for (ArrayList<String> i : possibleBuilds) {
+                for (String build : i) {
+                    if (nameToBuildID.get(build) == buildType) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        // #######################################################################################
         public static boolean validateTrade(String boardState, String action) {
             ArrayList<Character> validFormat = new ArrayList<>(Arrays.asList('t', 'r', 'a', 'd', 'e'));
             validFormat.addAll(possibleResources); // checks for format
@@ -214,7 +266,7 @@ public class CatanDiceExtra {
             }
             return false;
         }
-
+        // #######################################################################################
         public final static boolean validateKeep(String boardState, String action) {
             int numRolls = Integer.parseInt(Character.toString(boardState.toCharArray()[2]));
             if (numRolls < 3) {
@@ -229,7 +281,7 @@ public class CatanDiceExtra {
             }
             return false;
         }
-
+        // #######################################################################################
         public static boolean validateSwap(String boardState, String action) {
             final Character[] coordinateToResource = new Character[]{
                     'w',
