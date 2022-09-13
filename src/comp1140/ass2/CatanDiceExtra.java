@@ -148,7 +148,8 @@ public class CatanDiceExtra {
                     'K',
                     'R',
                     'C',
-                    'S'
+                    'S',
+                    'T'
             ));
             for (int i = 0; i < 10; i++) {
                 validformat.add(Integer.toString(i).charAt(0)); // Add 0-9 to list
@@ -158,7 +159,7 @@ public class CatanDiceExtra {
                     return false; // Check the format
                 }
             }
-            // ########### Now my code becomes spaghetti code T_T
+            // ###########
             Character buildType = action.charAt(5);
             if (ValidateBuildHelperFuncs.sufficentResourcesForBuild(boardState, buildType)) { // check for resources
                 return switch (buildType) {
@@ -292,7 +293,7 @@ public class CatanDiceExtra {
             private static boolean validateSettlementBuild(String boardState, String action) {
                 return !checkIfExists(boardState, action) && checkIfConnected(boardState, action);
             }
-
+            // #################### sub-helper functions below
             private static boolean sufficentResourcesForBuild(String boardState, Character buildType) {
                 final HashMap<Character, Resource> charToResource = new HashMap<>() {{ // maps to convert between our program and the assignment requirements.
                     put('b', Resource.brick);
@@ -307,6 +308,7 @@ public class CatanDiceExtra {
                     put("Solider", 'K');
                     put("Settlement", 'S');
                     put("Castle", 'C');
+                    put("City", 'T');
                 }};
                 // ###############
                 ArrayList<Resource> resources = new ArrayList<>();
@@ -323,7 +325,6 @@ public class CatanDiceExtra {
                 }
                 return false;
             }
-
             private static boolean checkBaseCase(String boardState, String action, Character buildType) {
                 if (buildType == 'R' && validateRoadLength(action)) {
                     if (boardState == "W00WXW00X00" || boardState == "X00WXW00X00") {
@@ -349,7 +350,6 @@ public class CatanDiceExtra {
                 }
                 return false;
             }
-
             private static boolean roadOnCoast(String action) {
                 final ArrayList<String> coastalRoadNodes = new ArrayList<>(Arrays.asList(
                         "03",
@@ -378,7 +378,6 @@ public class CatanDiceExtra {
                 }
                 return false;
             }
-
             private static boolean checkIfExists(String boardState, String action) {
                 String build = "";
                 if (action.charAt(5) == 'R') {
@@ -396,12 +395,11 @@ public class CatanDiceExtra {
                 }
                 return false;
             }
-
-            private static boolean checkIfConnected(String boardState, String action) { // TODO I think this can be written better, in a fashion similar to checkforSettlement();
+            private static boolean checkIfConnected(String boardState, String action) {
                 String playerBoardState = Misc.getPlayerBoardState(boardState);
                 int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
                 int currentIndex = 0;
-                while (playerBoardState.indexOf("R", currentIndex) != -1) {
+                while (playerBoardState.indexOf("R", currentIndex) != -1) { // Maybe make this a getRoadsFromPlayerBoardState() function??
                     int newIndex = playerBoardState.indexOf("R", currentIndex);
                     int firstCoord = Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex + 1)) + Character.toString(playerBoardState.charAt(newIndex + 2)));
                     int secondCoord = Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex + 3)) + Character.toString(playerBoardState.charAt(newIndex + 4)));
@@ -410,22 +408,8 @@ public class CatanDiceExtra {
                     }
                     currentIndex = newIndex + 1;
                 }
-                return (checkIfConnectedToBuildings(playerBoardState, actionCoord, "S") || checkIfConnectedToBuildings(playerBoardState, actionCoord, "T"));
-            }
-
-            private static boolean checkIfConnectedToBuildings(String playerBoardState, int actionCoord, String buildingType) {
-                int currentIndex = 0;
-                while (playerBoardState.indexOf(buildingType, currentIndex) != -1) {
-                    int newIndex = playerBoardState.indexOf(buildingType, currentIndex);
-                    int firstCoord = Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex + 1)) + Character.toString(playerBoardState.charAt(newIndex + 2)));
-                    if (actionCoord == firstCoord) {
-                        return true;
-                    }
-                    currentIndex = newIndex + 1;
-                }
                 return false;
             }
-
             private static boolean checkIfConnectedR(String boardState, String action) { // because roads have two coordinates we can check them both recursively.
                 String[] coords = Misc.getRoadCoordsFromAction(action);
                 if (validateRoadLength(action)) { // coordinates for the road can't be unreasonably far away.
@@ -433,7 +417,6 @@ public class CatanDiceExtra {
                 }
                 return false;
             }
-
             private static boolean validateRoadLength(String action) {
                 String[] coords = Misc.getRoadCoordsFromAction(action);
                 if (Math.abs(Integer.parseInt(coords[0]) - Integer.parseInt(coords[1])) <= 6) { // TODO find better fix for this instead of approximating (i.e. it thinks R1117 is a valid road but it isn't)
@@ -468,6 +451,9 @@ public class CatanDiceExtra {
                             else if (playerBoardState.contains("S" + coord)) {
                                 return true;
                             }
+                            else if (playerBoardState.contains("T" + coord)) {
+                                return true;
+                            }
                         }
                     }
                 }
@@ -486,14 +472,14 @@ public class CatanDiceExtra {
                             Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex+3)) +
                             Character.toString(playerBoardState.charAt(newIndex+4)))
                     );
-                    if (surroundingCoords.contains(road.get(0)) && surroundingCoords.contains(road.get(1))) { // This is kinda bad because hypothetical roads that don't exist could be valid like R1117
+                    if (surroundingCoords.contains(road.get(0)) && surroundingCoords.contains(road.get(1))) { // TODO This is kinda bad because hypothetical roads that don't exist could be valid like R1117
                         return true;
                     }
                     currentIndex = newIndex + 1;
                 }
                 return false;
             }
-            private static boolean settlementConnectedToKnight(String playerBoardState, ArrayList<Integer> surroundingCoords) { // Do we need to add one for cities too? Probably not right?
+            private static boolean settlementConnectedToKnight(String playerBoardState, ArrayList<Integer> surroundingCoords) { // TODO Do we need to add one for cities too? Probably not right?
                 int currentIndex = 0;
                 while (playerBoardState.indexOf("S", currentIndex) != -1) {
                     int newIndex = playerBoardState.indexOf("S", currentIndex);
