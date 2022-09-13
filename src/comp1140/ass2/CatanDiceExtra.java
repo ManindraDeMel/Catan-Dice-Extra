@@ -1,5 +1,6 @@
 package comp1140.ass2;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class CatanDiceExtra {
@@ -180,7 +181,7 @@ public class CatanDiceExtra {
                     return false;
                 }
             }
-            int numResources = action.length() - 4; // the -4 is for "keep"
+            int numResources = action.length() - 5; // the -4 is for "trade"
             ArrayList<Character> resources = Misc.getResourcesFromBoardState(boardState);
             int numGold = 0;
             for (Character c : resources) {
@@ -210,26 +211,6 @@ public class CatanDiceExtra {
         }
         // #######################################################################################
         public static boolean validateSwap(String boardState, String action) {
-            final Character[] coordinateToResource = new Character[]{
-                    'w',
-                    'g',
-                    'o',
-                    'o',
-                    'b',
-                    'l',
-                    'w',
-                    'g',
-                    'l',
-                    'b',
-                    'g',
-                    'w',
-                    'b',
-                    'l',
-                    'o',
-                    'o',
-                    'g',
-                    'w'
-            };
             ArrayList<Character> resources = Misc.getResourcesFromBoardState(boardState);
             Character resourceIn = action.charAt(4);
             Character resourceOut = action.charAt(5);
@@ -251,11 +232,11 @@ public class CatanDiceExtra {
                 return false; // Player has no usable knights
             }
             for (int location : locations) {
-                if (coordinateToResource[location] == resourceOut) {
-                    return true; // correct knight owned
-                }
-                else if (location == 9 || location == 10) {
+                if (location == 9 || location == 10) {
                     return true; // multipurpose knight owned
+                }
+                else if (Misc.coordinateToResource[location] == resourceOut) {
+                    return true; // correct knight owned
                 }
             }
             return false;
@@ -295,6 +276,12 @@ public class CatanDiceExtra {
             }
             // ####################
             private static boolean validateKnightBuild(String boardState, String action) {
+                int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
+                if (actionCoord >= 0 && actionCoord < 20) {
+                    ArrayList<Integer> surroundingCoords = Misc.knightIndexingToRowIndexing.get(actionCoord);
+                    String playerBoardState = Misc.getPlayerBoardState(boardState);
+                    return roadConnectedToKnight(playerBoardState, surroundingCoords) || settlementConnectedToKnight(playerBoardState, surroundingCoords);
+                }
                 return false;
             }
             // ####################
@@ -410,7 +397,7 @@ public class CatanDiceExtra {
                 return false;
             }
 
-            private static boolean checkIfConnected(String boardState, String action) { //TODO I think this can be written better, in a fashion similar to checkforSettlement();
+            private static boolean checkIfConnected(String boardState, String action) { // TODO I think this can be written better, in a fashion similar to checkforSettlement();
                 String playerBoardState = Misc.getPlayerBoardState(boardState);
                 int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
                 int currentIndex = 0;
@@ -486,11 +473,101 @@ public class CatanDiceExtra {
                 }
                 return false; // no common roads to connect to.
             }
+            private static boolean roadConnectedToKnight(String playerBoardState, ArrayList<Integer> surroundingCoords) {
+                int currentIndex = 0;
+                while (playerBoardState.indexOf("R", currentIndex) != -1) {
+                    int newIndex = playerBoardState.indexOf("R", currentIndex);
+                    ArrayList<Integer> road = new ArrayList<>();
+                    road.add(
+                            Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex+1)) +
+                            Character.toString(playerBoardState.charAt(newIndex+2)))
+                    );
+                    road.add(
+                            Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex+3)) +
+                            Character.toString(playerBoardState.charAt(newIndex+4)))
+                    );
+                    if (surroundingCoords.contains(road.get(0)) && surroundingCoords.contains(road.get(1))) { // This is kinda bad because hypothetical roads that don't exist could be valid like R1117
+                        return true;
+                    }
+                    currentIndex = newIndex + 1;
+                }
+                return false;
+            }
+            private static boolean settlementConnectedToKnight(String playerBoardState, ArrayList<Integer> surroundingCoords) { // Do we need to add one for cities too? Probably not right?
+                int currentIndex = 0;
+                while (playerBoardState.indexOf("S", currentIndex) != -1) {
+                    int newIndex = playerBoardState.indexOf("S", currentIndex);
+                    int coord  = Integer.parseInt(
+                            Character.toString(playerBoardState.charAt(newIndex+1)) + Character.toString(playerBoardState.charAt(newIndex+2))
+                    );
+                    if (surroundingCoords.contains(coord)) {
+                        return true;
+                    }
+                    currentIndex = newIndex + 1;
+                }
+                return false;
+            }
         }
         // ####################################################################################### Miscellaneous Helper functions / constants
         private class Misc {
-            private static final List<Character> possibleResources = new ArrayList<>(Arrays.asList('b', 'g', 'l', 'm', 'o', 'w')); // ValidateBuildHelperFuncs constants and methods
+            private static final List<Character> possibleResources = new ArrayList<>(Arrays.asList('b', 'g', 'l', 'm', 'o', 'w'));
 
+            private static final ArrayList<ArrayList<Integer>> knightIndexingToRowIndexing = new ArrayList<>(Arrays.asList(
+                    // # Row 1
+                    new ArrayList<>(Arrays.asList(0, 4, 8, 12, 7, 3)),
+                    new ArrayList<>(Arrays.asList(1, 5, 9, 13, 8, 4)),
+                    new ArrayList<>(Arrays.asList(2, 6, 10, 14, 9, 5)),
+                    // # Row 2
+                    new ArrayList<>(Arrays.asList(7, 12, 17, 22, 16, 11)),
+                    new ArrayList<>(Arrays.asList(8, 13, 18, 23, 17, 12)),
+                    new ArrayList<>(Arrays.asList(9, 14, 19, 24, 18, 13)),
+                    new ArrayList<>(Arrays.asList(10, 15, 20, 25, 19, 14)),
+                    // # Row 3
+                    new ArrayList<>(Arrays.asList(16, 22, 28, 33, 27, 21)),
+                    new ArrayList<>(Arrays.asList(17, 23, 29, 34, 28, 22)),
+
+                    new ArrayList<>(Arrays.asList(18, 24, 30, 35, 29, 23)), // duplication for tile 9 && 10
+                    new ArrayList<>(Arrays.asList(18, 24, 30, 35, 29, 23)),
+
+                    new ArrayList<>(Arrays.asList(19, 25, 31, 36, 30, 24)),
+                    new ArrayList<>(Arrays.asList(20, 26, 32, 37, 31, 25)),
+                    // # Row 4
+                    new ArrayList<>(Arrays.asList(28, 34, 39, 43, 38, 33)),
+                    new ArrayList<>(Arrays.asList(29, 35, 40, 44, 39, 34)),
+                    new ArrayList<>(Arrays.asList(30, 36, 41, 45, 40, 35)),
+                    new ArrayList<>(Arrays.asList(31, 37, 42, 46, 41, 36)),
+                    // # Row 5
+                    new ArrayList<>(Arrays.asList(39, 44, 48, 51, 47, 43)),
+                    new ArrayList<>(Arrays.asList(40, 45, 49, 52, 48, 44)),
+                    new ArrayList<>(Arrays.asList(41, 46, 50, 53, 49, 45))
+            ));
+            final static Character[] coordinateToResource = new Character[]{
+                    // # Row 1
+                    'w',
+                    'g',
+                    'o',
+                    // # Row 2
+                    'o',
+                    'b',
+                    'l',
+                    'w',
+                    // # Row 3
+                    'g',
+                    'l',
+                    'm',
+                    'm',
+                    'b',
+                    'g',
+                    // # Row 4
+                    'w',
+                    'b',
+                    'l',
+                    'o',
+                    // # Row 5
+                    'o',
+                    'g',
+                    'w'
+            };
             //
             private static ArrayList<Character> getResourcesFromBoardState(String boardState) {
                 ArrayList<Character> resources = new ArrayList<>();
