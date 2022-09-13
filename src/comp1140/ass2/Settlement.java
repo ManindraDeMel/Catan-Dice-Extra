@@ -7,9 +7,11 @@ public class Settlement extends GamePiece{
     public Boolean isCityable;
     public Boolean isCity;
     public Boolean isBuilt;
-    public Coordinate[] location;
+    public Coordinate location;
 
-    Settlement(Player player) {
+    Settlement(Player player, Coordinate coord, Boolean cityable) {
         super(player);
+        this.location = coord;
+        this.isCityable=cityable;
     }
 }
