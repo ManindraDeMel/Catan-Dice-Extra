@@ -45,7 +45,6 @@ public class Board {
                 }
                 this.tiles[tilenum] = new Tile(new Player(), tilecoords);
                 tilenum++;
-                if
                 this.settlements[settlenum] = new Settlement(new Player(), new Coordinate(x, y), cityable);
             }
             if (y<3) {
