@@ -1,6 +1,4 @@
 package comp1140.ass2;
-
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class CatanDiceExtra {
