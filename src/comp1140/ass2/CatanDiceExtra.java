@@ -122,7 +122,86 @@ public class CatanDiceExtra {
      */
     public static int[] longestRoad(String boardState) {
         // FIXME: Task 8a
-        return null;
+
+        // Getting strings of different sections
+        String turn = boardState.substring(0, boardState.indexOf('W', 1));
+        String playerW = boardState.substring(boardState.indexOf('W', 1), boardState.indexOf('X', 1));
+        String playerX = boardState.substring(boardState.indexOf('X', 1), boardState.indexOf('W', boardState.indexOf('X', 1)));
+        String rest = boardState.substring(boardState.indexOf('W', boardState.indexOf('X', 1)));
+
+
+//        System.out.println(turn);
+//        System.out.println(playerW);
+//        System.out.println(playerX);
+//        System.out.println(rest);
+
+        // Array to store the longest roads of each player
+        int[] longRoadArr = new int[2];
+
+
+        int countW = (int) playerW.chars().filter(ch -> ch == 'R').count();
+
+        String roadsW = "";
+
+        if (countW != 0) {
+            roadsW = playerW.substring(playerW.indexOf('R'), playerW.indexOf('R') + countW * 5);
+            longRoadArr[0] += 1;
+        }
+
+        for (int i = 0; i < countW - 1; i++) {
+            if (roadsW.substring(3 + i*5, 5 + i*5).equals(roadsW.substring(3 + (i+0)*5 + 3, 5 + (i+0)*5 + 3)))
+                longRoadArr[0] += 1;
+//            System.out.println(roads);
+//            else
+//                System.out.println(roadsW.substring(3 + i * 5, 5 + i * 5) + " " + roadsW.substring(3 + (i + 1) * 5, 5 + (i + 1) * 5));
+//                System.out.println(roadsW);
+        }
+
+//        longRoadArr[0] = count;
+
+        int count = (int) playerX.chars().filter(ch -> ch == 'R').count();
+//        longRoadArr[1] = (int) playerX.chars().filter(ch -> ch == 'R').count();
+        String roads = "";
+
+        if (count != 0) {
+            roads = playerX.substring(playerX.indexOf('R'), playerX.indexOf('R') + count * 5);
+            longRoadArr[1] += 1;
+        }
+
+        for (int i = 0; i < count - 1; i++) {
+            if (roads.substring(3 + i * 5, 5 + i * 5).equals(roads.substring(3 + (i + 0) * 5 + 3, 5 + (i + 0) * 5 + 3)))
+//                System.out.println(roads.substring(3 + i * 5, 5 + i * 5) + " " + roads.substring(3 + (i + 1) * 5, 5 + (i + 1) * 5));
+                longRoadArr[1] += 1;
+//            else
+//                System.out.println(roads.substring(3 + i * 5, 5 + i * 5) + " " + roads.substring(3 + (i + 1) * 5, 5 + (i + 1) * 5));
+//                System.out.println(roads);
+
+        }
+
+        System.out.println();
+        System.out.println("----------");
+        System.out.println(Arrays.toString(longRoadArr));
+        System.out.println("W: " + countW + " - " + playerW + " Roads: " + roadsW);
+        System.out.println("X: " + count + " - " + playerX + " Roads: " + roads);
+
+        for (int i = 0; i < countW - 1; i++) {
+//            if (roadsW.substring(3 + i*5, 5 + i*5).equals(roadsW.substring(3 + (i+1)*5, 5 + (i+1)*5)))
+//                longRoadArr[0] += 1;
+////            System.out.println(roads);
+//            else
+            System.out.println(roadsW.substring(3 + i * 5, 5 + i * 5) + " " + roadsW.substring(3 + (i + 0) * 5 + 3, 5 + (i + 0) * 5 + 3));
+//                System.out.println(roadsW);
+        }
+            System.out.println("-----------");
+//        System.out.println();
+
+
+
+//        System.out.println(Arrays.toString(longRoadArr));
+//        System.out.println(playerW);
+//        System.out.println(playerX);
+
+        return longRoadArr;
     }
 
     /**
