@@ -470,8 +470,24 @@ public class CatanDiceExtra {
                             Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex+3)) +
                             Character.toString(playerBoardState.charAt(newIndex+4)))
                     );
-                    if (surroundingCoords.contains(road.get(0)) && surroundingCoords.contains(road.get(1))) { // TODO This is kinda bad because hypothetical roads that don't exist could be valid like R1117
-                        return true;
+
+                    if (surroundingCoords.contains(road.get(0)) && surroundingCoords.contains(road.get(1))) {
+                        int indexOfOneCoord = surroundingCoords.indexOf(road.get(0)); // check if the roads are next to each other
+                        if (indexOfOneCoord == 0) { // borders
+                            if (surroundingCoords.get(1) == road.get(1) || surroundingCoords.get(surroundingCoords.size() - 1) == road.get(1)) {
+                                return true;
+                            }
+                        }
+                        else if (indexOfOneCoord == surroundingCoords.size() - 1) { // borders
+                            if (surroundingCoords.get(0) == road.get(1) || surroundingCoords.get(surroundingCoords.size() - 1) == road.get(1)) {
+                                return true;
+                            }
+                        }
+                        else {
+                            if (surroundingCoords.get(indexOfOneCoord - 1) == road.get(1) || surroundingCoords.get(indexOfOneCoord + 1) == road.get(1)) {
+                                return true;
+                            }
+                        }
                     }
                     currentIndex = newIndex + 1;
                 }
