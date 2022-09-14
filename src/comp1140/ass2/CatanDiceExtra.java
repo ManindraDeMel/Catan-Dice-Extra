@@ -511,10 +511,13 @@ public class CatanDiceExtra {
                 }
                 return false;
             }
-            private static boolean settlementConnectedToKnight(String playerBoardState, ArrayList<Integer> surroundingCoords) { // TODO Do we need to add one for cities too? Probably not right?
+            private static boolean settlementConnectedToKnight(String playerBoardState, ArrayList<Integer> surroundingCoords) {
+                return settlementConnectedToKnightHelper(playerBoardState, surroundingCoords, "S") || settlementConnectedToKnightHelper(playerBoardState, surroundingCoords, "T");
+            }
+            private static boolean settlementConnectedToKnightHelper (String playerBoardState, ArrayList<Integer> surroundingCoords, String buildtype) {
                 int currentIndex = 0;
-                while (playerBoardState.indexOf("S", currentIndex) != -1) {
-                    int newIndex = playerBoardState.indexOf("S", currentIndex);
+                while (playerBoardState.indexOf(buildtype, currentIndex) != -1) {
+                    int newIndex = playerBoardState.indexOf(buildtype, currentIndex);
                     int coord  = Integer.parseInt(
                             Character.toString(playerBoardState.charAt(newIndex+1)) + Character.toString(playerBoardState.charAt(newIndex+2))
                     );
