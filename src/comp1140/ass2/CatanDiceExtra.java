@@ -328,19 +328,21 @@ public class CatanDiceExtra {
                     if (boardState == "W00WXW00X00" || boardState == "X00WXW00X00") {
                         return roadOnCoast(action);
                     }
-                    else if (boardState.length() == 16 && boardState.contains("R")) { // 2nd turn check it doesn't overlap with another enemy road. TODO Does it need to be 5 tiles away?
-                        ArrayList<String> actionLocations = new ArrayList<>(Arrays.asList(
-                                Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)),
-                                Character.toString(action.charAt(action.length() - 4)) + Character.toString(action.charAt(action.length() - 3))
+                    else if (boardState.length() == 16 && boardState.contains("R")) {
+                        ArrayList<Integer> actionLocations = new ArrayList<>(Arrays.asList(
+                                Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1))),
+                                Integer.parseInt(Character.toString(action.charAt(action.length() - 4)) + Character.toString(action.charAt(action.length() - 3)))
                         ));
                         int indexOfRoad = boardState.indexOf("R");
-                        ArrayList<String> boardLocations = new ArrayList<>(Arrays.asList(
-                                Character.toString(boardState.charAt(indexOfRoad + 1)) + Character.toString(boardState.charAt(indexOfRoad + 2)),
-                                Character.toString(boardState.charAt(indexOfRoad + 3)) + Character.toString(boardState.charAt(indexOfRoad + 4))
+                        ArrayList<Integer> boardLocations = new ArrayList<>(Arrays.asList(
+                                Integer.parseInt(Character.toString(boardState.charAt(indexOfRoad + 1)) + Character.toString(boardState.charAt(indexOfRoad + 2))),
+                                Integer.parseInt(Character.toString(boardState.charAt(indexOfRoad + 3)) + Character.toString(boardState.charAt(indexOfRoad + 4)))
                         ));
-                        for (String s : boardLocations) {
-                            if (actionLocations.contains(s)) {
-                                return false;
+                        for (int i = 0; i < 2; i++) {
+                            for (int j = 0; j < 2; j ++) {
+                                if (Misc.getDistance(Misc.convertToCoordinate(actionLocations.get(i)), Misc.convertToCoordinate((boardLocations.get(j)))) < 5) {
+                                    return false;
+                                }
                             }
                         }
                         return roadOnCoast(action);
@@ -618,10 +620,23 @@ public class CatanDiceExtra {
                 }
                 return result;
             }
+            private static Coordinate convertToCoordinate(int boardCoord) {
+                int yCoord = 0, xCoord = 0;
+                for (int hexIndex = 0; hexIndex < Misc.knightIndexingToRowIndexing.size(); hexIndex++) {
+                    if (Misc.knightIndexingToRowIndexing.get(hexIndex).contains(boardCoord)) {
+                        yCoord = hexIndex;
+                        xCoord = Misc.knightIndexingToRowIndexing.get(hexIndex).indexOf(boardCoord);
+                    }
+                }
+                return new Coordinate(xCoord, yCoord);
+            }
             private static String[] getRoadCoordsFromAction(String action) {
                 String firstCoord = Character.toString(action.charAt(action.length() - 4)) + Character.toString(action.charAt(action.length() - 3));
                 String secondCoord = Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1));
                 return new String[]{firstCoord, secondCoord};
+            }
+            private static double getDistance(Coordinate a, Coordinate b) {
+                return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
             }
         }
     }
