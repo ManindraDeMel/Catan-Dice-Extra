@@ -417,8 +417,26 @@ public class CatanDiceExtra {
             }
             private static boolean validateRoadLength(String action) {
                 String[] coords = Misc.getRoadCoordsFromAction(action);
-                if (Math.abs(Integer.parseInt(coords[0]) - Integer.parseInt(coords[1])) <= 6) { // TODO find better fix for this instead of approximating (i.e. it thinks R1117 is a valid road but it isn't)
-                    return true;
+                ArrayList<ArrayList<Integer>> roads = Misc.knightIndexingToRowIndexing;
+                for (ArrayList<Integer> hexCoords : roads) {
+                    if (hexCoords.contains(Integer.parseInt(coords[0]))) {
+                        int indexOfOneCoord = hexCoords.indexOf(Integer.parseInt(coords[0]));
+                        if (indexOfOneCoord == 0) {
+                            if (hexCoords.get(1) == Integer.parseInt(coords[1]) || hexCoords.get(hexCoords.size() - 1) == Integer.parseInt(coords[1])) {
+                                return true;
+                            }
+                        }
+                        else if (indexOfOneCoord == hexCoords.size() - 1) {
+                            if (hexCoords.get(0) == Integer.parseInt(coords[1]) || hexCoords.get(hexCoords.size() - 2) == Integer.parseInt(coords[1])) {
+                                return true;
+                            }
+                        }
+                        else {
+                            if (hexCoords.get(indexOfOneCoord - 1) == Integer.parseInt(coords[1]) || hexCoords.get(indexOfOneCoord + 1) == Integer.parseInt(coords[1])) {
+                                return true;
+                            }
+                        }
+                    }
                 }
                 return false;
             }
@@ -479,7 +497,7 @@ public class CatanDiceExtra {
                             }
                         }
                         else if (indexOfOneCoord == surroundingCoords.size() - 1) { // borders
-                            if (surroundingCoords.get(0) == road.get(1) || surroundingCoords.get(surroundingCoords.size() - 1) == road.get(1)) {
+                            if (surroundingCoords.get(0) == road.get(1) || surroundingCoords.get(surroundingCoords.size() - 2) == road.get(1)) {
                                 return true;
                             }
                         }
