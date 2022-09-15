@@ -1,8 +1,6 @@
 package comp1140.ass2;
-<<<<<<< HEAD
+import org.jetbrains.annotations.NotNull;
 
-=======
->>>>>>> parent of 42d40c7 (layout for 8a)
 import java.util.*;
 
 public class CatanDiceExtra {
@@ -606,12 +604,23 @@ public class CatanDiceExtra {
                 return resources;
             }
 
-            private static String getPlayerBoardState(String boardState) {
+            public static String getPlayerBoardState(String boardState) {
                 HashMap<Character, String> switchPlayers = new HashMap<>() {{
                     put('W', "X");
                     put('X', "W");
                 }};
                 Character playerTurn = boardState.charAt(0);
+                return getString(boardState, playerTurn, switchPlayers);
+            }
+            public static String getPlayerBoardState(String boardState, Character playerTurn) {
+                HashMap<Character, String> switchPlayers = new HashMap<>() {{
+                    put('W', "X");
+                    put('X', "W");
+                }};
+                return getString(boardState, playerTurn, switchPlayers);
+            }
+            @NotNull
+            private static String getString(String boardState, Character playerTurn, HashMap<Character, String> switchPlayers) {
                 int startOfPlayerBoardState = boardState.indexOf(Character.toString(playerTurn), 1);
                 int endOfPlayerBoardState = boardState.indexOf(switchPlayers.get(playerTurn), startOfPlayerBoardState);
                 List<Character> playerBoardState = new ArrayList<>();
@@ -624,6 +633,7 @@ public class CatanDiceExtra {
                 }
                 return result;
             }
+
             private static Coordinate convertToCoordinate(int boardCoord) {
                 int yCoord = 0, xCoord = 0;
                 for (int hexIndex = 0; hexIndex < Misc.knightIndexingToRowIndexing.size(); hexIndex++) {
@@ -660,6 +670,18 @@ public class CatanDiceExtra {
         // FIXME: Task 8a
         return null;
     }
+    private class longestRoadHelper {
+        public static ArrayList<ArrayList<ArrayList<Integer>>> getRoads(Character player, String boardState) {
+            String[] playerBoardStates = new String[]{validateClass.Misc.getPlayerBoardState(boardState, 'W'), validateClass.Misc.getPlayerBoardState(boardState, 'X')};
+            return null;
+        }
+        public static HashMap<Integer, ArrayList<Integer>> generateGraph(ArrayList<ArrayList<Integer>> roads) {
+            return null;
+        }
+        public static int getLongestRoad(HashMap<Integer, ArrayList<Integer>> graph) {
+            return 0;
+        }
+    }
 
     /**
      * Return an integer array containing the size of the army owned by
@@ -674,18 +696,7 @@ public class CatanDiceExtra {
      */
     public static int[] largestArmy(String boardState) {
         // FIXME: Task 8b
-
-        int[] largeArmy = new int[2];
-
-        // Extracting the Board State of each player
-        String playerW = boardState.substring(boardState.indexOf('W', 1), boardState.indexOf('X', 1));
-        String playerX = boardState.substring(boardState.indexOf('X', 1), boardState.indexOf('W', boardState.indexOf('X', 1)));
-
-        // Checking the army size for each player
-        largeArmy[0]= (int) playerW.chars().filter(ch -> ch == 'K').count() + (int) playerW.chars().filter(ch -> ch == 'J').count();
-        largeArmy[1] = (int) playerX.chars().filter(ch -> ch == 'K').count() + (int) playerX.chars().filter(ch -> ch == 'J').count();
-
-        return largeArmy;
+        return null;
     }
 
     /**
