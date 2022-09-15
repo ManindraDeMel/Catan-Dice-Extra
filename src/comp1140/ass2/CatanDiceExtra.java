@@ -1,8 +1,5 @@
 package comp1140.ass2;
 
-import comp1140.ass2.test.pair;
-import comp1140.ass2.test.GFG;
-
 import java.util.*;
 
 public class CatanDiceExtra {
@@ -124,10 +121,8 @@ public class CatanDiceExtra {
      */
     public static int[] longestRoad(String boardState) {
         // FIXME: Task 8a
-        return null
+        return null;
     }
-
-
 
     /**
      * Return an integer array containing the size of the army owned by
@@ -143,30 +138,17 @@ public class CatanDiceExtra {
     public static int[] largestArmy(String boardState) {
         // FIXME: Task 8b
 
-        int[] largeArr = new int[2];
+        int[] largeArmy = new int[2];
 
+        // Extracting the Board State of each player
         String playerW = boardState.substring(boardState.indexOf('W', 1), boardState.indexOf('X', 1));
         String playerX = boardState.substring(boardState.indexOf('X', 1), boardState.indexOf('W', boardState.indexOf('X', 1)));
 
-        int countW = (int) playerW.chars().filter(ch -> ch == 'K').count() + (int) playerW.chars().filter(ch -> ch == 'J').count();
-        int countX = (int) playerX.chars().filter(ch -> ch == 'K').count() + (int) playerX.chars().filter(ch -> ch == 'J').count();
+        // Checking the army size for each player
+        largeArmy[0]= (int) playerW.chars().filter(ch -> ch == 'K').count() + (int) playerW.chars().filter(ch -> ch == 'J').count();
+        largeArmy[1] = (int) playerX.chars().filter(ch -> ch == 'K').count() + (int) playerX.chars().filter(ch -> ch == 'J').count();
 
-        largeArr[0] = countW;
-        largeArr[1] = countX;
-
-        System.out.println("-------------------------");
-        System.out.println(Arrays.toString(largeArr));
-        System.out.println("W: " + playerW);
-        System.out.println("X: " + playerX);
-        System.out.println("-------------------------");
-        System.out.println();
-
-
-//        String roadsW = "";
-//        if (countW != 0)
-//            roadsW = playerW.substring(playerW.indexOf('R'), playerW.indexOf('R') + countW * 5);
-
-        return largeArr;
+        return largeArmy;
     }
 
     /**
