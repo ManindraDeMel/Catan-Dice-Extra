@@ -1,4 +1,5 @@
 package comp1140.ass2;
+
 import java.util.*;
 
 public class CatanDiceExtra {
@@ -670,7 +671,18 @@ public class CatanDiceExtra {
      */
     public static int[] largestArmy(String boardState) {
         // FIXME: Task 8b
-        return null;
+
+        int[] largeArmy = new int[2];
+
+        // Extracting the Board State of each player
+        String playerW = boardState.substring(boardState.indexOf('W', 1), boardState.indexOf('X', 1));
+        String playerX = boardState.substring(boardState.indexOf('X', 1), boardState.indexOf('W', boardState.indexOf('X', 1)));
+
+        // Checking the army size for each player
+        largeArmy[0]= (int) playerW.chars().filter(ch -> ch == 'K').count() + (int) playerW.chars().filter(ch -> ch == 'J').count();
+        largeArmy[1] = (int) playerX.chars().filter(ch -> ch == 'K').count() + (int) playerX.chars().filter(ch -> ch == 'J').count();
+
+        return largeArmy;
     }
 
     /**
