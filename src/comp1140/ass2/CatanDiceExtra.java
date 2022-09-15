@@ -711,16 +711,11 @@ public class CatanDiceExtra {
             return graph;
         }
         public static int getLongestRoad(HashMap<ArrayList<Integer>, ArrayList<ArrayList<Integer>>> graph) {
-            ArrayList<Integer> coastalNodesInt = new ArrayList<>();
-            for (String s : validateClass.Misc.coastalRoadNodes) {
-                coastalNodesInt.add(Integer.parseInt(s));
-            }
+            ArrayList<Integer> differentLengths = new ArrayList<>();
             for (ArrayList<Integer> road : graph.keySet()) {
-                if (coastalNodesInt.contains(road.get(0)) || coastalNodesInt.contains(road.get(1))) {
-                    return getLongestRoadHelper(1, graph.get(road), graph);
-                }
+                differentLengths.add(getLongestRoadHelper(1, graph.get(road), graph));
             }
-            return -1; // if there are no coastal roads
+            return Collections.max(differentLengths);
         }
         public static int getLongestRoadHelper(int counter, ArrayList<ArrayList<Integer>> connectedRoads, HashMap<ArrayList<Integer>, ArrayList<ArrayList<Integer>>> graph) {
             if (connectedRoads.size() == 0) {
