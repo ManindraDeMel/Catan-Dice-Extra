@@ -351,28 +351,8 @@ public class CatanDiceExtra {
                 return false;
             }
             private static boolean roadOnCoast(String action) {
-                final ArrayList<String> coastalRoadNodes = new ArrayList<>(Arrays.asList(
-                        "03",
-                        "07",
-                        "16",
-                        "21",
-                        "33",
-                        "43",
-                        "47",
-                        "48",
-                        "49",
-                        "50",
-                        "46",
-                        "37",
-                        "32",
-                        "20",
-                        "10",
-                        "06",
-                        "05",
-                        "04"
-                ));
                 for (String s : Misc.getRoadCoordsFromAction(action)) {
-                    if (coastalRoadNodes.contains(s)) {
+                    if (Misc.coastalRoadNodes.contains(s)) {
                         return true;
                     }
                 }
@@ -591,6 +571,26 @@ public class CatanDiceExtra {
                     'g',
                     'w'
             };
+            final static ArrayList<String> coastalRoadNodes = new ArrayList<>(Arrays.asList(
+                    "03",
+                    "07",
+                    "16",
+                    "21",
+                    "33",
+                    "43",
+                    "47",
+                    "48",
+                    "49",
+                    "50",
+                    "46",
+                    "37",
+                    "32",
+                    "20",
+                    "10",
+                    "06",
+                    "05",
+                    "04"
+            ));
             //
             private static ArrayList<Character> getResourcesFromBoardState(String boardState) {
                 ArrayList<Character> resources = new ArrayList<>();
@@ -664,63 +664,75 @@ public class CatanDiceExtra {
      * @return array of contiguous road lengths, one per player.
      */
     public static int[] longestRoad(String boardState) {
-        // FIXME: Task 8a
-        return null;
+        int[] longestRoadArr = new int[2];
+        char[] players = new char[]{'W', 'X'};
+        for (int i = 0; i < players.length; i++) {
+            char player = players[i];
+            ArrayList<ArrayList<Integer>> playerRoads = longestRoadHelper.getRoads(player, boardState);
+            if (playerRoads.size() != 0) { // has at least 1 road
+                longestRoadArr[i] = longestRoadHelper.getLongestRoad(longestRoadHelper.generateGraph(playerRoads));
+            }
+            else {
+                longestRoadArr[i] = 0;
+            }
+        }
+        return longestRoadArr;
     }
     private class longestRoadHelper {
-        private static ArrayList<ArrayList<Integer>> knightNeighbours = new ArrayList<>(Arrays.asList(
-                new ArrayList<>(Arrays.asList(1, 3, 4)),
-                new ArrayList<>(Arrays.asList(0, 4, 5, 2)),
-                new ArrayList<>(Arrays.asList(1, 5, 6)),
-
-                new ArrayList<>(Arrays.asList(0, 4, 8, 7)),
-                new ArrayList<>(Arrays.asList(0, 1, 5, 9, 9, 3)),
-                new ArrayList<>(Arrays.asList(1, 2, 6, 11, 9, 4)),
-                new ArrayList<>(Arrays.asList(2, 5, 11, 12)),
-
-                new ArrayList<>(Arrays.asList(3, 8, 13)),
-                new ArrayList<>(Arrays.asList(3, 4, 9, 14, 13, 7)),
-                new ArrayList<>(Arrays.asList(4, 5, 11, 15, 14, 8)),
-                new ArrayList<>(Arrays.asList(4, 5, 11, 15, 14, 8)),
-                new ArrayList<>(Arrays.asList(5, 6, 12, 16, 15, 9)),
-                new ArrayList<>(Arrays.asList(6, 11, 16)),
-
-                new ArrayList<>(Arrays.asList(7, 8, 14, 17)),
-                new ArrayList<>(Arrays.asList(8, 9, 15, 18, 17, 13)),
-                new ArrayList<>(Arrays.asList(9, 11, 16, 19, 18, 14)),
-                new ArrayList<>(Arrays.asList(12, 11, 15, 19)),
-
-                new ArrayList<>(Arrays.asList(13, 14, 18)),
-                new ArrayList<>(Arrays.asList(17, 14, 15, 19)),
-                new ArrayList<>(Arrays.asList(18, 15, 16))
-        ));
         public static ArrayList<ArrayList<Integer>> getRoad(String playerBoardState) {
             int currentIndex = 0;
             ArrayList<ArrayList<Integer>> roads = new ArrayList<>();
             while (playerBoardState.indexOf("R", currentIndex) != -1) {
-                int newIndex = playerBoardState.indexOf("R", 1);
+                int newIndex = playerBoardState.indexOf("R", currentIndex);
                 roads.add(new ArrayList<>(Arrays.asList(
-                        Integer.parseInt(Character.toString(playerBoardState.indexOf(newIndex+1))),
-                        Integer.parseInt(Character.toString(playerBoardState.indexOf(newIndex+2)))
+                        Integer.parseInt(Character.toString(playerBoardState.toCharArray()[newIndex+1]) + Character.toString(playerBoardState.toCharArray()[newIndex+2])),
+                        Integer.parseInt(Character.toString(playerBoardState.toCharArray()[newIndex+3]) + Character.toString(playerBoardState.toCharArray()[newIndex+4]))
                 )));
-                currentIndex = newIndex;
+                currentIndex = newIndex + 1;
             }
             return roads;
         }
-        public static ArrayList<ArrayList<ArrayList<Integer>>> getRoads(Character player, String boardState) {
-            HashMap<Character, Character> switchPlayers = new HashMap<>() {{
-                put('W', 'X');
-                put('X', 'W');
-            }};
-            ArrayList<ArrayList<Integer>> playerRoads = getRoad(validateClass.Misc.getPlayerBoardState(boardState, player));
-            ArrayList<ArrayList<Integer>> otherPlayerRoads = getRoad(validateClass.Misc.getPlayerBoardState(boardState, switchPlayers.get(player)));
-            return new ArrayList<>(Arrays.asList(playerRoads, otherPlayerRoads));
+        public static ArrayList<ArrayList<Integer>> getRoads(Character player, String boardState) {
+            return getRoad(validateClass.Misc.getPlayerBoardState(boardState, player));
         }
-        public static HashMap<Integer, ArrayList<Integer>> generateGraph(ArrayList<ArrayList<ArrayList<Integer>>> roads) {
-            return null;
+        public static HashMap<ArrayList<Integer>, ArrayList<ArrayList<Integer>>> generateGraph(ArrayList<ArrayList<Integer>> roads) {
+            HashMap<ArrayList<Integer>, ArrayList<ArrayList<Integer>>> graph = new HashMap<>();
+            for(ArrayList<Integer> road : roads) {
+                ArrayList<ArrayList<Integer>> connectedRoads = new ArrayList<>();
+                for (ArrayList<Integer> road2 : roads) {
+                    if (road != road2) {
+                        if (road.get(1) == road2.get(0)) {
+                                connectedRoads.add(road2);
+                        }
+                    }
+                }
+                graph.put(road, connectedRoads);
+            }
+            return graph;
         }
-        public static int getLongestRoad(HashMap<Integer, ArrayList<Integer>> graph) {
-            return 0;
+        public static int getLongestRoad(HashMap<ArrayList<Integer>, ArrayList<ArrayList<Integer>>> graph) {
+            ArrayList<Integer> coastalNodesInt = new ArrayList<>();
+            for (String s : validateClass.Misc.coastalRoadNodes) {
+                coastalNodesInt.add(Integer.parseInt(s));
+            }
+            for (ArrayList<Integer> road : graph.keySet()) {
+                if (coastalNodesInt.contains(road.get(0)) || coastalNodesInt.contains(road.get(1))) {
+                    return getLongestRoadHelper(1, graph.get(road), graph);
+                }
+            }
+            return -1; // if there are no coastal roads
+        }
+        public static int getLongestRoadHelper(int counter, ArrayList<ArrayList<Integer>> connectedRoads, HashMap<ArrayList<Integer>, ArrayList<ArrayList<Integer>>> graph) {
+            if (connectedRoads.size() == 0) {
+                return counter;
+            }
+            ArrayList<Integer> children = new ArrayList<>();
+            counter++;
+            for (ArrayList<Integer> road : connectedRoads) { // basic recursion
+                int debug = getLongestRoadHelper(counter, graph.get(road), graph);
+                children.add(debug);
+            }
+            return Collections.max(children);
         }
     }
 
