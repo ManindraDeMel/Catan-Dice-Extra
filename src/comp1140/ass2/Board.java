@@ -1,10 +1,10 @@
 package comp1140.ass2;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Board {
-    HashMap <Tile, GamePiece>[][] pieces;
-
     public void instatiateBoard() {
 
     }
