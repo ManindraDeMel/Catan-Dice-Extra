@@ -1,6 +1,4 @@
 package comp1140.ass2;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.*;
 
 public class CatanDiceExtra {
@@ -619,7 +617,6 @@ public class CatanDiceExtra {
                 }};
                 return getString(boardState, playerTurn, switchPlayers);
             }
-            @NotNull
             private static String getString(String boardState, Character playerTurn, HashMap<Character, String> switchPlayers) {
                 int startOfPlayerBoardState = boardState.indexOf(Character.toString(playerTurn), 1);
                 int endOfPlayerBoardState = boardState.indexOf(switchPlayers.get(playerTurn), startOfPlayerBoardState);
@@ -695,8 +692,18 @@ public class CatanDiceExtra {
      * @return array of army sizes, one per player.
      */
     public static int[] largestArmy(String boardState) {
-        // FIXME: Task 8b
-        return null;
+        int[] largeArmy = new int[2];
+
+        // Extracting the Board State of each player
+        String playerW = boardState.substring(boardState.indexOf('W', 1), boardState.indexOf('X', 1));
+        String playerX = boardState.substring(boardState.indexOf('X', 1), boardState.indexOf('W', boardState.indexOf('X', 1)));
+
+        // Checking the army size for each player
+        largeArmy[0]= (int) playerW.chars().filter(ch -> ch == 'K').count() + (int) playerW.chars().filter(ch -> ch == 'J').count();
+        largeArmy[1] = (int) playerX.chars().filter(ch -> ch == 'K').count() + (int) playerX.chars().filter(ch -> ch == 'J').count();
+
+        return largeArmy;
+
     }
 
     /**
