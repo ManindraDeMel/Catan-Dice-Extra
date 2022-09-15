@@ -656,6 +656,17 @@ public class CatanDiceExtra {
         // FIXME: Task 8a
         return null;
     }
+    private class longestRoadHelper {
+        public static ArrayList<ArrayList<Integer>> getRoads(Character player, String boardState) {
+            return null;
+        }
+        public static HashMap<Integer, ArrayList<Integer>> generateGraph(ArrayList<ArrayList<Integer>> roads) {
+            return null;
+        }
+        public static int DFS(HashMap<Integer, ArrayList<Integer>> graph) {
+            return 0;
+        }
+    }
 
     /**
      * Return an integer array containing the size of the army owned by
