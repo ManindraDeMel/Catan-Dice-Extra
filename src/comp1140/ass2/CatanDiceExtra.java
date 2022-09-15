@@ -668,11 +668,55 @@ public class CatanDiceExtra {
         return null;
     }
     private class longestRoadHelper {
-        public static ArrayList<ArrayList<ArrayList<Integer>>> getRoads(Character player, String boardState) {
-            String[] playerBoardStates = new String[]{validateClass.Misc.getPlayerBoardState(boardState, 'W'), validateClass.Misc.getPlayerBoardState(boardState, 'X')};
-            return null;
+        private static ArrayList<ArrayList<Integer>> knightNeighbours = new ArrayList<>(Arrays.asList(
+                new ArrayList<>(Arrays.asList(1, 3, 4)),
+                new ArrayList<>(Arrays.asList(0, 4, 5, 2)),
+                new ArrayList<>(Arrays.asList(1, 5, 6)),
+
+                new ArrayList<>(Arrays.asList(0, 4, 8, 7)),
+                new ArrayList<>(Arrays.asList(0, 1, 5, 9, 9, 3)),
+                new ArrayList<>(Arrays.asList(1, 2, 6, 11, 9, 4)),
+                new ArrayList<>(Arrays.asList(2, 5, 11, 12)),
+
+                new ArrayList<>(Arrays.asList(3, 8, 13)),
+                new ArrayList<>(Arrays.asList(3, 4, 9, 14, 13, 7)),
+                new ArrayList<>(Arrays.asList(4, 5, 11, 15, 14, 8)),
+                new ArrayList<>(Arrays.asList(4, 5, 11, 15, 14, 8)),
+                new ArrayList<>(Arrays.asList(5, 6, 12, 16, 15, 9)),
+                new ArrayList<>(Arrays.asList(6, 11, 16)),
+
+                new ArrayList<>(Arrays.asList(7, 8, 14, 17)),
+                new ArrayList<>(Arrays.asList(8, 9, 15, 18, 17, 13)),
+                new ArrayList<>(Arrays.asList(9, 11, 16, 19, 18, 14)),
+                new ArrayList<>(Arrays.asList(12, 11, 15, 19)),
+
+                new ArrayList<>(Arrays.asList(13, 14, 18)),
+                new ArrayList<>(Arrays.asList(17, 14, 15, 19)),
+                new ArrayList<>(Arrays.asList(18, 15, 16))
+        ));
+        public static ArrayList<ArrayList<Integer>> getRoad(String playerBoardState) {
+            int currentIndex = 0;
+            ArrayList<ArrayList<Integer>> roads = new ArrayList<>();
+            while (playerBoardState.indexOf("R", currentIndex) != -1) {
+                int newIndex = playerBoardState.indexOf("R", 1);
+                roads.add(new ArrayList<>(Arrays.asList(
+                        Integer.parseInt(Character.toString(playerBoardState.indexOf(newIndex+1))),
+                        Integer.parseInt(Character.toString(playerBoardState.indexOf(newIndex+2)))
+                )));
+                currentIndex = newIndex;
+            }
+            return roads;
         }
-        public static HashMap<Integer, ArrayList<Integer>> generateGraph(ArrayList<ArrayList<Integer>> roads) {
+        public static ArrayList<ArrayList<ArrayList<Integer>>> getRoads(Character player, String boardState) {
+            HashMap<Character, Character> switchPlayers = new HashMap<>() {{
+                put('W', 'X');
+                put('X', 'W');
+            }};
+            ArrayList<ArrayList<Integer>> playerRoads = getRoad(validateClass.Misc.getPlayerBoardState(boardState, player));
+            ArrayList<ArrayList<Integer>> otherPlayerRoads = getRoad(validateClass.Misc.getPlayerBoardState(boardState, switchPlayers.get(player)));
+            return new ArrayList<>(Arrays.asList(playerRoads, otherPlayerRoads));
+        }
+        public static HashMap<Integer, ArrayList<Integer>> generateGraph(ArrayList<ArrayList<ArrayList<Integer>>> roads) {
             return null;
         }
         public static int getLongestRoad(HashMap<Integer, ArrayList<Integer>> graph) {
