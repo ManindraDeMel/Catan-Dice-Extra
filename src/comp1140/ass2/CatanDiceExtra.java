@@ -1,4 +1,6 @@
 package comp1140.ass2;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 
 public class CatanDiceExtra {
@@ -602,12 +604,23 @@ public class CatanDiceExtra {
                 return resources;
             }
 
-            private static String getPlayerBoardState(String boardState) {
+            public static String getPlayerBoardState(String boardState) {
                 HashMap<Character, String> switchPlayers = new HashMap<>() {{
                     put('W', "X");
                     put('X', "W");
                 }};
                 Character playerTurn = boardState.charAt(0);
+                return getString(boardState, playerTurn, switchPlayers);
+            }
+            public static String getPlayerBoardState(String boardState, Character playerTurn) {
+                HashMap<Character, String> switchPlayers = new HashMap<>() {{
+                    put('W', "X");
+                    put('X', "W");
+                }};
+                return getString(boardState, playerTurn, switchPlayers);
+            }
+            @NotNull
+            private static String getString(String boardState, Character playerTurn, HashMap<Character, String> switchPlayers) {
                 int startOfPlayerBoardState = boardState.indexOf(Character.toString(playerTurn), 1);
                 int endOfPlayerBoardState = boardState.indexOf(switchPlayers.get(playerTurn), startOfPlayerBoardState);
                 List<Character> playerBoardState = new ArrayList<>();
@@ -620,6 +633,7 @@ public class CatanDiceExtra {
                 }
                 return result;
             }
+
             private static Coordinate convertToCoordinate(int boardCoord) {
                 int yCoord = 0, xCoord = 0;
                 for (int hexIndex = 0; hexIndex < Misc.knightIndexingToRowIndexing.size(); hexIndex++) {
@@ -657,13 +671,14 @@ public class CatanDiceExtra {
         return null;
     }
     private class longestRoadHelper {
-        public static ArrayList<ArrayList<Integer>> getRoads(Character player, String boardState) {
+        public static ArrayList<ArrayList<ArrayList<Integer>>> getRoads(Character player, String boardState) {
+            String[] playerBoardStates = new String[]{validateClass.Misc.getPlayerBoardState(boardState, 'W'), validateClass.Misc.getPlayerBoardState(boardState, 'X')};
             return null;
         }
         public static HashMap<Integer, ArrayList<Integer>> generateGraph(ArrayList<ArrayList<Integer>> roads) {
             return null;
         }
-        public static int DFS(HashMap<Integer, ArrayList<Integer>> graph) {
+        public static int getLongestRoad(HashMap<Integer, ArrayList<Integer>> graph) {
             return 0;
         }
     }
