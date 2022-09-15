@@ -4,12 +4,13 @@ import java.util.Set;
 
 public class Settlement extends GamePiece{
     public SettlementState state;
-    public Boolean isCityable;
+    public Boolean isCityable; // can find with location on board
     public Boolean isCity;
-    public Boolean isBuilt;
     public Coordinate[] location;
 
-    Settlement(Player player) {
+    Settlement(Player player, Boolean isCity, Coordinate[] location) {
         super(player);
+        this.isCity = isCity;
+        this.location = location;
     }
 }
