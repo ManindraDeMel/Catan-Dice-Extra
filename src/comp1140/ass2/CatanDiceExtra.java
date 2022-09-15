@@ -2,10 +2,7 @@ package comp1140.ass2;
 
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class CatanDiceExtra {
     ArrayList<Player> players = new ArrayList<>();
@@ -126,300 +123,295 @@ public class CatanDiceExtra {
      */
     public static int[] longestRoad(String boardState) {
         // FIXME: Task 8a
-
-//        // Getting strings of different sections
-//        String turn = boardState.substring(0, boardState.indexOf('W', 1));
-//        String playerW = boardState.substring(boardState.indexOf('W', 1), boardState.indexOf('X', 1));
-//        String playerX = boardState.substring(boardState.indexOf('X', 1), boardState.indexOf('W', boardState.indexOf('X', 1)));
-//        String rest = boardState.substring(boardState.indexOf('W', boardState.indexOf('X', 1)));
-//
-//
-////        System.out.println(turn);
-////        System.out.println(playerW);
-////        System.out.println(playerX);
-////        System.out.println(rest);
-//
-//        // Array to store the longest roads of each player
-//        int[] longRoadArr = new int[2];
-//
-//
-//        int countW = (int) playerW.chars().filter(ch -> ch == 'R').count();
-//
-//        String roadsW = "";
-//
-//        if (countW != 0) {
-//            roadsW = playerW.substring(playerW.indexOf('R'), playerW.indexOf('R') + countW * 5);
-//            longRoadArr[0] += 1;
-//        }
-//
-//        for (int i = 0; i < countW - 1; i++) {
-//            if (roadsW.substring(3 + i*5, 5 + i*5).equals(roadsW.substring(3 + (i+0)*5 + 3, 5 + (i+0)*5 + 3)))
-//                longRoadArr[0] += 1;
-////            System.out.println(roads);
-////            else
-////                System.out.println(roadsW.substring(3 + i * 5, 5 + i * 5) + " " + roadsW.substring(3 + (i + 1) * 5, 5 + (i + 1) * 5));
-////                System.out.println(roadsW);
-//        }
-//
-////        longRoadArr[0] = count;
-//
-//        int count = (int) playerX.chars().filter(ch -> ch == 'R').count();
-////        longRoadArr[1] = (int) playerX.chars().filter(ch -> ch == 'R').count();
-//        String roads = "";
-//
-//        if (count != 0) {
-//            roads = playerX.substring(playerX.indexOf('R'), playerX.indexOf('R') + count * 5);
-//            longRoadArr[1] += 1;
-//        }
-//
-//        for (int i = 0; i < count - 1; i++) {
-//            if (roads.substring(3 + i * 5, 5 + i * 5).equals(roads.substring(3 + (i + 0) * 5 + 3, 5 + (i + 0) * 5 + 3)))
-////                System.out.println(roads.substring(3 + i * 5, 5 + i * 5) + " " + roads.substring(3 + (i + 1) * 5, 5 + (i + 1) * 5));
-//                longRoadArr[1] += 1;
-////            else
-////                System.out.println(roads.substring(3 + i * 5, 5 + i * 5) + " " + roads.substring(3 + (i + 1) * 5, 5 + (i + 1) * 5));
-////                System.out.println(roads);
-//
-//        }
-//
-//        System.out.println();
-//        System.out.println("----------");
-//        System.out.println(Arrays.toString(longRoadArr));
-//        System.out.println("W: " + countW + " - " + playerW + " Roads: " + roadsW);
-//        System.out.println("X: " + count + " - " + playerX + " Roads: " + roads);
-//
-//        for (int i = 0; i < countW - 1; i++) {
-////            if (roadsW.substring(3 + i*5, 5 + i*5).equals(roadsW.substring(3 + (i+1)*5, 5 + (i+1)*5)))
-////                longRoadArr[0] += 1;
-//////            System.out.println(roads);
-////            else
-//            System.out.println(roadsW.substring(3 + i * 5, 5 + i * 5) + " " + roadsW.substring(3 + (i + 0) * 5 + 3, 5 + (i + 0) * 5 + 3));
-////                System.out.println(roadsW);
-//        }
-//            System.out.println("-----------");
-////        System.out.println();
-//
-//
-//
-////        System.out.println(Arrays.toString(longRoadArr));
-////        System.out.println(playerW);
-////        System.out.println(playerX);
-//
-//        return longRoadArr;
-        //###############################################################################################
+        int[] longArr = new int[2];
 
         String playerW = boardState.substring(boardState.indexOf('W', 1), boardState.indexOf('X', 1));
         String playerX = boardState.substring(boardState.indexOf('X', 1), boardState.indexOf('W', boardState.indexOf('X', 1)));
 
+        // n is number of cities
+        int n = 54*2;
 
-        // Array to store the longest roads of each player
-        int[] longRoadArr = new int[2];
+        Vector<Vector<GFG.pair>> graph = new Vector<Vector<GFG.pair>>();
+        for(int i = 0; i < n + 1; i++)
+        {
+            graph.add(new Vector<GFG.pair>());
+        }
 
         int countW = (int) playerW.chars().filter(ch -> ch == 'R').count();
         String roadsW = "";
         if (countW != 0)
             roadsW = playerW.substring(playerW.indexOf('R'), playerW.indexOf('R') + countW * 5);
-        LongestPathUndirectedTree.Graph graphW = new LongestPathUndirectedTree.Graph(54);
 
+        System.out.println("--");
         for (int i = 0; i < countW; i++) {
-            graphW.addEdge(Integer.parseInt(roadsW.substring(1 + i * 5, 3 + i * 5)), Integer.parseInt(roadsW.substring(3 + i*5, 5 + i*5)));
+            int one = Integer.parseInt(roadsW.substring(1 + i * 5, 3 + i * 5));
+            int two = Integer.parseInt(roadsW.substring(3 + i*5, 5 + i*5));
+
+            System.out.println(one + " " + two);
+
+            graph.get(one).add(new GFG.pair(two, 1));
+            graph.get(two).add(new GFG.pair(one, 1));
+        }
+        System.out.println("--");
+
+        longArr[0] = GFG.longestCable(graph, n);
+
+        ///////////////////////////
+        Vector<Vector<GFG.pair>> graphX = new Vector<Vector<GFG.pair>>();
+        for(int i = 0; i < n + 1; i++)
+        {
+            graphX.add(new Vector<GFG.pair>());
         }
 
+        int countX = (int) playerX.chars().filter(ch -> ch == 'R').count();
+        String roadsX = "";
+        if (countX != 0)
+            roadsX = playerX.substring(playerX.indexOf('R'), playerX.indexOf('R') + countX * 5);
+
+        System.out.println("--");
+        for (int i = 0; i < countX; i++) {
+            int one = Integer.parseInt(roadsX.substring(1 + i*5, 3 + i*5));
+            int two = Integer.parseInt(roadsX.substring(3 + i*5, 5 + i*5));
+
+            System.out.println(one + " " + two);
+
+            graphX.get(one).add(new GFG.pair(two, 1));
+            graphX.get(two).add(new GFG.pair(one, 1));
+        }
+        System.out.println("--");
+
+        longArr[1] = GFG.longestCable(graphX, n);
+
+        // create undirected graph
+        // first edge
+//        graph.get(1).add(new GFG.pair(2, 3));
+//        graph.get(2).add(new GFG.pair(1, 3));
+//
+//        // second edge
+//        graph.get(2).add(new GFG.pair(3, 4));
+//        graph.get(3).add(new GFG.pair(2, 4));
+//
+//        // third edge
+//        graph.get(2).add(new GFG.pair(6, 2));
+//        graph.get(6).add(new GFG.pair(2, 2));
+//
+//        // fourth edge
+//        graph.get(4).add(new GFG.pair(6, 6));
+//        graph.get(6).add(new GFG.pair(4, 6));
+//
+//        // fifth edge
+//        graph.get(5).add(new GFG.pair(6, 5));
+//        graph.get(6).add(new GFG.pair(5, 5));
+//
+//        System.out.print("Maximum length of cable = "
+//                + GFG.longestCable(graph, n));
+
+        String s="""
+        int countW = (int) playerW.chars().filter(ch -> ch == 'R').count();
+        String roadsW = "";
+        if (countW != 0)
+            roadsW = playerW.substring(playerW.indexOf('R'), playerW.indexOf('R') + countW * 5);
+        GFG.Graph gW = new GFG.Graph(54);
+
+        for (int i = 0; i < countW; i++) {
+            gW.addEdge(Integer.parseInt(roadsW.substring(1 + i * 5, 3 + i * 5)), Integer.parseInt(roadsW.substring(3 + i*5, 5 + i*5)), 1);
+        }
 
 
         int countX = (int) playerX.chars().filter(ch -> ch == 'R').count();
         String roadsX = "";
         if (countX != 0)
             roadsX = playerX.substring(playerX.indexOf('R'), playerX.indexOf('R') + countX * 5);
-        LongestPathUndirectedTree.Graph graphX = new LongestPathUndirectedTree.Graph(54);
+        GFG.Graph gX = new GFG.Graph(54);
 
         for (int i = 0; i < countX; i++) {
-//            System.out.println(roadsX);
-//            System.out.println(roadsX.substring(1 + i*4, 3 + i*5) + " " + roadsX.substring(3 + i*5, 5 + i*5));
-            graphX.addEdge(Integer.parseInt(roadsX.substring(1 + i*5, 3 + i*5)), Integer.parseInt(roadsX.substring(3 + i*5, 5 + i*5)));
+            gX.addEdge(Integer.parseInt(roadsX.substring(1 + i * 5, 3 + i * 5)), Integer.parseInt(roadsX.substring(3 + i * 5, 5 + i * 5)), 1);
         }
 
 
-        System.out.println();
-        System.out.println("----------");
+        int l1 = 0;
+        int l2 = 0;
 
-        if (countW != 0){
-            longRoadArr[0] = graphW.longestPathLength(0) + 1;
-        }
-        else {
-            longRoadArr[0] = graphW.longestPathLength(0);
-        }
 
-        if (countX != 0){
-            longRoadArr[1] = graphX.longestPathLength(0) + 1;
-        }
-        else {
-            longRoadArr[1] = graphX.longestPathLength(0);
+        for (int i = 0; i < 54; i++) {
+            int s = 1;
+//            System.out.print("Following are longest distances from source vertex "+ s + " \n" );
+            if (l1 < gW.longestPath(i)) {
+                l1 = gW.longestPath(i);
+            }
+            if (l2 < gW.longestPath(i)) {
+                l2 = gW.longestPath(i);
+            }
         }
 
-        int[][] arr = new int[2][54];
-        for (int i = 0; i < 54; i++){
-            arr[0][i] = graphW.longestPathLength(i);
-            arr[1][i] = graphX.longestPathLength(i);
+        longArr[0] = l1;
+        longArr[1] = l2;
+
+        if (countW == 0)
+            longArr[0] = 0;
+        if (countX == 0)
+            longArr[1] = 0;
+
+        """;
+
+//        longArr[0] -= 1;
+//        longArr[1] -= 1;
+
+        for (int i = 0; i < 2; i++) {
+            if (longArr[0] < 0 || countW == 0)
+                longArr[0] = 0;
+
+            if (longArr[1] < 0|| countX == 0)
+                longArr[1] = 0;
         }
-        Arrays.sort(arr[0]);
-        Arrays.sort(arr[1]);
 
-        longRoadArr[0] = arr[0][53];
-        longRoadArr[1] = arr[1][53];
+        System.out.println("------------------------");
+        System.out.println(Arrays.toString(longArr));
+        System.out.println("W: " + countW + " " + playerW);
+        for (int i = 0; i < countW; i++) {
+            int one = Integer.parseInt(roadsW.substring(1 + i*5, 3 + i*5));
+            int two = Integer.parseInt(roadsW.substring(3 + i*5, 5 + i*5));
 
-//        longRoadArr[0] = graphW.longestPathLength() + 1;
-//        longRoadArr[1] = graphX.longestPathLength() + 1;
+            System.out.println(one + " " + two);
+        }
+        System.out.println("X: " + countX + " " + playerX);
+        System.out.println("------------------------");
 
-//        longRoadArr[0] = graphW.printGraph2();
-//        longRoadArr[1] = graphX.printGraph2();
-
-
-        System.out.println(Arrays.toString(longRoadArr));
-        System.out.println("W: " + countW + " - " + playerW + " Roads: " + roadsW);
-        System.out.println("X: " + countX + " - " + playerX + " Roads: " + roadsX);
-
-//        for (int i = 0; i < countW - 1; i++) {
-////            if (roadsW.substring(3 + i*5, 5 + i*5).equals(roadsW.substring(3 + (i+1)*5, 5 + (i+1)*5)))
-////                longRoadArr[0] += 1;
-//////            System.out.println(roads);
-////            else
-//            System.out.println(roadsW.substring(3 + i * 5, 5 + i * 5) + " " + roadsW.substring(3 + (i + 0) * 5 + 3, 5 + (i + 0) * 5 + 3));
-////                System.out.println(roadsW);
-//        }
-            System.out.println("-----------");
-
-            graphW.printGraph();
-        return longRoadArr;
+        return longArr;
     }
 
-    // Java program to find the longest path of the tree
-    class LongestPathUndirectedTree {
+    // Java program to find the longest cable length
+// between any two cities.
 
-        // Utility Pair class for storing maximum distance
-        // Node with its distance
-        static class Pair<T,V> {
-            T first; // maximum distance Node
-            V second; // distance of maximum distance node
+    public class GFG
+    {
 
-            //Constructor
-            Pair(T first, V second) {
-                this.first = first;
-                this.second = second;
+        // visited[] array to make nodes visited
+        // src is starting node for DFS traversal
+        // prev_len is sum of cable length till current node
+        // max_len is pointer which stores the maximum length
+        // of cable value after DFS traversal
+
+        // Class containing left and
+        // right child of current
+        // node and key value
+        static class pair {
+
+            public int x, y;
+            public pair(int f, int s)
+            {
+                x = f;
+                y = s;
             }
         }
 
-        // This class represents an undirected graph using adjacency list
-        static class Graph {
-            int V; // No. of vertices
-            LinkedList<Integer>[] adj; //Adjacency List
+        // maximum length of cable among the connected
+        // cities
+        static int max_len = Integer.MIN_VALUE;
 
-            // Constructor
-            Graph(int V) {
-                this.V = V;
-                // Initializing Adjacency List
-                adj = new LinkedList[V];
-                for(int i = 0; i < V; ++i) {
-                    adj[i] = new LinkedList<Integer>();
-                }
-            }
+        static void DFS(Vector<Vector<pair>> graph, int src,
+                        int prev_len, boolean[] visited)
+        {
 
-            void printGraph(){
-                for (int i = 0; i < V; i++){
+            // Mark the src node visited
+            visited[src] = true;
 
-                    System.out.print("Node" + i);
-                    for (int x : adj[i]){
-                        System.out.print(" -> " + x);
-                    }
-                    System.out.println();
-                }
-            }
+            // curr_len is for length of cable
+            // from src city to its adjacent city
+            int curr_len = 0;
 
-            int printGraph2(){
+            // Adjacent is pair type which stores
+            // destination city and cable length
+            pair adjacent;
 
-                int[] arr = new int[V];
+            // Traverse all adjacent
+            for(int i = 0; i < graph.get(src).size(); i++)
+            {
+                // Adjacent element
+                adjacent = graph.get(src).get(i);
 
-                for (int i = 0; i < V; i++){
-                    System.out.print("Node" + i);
-                    for (int x : adj[i]){
-                        System.out.print(" -> " + x);
-                    }
-                    arr[i] = adj[i].size();
-                    System.out.println();
-                }
-                Arrays.sort(arr);
-                return arr[53];
-            }
+                // If node or city is not visited
+                if (!visited[adjacent.x])
+                {
+                    // Total length of cable from
+                    // src city to its adjacent
+                    curr_len = prev_len + adjacent.y;
 
-            // function to add an edge to graph
-            void addEdge(int s, int d) {
-                adj[s].add(d); // Add d to s's list.
-                adj[d].add(s); // Since the graph is undirected
-            }
-
-
-            // method returns farthest node and its distance from node u
-            Pair<Integer, Integer> bfs(int u) {
-                int[] dis = new int[V];
-
-                // mark all distance with -1
-                Arrays.fill(dis, -1);
-
-                Queue<Integer> q = new LinkedList<>();
-
-                q.add(u);
-
-                // distance of u from u will be 0
-                dis[u] = 0;
-                while (!q.isEmpty()) {
-                    int t = q.poll();
-
-                    // loop for all adjacent nodes of node-t
-                    for(int i = 0; i < adj[t].size(); ++i) {
-                        int v = adj[t].get(i);
-
-                        // push node into queue only if
-                        // it is not visited already
-                        if(dis[v] == -1) {
-                            q.add(v);
-                            // make distance of v, one more
-                            // than distance of t
-                            dis[v] = dis[t] + 1;
-                        }
-                    }
+                    // Call DFS for adjacent city
+                    DFS(graph, adjacent.x, curr_len, visited);
                 }
 
-                int maxDis = 0;
-                int nodeIdx = 0;
-
-                // get farthest node distance and its index
-                for(int i = 0; i < V; ++i) {
-                    if(dis[i] > maxDis) {
-                        maxDis = dis[i];
-                        nodeIdx = i;
-                    }
+                // If total cable length till
+                // now greater than previous
+                // length then update it
+                if (max_len < curr_len)
+                {
+                    max_len = curr_len;
                 }
 
-                return new Pair<Integer, Integer>(nodeIdx, maxDis);
+                // make curr_len = 0 for next adjacent
+                curr_len = 0;
+            }
+        }
+
+        // n is number of cities or nodes in graph
+        // cable_lines is total cable_lines among the cities
+        // or edges in graph
+        public static int longestCable(Vector<Vector<pair>> graph, int n)
+        {
+            // call DFS for each city to find maximum
+            // length of cable
+            for (int i=1; i<=n; i++)
+            {
+                // initialize visited array with 0
+                boolean[] visited = new boolean[n+1];
+
+                // Call DFS for src vertex i
+                DFS(graph, i, 0, visited);
             }
 
-            // method prints longest path of given tree
-            int longestPathLength(int i) {
-                Pair<Integer, Integer> t1, t2;
+            return max_len;
+        }
 
-                // first bfs to find one end point of
-                // the longest path
-                t1 = bfs(i);
+        public static void main(String[] args) {
+            // n is number of cities
+            int n = 6;
 
-                // second bfs to find actual longest path
-                t2 = bfs(t1.first);
-
-                System.out.println("Longest path is from "+ t1.first
-                        + " to "+ t2.first +" of length "+t2.second);
-                return t2.second;
+            Vector<Vector<pair>> graph = new Vector<Vector<pair>>();
+            for(int i = 0; i < n + 1; i++)
+            {
+                graph.add(new Vector<pair>());
             }
+
+            // create undirected graph
+            // first edge
+            graph.get(1).add(new pair(2, 3));
+            graph.get(2).add(new pair(1, 3));
+
+            // second edge
+            graph.get(2).add(new pair(3, 4));
+            graph.get(3).add(new pair(2, 4));
+
+            // third edge
+            graph.get(2).add(new pair(6, 2));
+            graph.get(6).add(new pair(2, 2));
+
+            // fourth edge
+            graph.get(4).add(new pair(6, 6));
+            graph.get(6).add(new pair(4, 6));
+
+            // fifth edge
+            graph.get(5).add(new pair(6, 5));
+            graph.get(6).add(new pair(5, 5));
+
+            System.out.print("Maximum length of cable = "
+                    + longestCable(graph, n));
         }
     }
+
+// This code is contributed by suresh07.
+
+
 
 
 
@@ -436,7 +428,31 @@ public class CatanDiceExtra {
      */
     public static int[] largestArmy(String boardState) {
         // FIXME: Task 8b
-        return null;
+
+        int[] largeArr = new int[2];
+
+        String playerW = boardState.substring(boardState.indexOf('W', 1), boardState.indexOf('X', 1));
+        String playerX = boardState.substring(boardState.indexOf('X', 1), boardState.indexOf('W', boardState.indexOf('X', 1)));
+
+        int countW = (int) playerW.chars().filter(ch -> ch == 'K').count() + (int) playerW.chars().filter(ch -> ch == 'J').count();
+        int countX = (int) playerX.chars().filter(ch -> ch == 'K').count() + (int) playerX.chars().filter(ch -> ch == 'J').count();
+
+        largeArr[0] = countW;
+        largeArr[1] = countX;
+
+        System.out.println("-------------------------");
+        System.out.println(Arrays.toString(largeArr));
+        System.out.println("W: " + playerW);
+        System.out.println("X: " + playerX);
+        System.out.println("-------------------------");
+        System.out.println();
+
+
+//        String roadsW = "";
+//        if (countW != 0)
+//            roadsW = playerW.substring(playerW.indexOf('R'), playerW.indexOf('R') + countW * 5);
+
+        return largeArr;
     }
 
     /**
