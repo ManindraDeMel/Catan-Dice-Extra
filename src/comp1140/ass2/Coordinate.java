@@ -8,4 +8,13 @@ public class Coordinate {
         this.x = x;
         this.y = y;
     }
+
+    public int CoordinateToIndex(Coordinate coord, Coordinate[] coords) {
+        for (int x=0; x<= coords.length; x++) {
+            if (coords[x]==coord) {
+                break;
+            }
+        }
+        return x;
+    }
 }

@@ -8,10 +8,12 @@ public class Settlement extends GamePiece{
     public Boolean isCity;
     public Boolean isBuilt;
     public Coordinate location;
+    public int intersectionIndex;
 
-    Settlement(Player player, Coordinate coord, Boolean cityable) {
+    Settlement(Player player, Coordinate coord, Boolean cityable, int index) {
         super(player);
         this.location = coord;
         this.isCityable=cityable;
+        this.intersectionIndex =index;
     }
 }

@@ -4,9 +4,11 @@ public class Tile extends GamePiece{
     public Boolean used;
     public Resource resourceType;
     public Coordinate[] location;
-    public Tile(Player player, Coordinate[] coords) {
+    public int tileIndex;
+    public Tile(Player player, Coordinate[] coords, int index) {
         super(player);
         this.location = coords;
+        this.tileIndex=index;
     }
 
 }

@@ -2,6 +2,7 @@ package comp1140.ass2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Set;
 
 public class CatanDiceExtra {
     ArrayList<Player> players = new ArrayList<>();
@@ -31,35 +32,85 @@ public class CatanDiceExtra {
      * @return true iff the string is a well-formed representation of
      * a board state, false otherwise.
      */
-    public static boolean isBoardStateWellFormed(String boardState) {
-        if (boardState.charAt(0)!='W' && boardState.charAt(0)!='X') {
-            return false;
+    public static boolean isPlayerBoardStateWellFormed(String pBoardState) {
+        int x;
+        Set<Character> ints = Set.of('1', '2', '3', '4', '5', '6', '7', '8', '9', '0');
+        for (x = 0; x < pBoardState.length(); x++) {
+            if ((ints.contains(pBoardState.charAt(x)) == false) && (pBoardState.charAt(x) != 'C')) {
+                break;
+            }
         }
-        boardState = boardState.substring(1);
-        if (boardState.charAt(0)=='C') {
-            String[] cities = boardState.split("C");
-            int t = 0;
-            for (int i=0; i<cities.length ;i++){
-                if (cities[i].length()==1) {
-                    try {
-                        int n = Integer.parseInt(cities[i]);
-                        if (n>t && n<=4) {
-                            t=n;
-                        } else {
+        if (x != 0) {
+            if (x%2!=0) {
+                return false;
+            } else {
+                String[] cities = new String[x/2];
+                int[] citynums = new int[x/2+1];
+                citynums[0]=-1;
+                for (int y=2; y<=x; y+=2) {
+                    cities[(y/2)-1] = pBoardState.substring(y-2, y);
+                }
+                for (int z=0; z<cities.length; z++) {
+                    if ((cities[z].charAt(0)=='C')&&(ints.contains(cities[z].charAt(1)))) {
+                        citynums[z+1]= Integer.parseInt(cities[z].substring(1,2));
+                        if (((citynums[z]<citynums[z+1])&&(citynums[z+1]<4))==false) {
                             return false;
                         }
-                    } catch (NumberFormatException e) {
+                    } else {
                         return false;
                     }
-                } else {
-                    return false;
                 }
             }
-        } else if (boardState.charAt(0)=='J'); {
-
         }
+        return true;
+    }
+    public static boolean isBoardStateWellFormed(String boardState) {
+        Set<Character> ints = Set.of('1', '2', '3', '4', '5', '6', '7', '8', '9', '0');
+        Set<Character> resources = Set.of('b', 'g', 'l', 'm', 'o', 'w');
+        if (boardState.charAt(0) != 'W' && boardState.charAt(0) != 'X') {
+            return false;
+        }
+        if (boardState.charAt(1) != '0' && boardState.charAt(1) != '3' && boardState.charAt(1) != '4' && boardState.charAt(1) != '5' && boardState.charAt(1) != '6') {
+            return false;
+        }
+        if (boardState.charAt(2) != '0' && boardState.charAt(2) != '1' && boardState.charAt(2) != '2' && boardState.charAt(2) != '3') {
+            return false;
+        }
+        String boardStateNoDice = boardState.substring(3);
+        int x;
+        for (x = 0; x < boardStateNoDice.length(); x++) {
+            if (resources.contains(boardStateNoDice.charAt(x)) == false) {
+                break;
+            }
+        }
+        if (boardStateNoDice.charAt(x)!='W') {
+            return false;
+        }
+        String sorted = new String(boardStateNoDice.substring(0,x).toCharArray());
+        if (sorted.equals(boardStateNoDice.substring(0,x))==false) {
+            return false;
+        }
+        String boardStateNoTurn = boardStateNoDice.substring(x+1);
+        for (x=0;x<boardStateNoTurn.length();x++) {
+            if (boardStateNoTurn.charAt(x)=='X') {
+                break;
+            }
+        }
+        if (isPlayerBoardStateWellFormed(boardStateNoTurn.substring(0,x))==false) {
+            return false;
+        }
+        String boardStateNoWS = boardStateNoTurn.substring(x+1);
+        for (x=0;x<boardStateNoWS.length();x++) {
+            if (boardStateNoWS.charAt(x)=='W') {
+                break;
+            }
+        }
+        if (isPlayerBoardStateWellFormed(boardStateNoWS.substring(0,x))==false) {
+            return false;
+        }
+        String boardStateNoXS = boardStateNoTurn.substring(x+1);
         // FIXME: Task 3
-	    return true;
+        return true;
     }
 
     /**

@@ -31,8 +31,10 @@ public class Board {
                     tilecoords[3] = new Coordinate(x+1, y+1);
                     tilecoords[4] = new Coordinate(x, y+1);
                     tilecoords[5] = new Coordinate(x-1, y);
+                    this.tiles[tilenum] = new Tile(new Player(""), tilecoords, tilenum);
+                    tilenum++;
                     if (x==5 && y==2) {
-                        this.tiles[tilenum] = new Tile(new Player(), tilecoords);
+                        this.tiles[tilenum] = new Tile(new Player(""), tilecoords, tilenum);
                         tilenum++;
                     }
                 } else if (y>3) {
@@ -42,10 +44,15 @@ public class Board {
                     tilecoords[3] = new Coordinate(x+1, y-1);
                     tilecoords[4] = new Coordinate(x, y-1);
                     tilecoords[5] = new Coordinate(x-1, y);
+                    this.tiles[tilenum] = new Tile(new Player(""), tilecoords, tilenum);
+                    tilenum++;
                 }
-                this.tiles[tilenum] = new Tile(new Player(), tilecoords);
-                tilenum++;
-                this.settlements[settlenum] = new Settlement(new Player(), new Coordinate(x, y), cityable);
+                if ( ( (rowlen==6) && (x==3) ) || ( (rowlen==8) && (x==1||x==5) ) || ( (rowlen==10) && (x!=1&&x!=5) ) ) {
+                    cityable = true;
+                } else {
+                    cityable = false;
+                }
+                this.settlements[settlenum] = new Settlement(new Player(""), new Coordinate(x, y), cityable, c);
             }
             if (y<3) {
                 rowlen = 2*y+6;
