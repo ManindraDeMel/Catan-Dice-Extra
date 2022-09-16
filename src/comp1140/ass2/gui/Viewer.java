@@ -31,13 +31,17 @@ public class Viewer extends Application {
 
     private final Group board = new Group();
 
-    private static final double HEX_HEIGHT = 150;
-    private static final double HEX_WIDTH = (int) (HEX_HEIGHT * Math.sqrt(3) / 2);
+//    private static final double HEX_HEIGHT = 150;
+//    private static final double HEX_WIDTH = (int) (HEX_HEIGHT * Math.sqrt(3) / 2);
+    private static final double HEX_WIDTH = 140;
+    private static final double HEX_HEIGHT = (int) (HEX_WIDTH * Math.sqrt(3) / 2);
 
     private static final int MARGIN_X = (int) (HEX_HEIGHT * 0.5);
     private static final int BOARD_X = (int) (HEX_HEIGHT * 0.75);
     private static final int MARGIN_Y = (int) (HEX_HEIGHT * 0.5);
+
     private static final int BOARD_Y = MARGIN_Y;
+
     private static final Color[] playersColour = new Color[]{Color.ORANGE, Color.RED};
 //    private static final int BOARD_WIDTH = PenguinsPoolParty.BOARD_WIDTH * (int) HEX_WIDTH;
 //    private static final int BOARD_HEIGHT = (int) (PenguinsPoolParty.BOARD_HEIGHT * HEX_HEIGHT);
@@ -78,11 +82,11 @@ public class Viewer extends Application {
          * Add the points necessary for each hexagon in the game.
          */
         private void addHexagonPoints() {
-            double sideLength = HEX_HEIGHT * 3 / 5;
+            double sideLength = HEX_WIDTH * 3 / 5;
             double bearing = 0;
             for (int i = 0; i < 6; i++) {
-                double x = Math.cos(Math.PI / 18 * bearing) * sideLength;
-                double y = Math.sin(Math.PI / 18 * bearing) * sideLength;
+                double y = Math.cos(Math.PI / 18 * bearing) * sideLength;
+                double x = Math.sin(Math.PI / 18 * bearing) * sideLength;
                 this.getPoints().add(x);
                 this.getPoints().add(y);
                 bearing += 6;
@@ -224,18 +228,39 @@ public class Viewer extends Application {
         }
     }
 
+//    class ResourceCircle extends Circle{
+//        double startX, startY;
+//        ResourceCircle(){
+//            double centerX = startX;
+//            double centerY = startY + HEX_HEIGHT/5;
+//            double radius = HEX_HEIGHT/8;
+//            Circle circle = new Circle(centerX, centerY, radius);
+//            circle.setFill(Color.WHITE);
+//            circle.setStrokeWidth(2);
+//            circle.setStrokeMiterLimit(10);
+//            circle.setStrokeType(StrokeType.INSIDE);
+//            circle.setStroke(Color.valueOf("0x000000"));
+//            this.board.getChildren().add(circle);
+//
+//        }
+//    }
 
     private void makeBoard() {
         this.board.setLayoutX(BOARD_X + MARGIN_X);
         this.board.setLayoutY(BOARD_Y + MARGIN_Y);
         this.board.getChildren().clear();
 
-        for (int y = 0; y < 3; y++) {
-            for (int x = 0; x < 3; x++) {
-//                Hex hex = this.penguinsPoolParty.getHex(x, y);
-                double yOffset = x%2==0 ? 0.5 : 0;
-                double startX = x * HEX_WIDTH;
-                double startY = (y + yOffset) * HEX_HEIGHT;
+        for (int y = 0; y < 5; y++) {
+            for (int x= 0; x < 5; x++) {
+
+            if (((y==0 || y==4) && (x==0 || x==4)) || (y==1 && x==0) || (y==3 && x==0)){
+                continue;
+            }
+                double xOffset = y%2==0 ? 0.5 : 0;
+//                double startX = x * HEX_WIDTH;
+//                double startY = (y + yOffset) * HEX_HEIGHT;
+                double startX = (x+xOffset) * HEX_WIDTH;
+                double startY = y * HEX_HEIGHT;
                 Hexagon hexagon = new Hexagon(startX, startY);
                 this.board.getChildren().add(hexagon);
 
@@ -282,7 +307,7 @@ public class Viewer extends Application {
 
 //                KnightHead knightHead = new KnightHead(startX, startY, false, 'w');
                 Knight knight;
-                switch (x+y){
+                switch ((x+y)%3){
                     case 0 -> knight = new Knight(startX, startY, false, 'w');
                     case 1 -> knight = new Knight(startX, startY, true, 'w');
                     case 2 -> knight = new Knight(startX, startY, true, 'x');
