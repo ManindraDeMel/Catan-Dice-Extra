@@ -63,8 +63,26 @@ public class CatanDiceExtra {
      * 'b', 'l', 'w', 'g', 'o', 'm'.
      */
     public static String rollDice(int numOfDice) {
-        // FIXME: Task 5
-        return "";
+        HashMap<Integer, String> mapToDiceVal = new HashMap<>() {{
+            put(1, "b"); //brick
+            put(2, "l"); //lumber
+            put(3, "w"); //wool
+            put(4, "g"); //grain
+            put(5, "o"); //ore
+            put(6, "m"); //gold (money)
+        }};
+        Random random = new Random();
+        String resources = "";
+        for (int i = 0; i < numOfDice; i++) {
+            resources += String.format("%s", mapToDiceVal.get(random.nextInt(6) + 1));
+        }
+        char[] sortedResource = resources.toCharArray();
+        Arrays.sort(sortedResource);
+        String sortedResourcesStr = "";
+        for (int i = 0; i < sortedResource.length; i++) {
+            sortedResourcesStr += Character.toString(sortedResource[i]);
+        }
+        return sortedResourcesStr;
     }
 
     /**
@@ -103,9 +121,525 @@ public class CatanDiceExtra {
      * @param action: string representation of the player action.
      * @return true iff the action is executable, false otherwise.
      */
+
     public static boolean isActionValid(String boardState, String action) {
-        // FIXME: Task 7
-        return false;
+        char[] characters = action.toCharArray();
+        String actionState = "";
+        for (int i = 0; i < 4; i++) {
+            actionState += characters[i];
+        }
+        return switch (actionState) {
+            case "keep" -> validateClass.validateKeep(boardState, action);
+            case "buil" -> validateClass.validateBuild(boardState, action);
+            case "trad" -> validateClass.validateTrade(boardState, action);
+            case "swap" -> validateClass.validateSwap(boardState, action);
+            default -> false;
+        };
+    }
+    private class validateClass {
+        public static boolean validateBuild(String boardState, String action) {
+            ArrayList<Character> validformat = new ArrayList<>(Arrays.asList(
+                    'b',
+                    'u',
+                    'i',
+                    'l',
+                    'd',
+                    'K',
+                    'R',
+                    'C',
+                    'S',
+                    'T'
+            ));
+            for (int i = 0; i < 10; i++) {
+                validformat.add(Integer.toString(i).charAt(0)); // Add 0-9 to list
+            }
+            for (Character c : action.toCharArray()) {
+                if (!validformat.contains(c)) {
+                    return false; // Check the format
+                }
+            }
+            // ###########
+            Character buildType = action.charAt(5);
+            if (ValidateBuildHelperFuncs.sufficentResourcesForBuild(boardState, buildType)) { // check for resources
+                return switch (buildType) {
+                    case 'C' -> ValidateBuildHelperFuncs.validateCastleBuild(boardState, action.charAt(action.length() - 1));
+                    case 'K' -> ValidateBuildHelperFuncs.validateKnightBuild(boardState, action);
+                    case 'R' -> ValidateBuildHelperFuncs.validateRoadBuild(boardState, action);
+                    case 'S' -> ValidateBuildHelperFuncs.validateSettlementBuild(boardState, action);
+                    case 'T' -> ValidateBuildHelperFuncs.validateCityBuild(boardState, action);
+                    default -> false;
+                };
+            }
+            return ValidateBuildHelperFuncs.checkBaseCase(boardState, action, buildType); // if there aren't sufficient resources, the game might have just begun.
+        }
+        // #######################################################################################
+        public static boolean validateTrade(String boardState, String action) {
+            ArrayList<Character> validFormat = new ArrayList<>(Arrays.asList('t', 'r', 'a', 'd', 'e'));
+            validFormat.addAll(Misc.possibleResources); // checks for format
+            for (Character c : action.toCharArray()) { // can't trade for gold.
+                if (c == 'm' || !validFormat.contains(c)) {
+                    return false;
+                }
+            }
+            int numResources = action.length() - 5; // the -4 is for "trade"
+            ArrayList<Character> resources = Misc.getResourcesFromBoardState(boardState);
+            int numGold = 0;
+            for (Character c : resources) {
+                if (c == 'm') {
+                    numGold++;
+                }
+            }
+            if (numGold >= numResources * 2) {
+                return true;
+            }
+            return false;
+        }
+        // #######################################################################################
+        public static boolean validateKeep(String boardState, String action) {
+            int numRolls = Integer.parseInt(Character.toString(boardState.toCharArray()[2]));
+            if (numRolls < 3) {
+                ArrayList<Character> turnBoardState = new ArrayList<>(Arrays.asList('k', 'e', 'e', 'p')); // resources are valid, next check boardstate if the resources exist
+                turnBoardState.addAll(Misc.getResourcesFromBoardState(boardState));
+                for (Character c : action.toCharArray()) { // checking for format of keep[Resources] && check for if resources in gamestate too
+                    if (!turnBoardState.contains(c)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+        // #######################################################################################
+        public static boolean validateSwap(String boardState, String action) {
+            ArrayList<Character> resources = Misc.getResourcesFromBoardState(boardState);
+            Character resourceIn = action.charAt(4);
+            Character resourceOut = action.charAt(5);
+            if (!resources.contains(resourceIn)) {
+                return false; // Player doesn't have resource to trade.
+            }
+            String playerBoardState = Misc.getPlayerBoardState(boardState);
+            if (playerBoardState == "[]") {
+                return false; // Player has no builds
+            }
+            int currentIndex = 0;
+            ArrayList<Integer> locations = new ArrayList<>();
+            while (playerBoardState.indexOf("J", currentIndex) != -1) {
+                int newIndex = playerBoardState.indexOf("J", currentIndex);
+                locations.add(Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex+1)) + Character.toString(playerBoardState.charAt(newIndex+2))));
+                currentIndex = newIndex+1;
+            }
+            if (locations.size() == 0) {
+                return false; // Player has no usable knights
+            }
+            for (int location : locations) {
+                if (location == 9 || location == 10) {
+                    return true; // multipurpose knight owned
+                }
+                else if (Misc.coordinateToResource[location] == resourceOut) {
+                    return true; // correct knight owned
+                }
+            }
+            return false;
+        }
+        // ####################################################################################### Helper functions for validateBuild();
+        private class ValidateBuildHelperFuncs {
+            // #######################################################################################
+            private static boolean validateCastleBuild(String boardState, Character castlePosition) {
+                if (boardState.contains("C" + castlePosition)) {
+                    return false; // check existence
+                }
+                return true;
+            }
+            // ####################
+            private static boolean validateCityBuild(String boardState, String action) {
+                final ArrayList<Integer> validCityBuildLocations = new ArrayList<>(Arrays.asList(
+                        1,
+                        7,
+                        10,
+                        17,
+                        18,
+                        19,
+                        34,
+                        35,
+                        36,
+                        43,
+                        46,
+                        52
+                ));
+                String playerBoardState = Misc.getPlayerBoardState(boardState);
+                String settlement = "S" + Character.toString(action.charAt(6)) + Character.toString(action.charAt(7));
+                int location = Integer.parseInt(Character.toString(action.charAt(6)) + Character.toString(action.charAt(7)));
+                if (playerBoardState.contains(settlement) && validCityBuildLocations.contains(location)) { // settlement already built check && location is in a cityable location.
+                    return true;
+                }
+                return false;
+            }
+            // ####################
+            private static boolean validateKnightBuild(String boardState, String action) {
+                int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
+                if (actionCoord >= 0 && actionCoord < 20) {
+                    ArrayList<Integer> surroundingCoords = Misc.knightIndexingToRowIndexing.get(actionCoord);
+                    String playerBoardState = Misc.getPlayerBoardState(boardState);
+                    return roadConnectedToKnight(playerBoardState, surroundingCoords) || settlementConnectedToKnight(playerBoardState, surroundingCoords);
+                }
+                return false;
+            }
+            // ####################
+            private static boolean validateRoadBuild(String boardState, String action) {
+                return !checkIfExists(boardState, action) && checkIfConnectedR(boardState, action) && checkForSettlement(boardState, action);
+            }
+            // ####################
+            private static boolean validateSettlementBuild(String boardState, String action) {
+                return !checkIfExists(boardState, action) && checkIfConnected(boardState, action);
+            }
+            // #################### sub-helper functions below
+            private static boolean sufficentResourcesForBuild(String boardState, Character buildType) {
+                final HashMap<Character, Resource> charToResource = new HashMap<>() {{ // maps to convert between our program and the assignment requirements.
+                    put('b', Resource.brick);
+                    put('g', Resource.wheat);
+                    put('l', Resource.wood);
+                    put('m', Resource.gold);
+                    put('o', Resource.stone);
+                    put('w', Resource.sheep);
+                }};
+                final HashMap<String, Character> nameToBuildID = new HashMap<>() {{
+                    put("Road", 'R');
+                    put("Solider", 'K');
+                    put("Settlement", 'S');
+                    put("Castle", 'C');
+                    put("City", 'T');
+                }};
+                // ###############
+                ArrayList<Resource> resources = new ArrayList<>();
+                for (Character c : Misc.getResourcesFromBoardState(boardState)) {
+                    resources.add(charToResource.get(c)); // Convert to resource type
+                }
+                ArrayList<ArrayList<String>> possibleBuilds = Prices.findBuilds(resources);
+                for (ArrayList<String> i : possibleBuilds) {
+                    for (String build : i) {
+                        if (nameToBuildID.get(build) == buildType) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+            private static boolean checkBaseCase(String boardState, String action, Character buildType) {
+                if (buildType == 'R' && validateRoadLength(action)) {
+                    if (boardState == "W00WXW00X00" || boardState == "X00WXW00X00") {
+                        return roadOnCoast(action);
+                    }
+                    else if (boardState.length() == 16 && boardState.contains("R")) {
+                        ArrayList<Integer> actionLocations = new ArrayList<>(Arrays.asList(
+                                Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1))),
+                                Integer.parseInt(Character.toString(action.charAt(action.length() - 4)) + Character.toString(action.charAt(action.length() - 3)))
+                        ));
+                        int indexOfRoad = boardState.indexOf("R");
+                        ArrayList<Integer> boardLocations = new ArrayList<>(Arrays.asList(
+                                Integer.parseInt(Character.toString(boardState.charAt(indexOfRoad + 1)) + Character.toString(boardState.charAt(indexOfRoad + 2))),
+                                Integer.parseInt(Character.toString(boardState.charAt(indexOfRoad + 3)) + Character.toString(boardState.charAt(indexOfRoad + 4)))
+                        ));
+                        for (int i = 0; i < 2; i++) {
+                            for (int j = 0; j < 2; j ++) {
+                                if (Misc.getDistance(Misc.convertToCoordinate(actionLocations.get(i)), Misc.convertToCoordinate((boardLocations.get(j)))) < 5) {
+                                    return false;
+                                }
+                            }
+                        }
+                        return roadOnCoast(action);
+                    }
+                }
+                return false;
+            }
+            private static boolean roadOnCoast(String action) {
+                final ArrayList<String> coastalRoadNodes = new ArrayList<>(Arrays.asList(
+                        "03",
+                        "07",
+                        "16",
+                        "21",
+                        "33",
+                        "43",
+                        "47",
+                        "48",
+                        "49",
+                        "50",
+                        "46",
+                        "37",
+                        "32",
+                        "20",
+                        "10",
+                        "06",
+                        "05",
+                        "04"
+                ));
+                for (String s : Misc.getRoadCoordsFromAction(action)) {
+                    if (coastalRoadNodes.contains(s)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            private static boolean checkIfExists(String boardState, String action) {
+                String build = "";
+                if (action.charAt(5) == 'R') {
+                    for (Character c : new char[]{action.charAt(5), action.charAt(6), action.charAt(7), action.charAt(8), action.charAt(9)}) {
+                        build += Character.toString(c);
+                    }
+                }
+                else {
+                    for (Character c : new char[]{action.charAt(5), action.charAt(6), action.charAt(7)}) {
+                        build += Character.toString(c);
+                    }
+                }
+                if (boardState.contains(build)) {
+                    return true;
+                }
+                return false;
+            }
+            private static boolean checkIfConnected(String boardState, String action) {
+                String playerBoardState = Misc.getPlayerBoardState(boardState);
+                int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
+                int currentIndex = 0;
+                while (playerBoardState.indexOf("R", currentIndex) != -1) { // Maybe make this a getRoadsFromPlayerBoardState() function??
+                    int newIndex = playerBoardState.indexOf("R", currentIndex);
+                    int firstCoord = Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex + 1)) + Character.toString(playerBoardState.charAt(newIndex + 2)));
+                    int secondCoord = Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex + 3)) + Character.toString(playerBoardState.charAt(newIndex + 4)));
+                    if (actionCoord == firstCoord || actionCoord == secondCoord) {
+                        return true;
+                    }
+                    currentIndex = newIndex + 1;
+                }
+                return false;
+            }
+            private static boolean checkIfConnectedR(String boardState, String action) { // because roads have two coordinates we can check them both recursively.
+                String[] coords = Misc.getRoadCoordsFromAction(action);
+                if (validateRoadLength(action)) { // coordinates for the road can't be unreasonably far away.
+                    return checkIfConnected(boardState, coords[0]) || checkIfConnected(boardState, coords[1]);
+                }
+                return false;
+            }
+            private static boolean validateRoadLength(String action) {
+                String[] coords = Misc.getRoadCoordsFromAction(action);
+                ArrayList<ArrayList<Integer>> roads = Misc.knightIndexingToRowIndexing;
+                for (ArrayList<Integer> hexCoords : roads) {
+                    if (hexCoords.contains(Integer.parseInt(coords[0]))) {
+                        int indexOfOneCoord = hexCoords.indexOf(Integer.parseInt(coords[0]));
+                        if (indexOfOneCoord == 0) {
+                            if (hexCoords.get(1) == Integer.parseInt(coords[1]) || hexCoords.get(hexCoords.size() - 1) == Integer.parseInt(coords[1])) {
+                                return true;
+                            }
+                        }
+                        else if (indexOfOneCoord == hexCoords.size() - 1) {
+                            if (hexCoords.get(0) == Integer.parseInt(coords[1]) || hexCoords.get(hexCoords.size() - 2) == Integer.parseInt(coords[1])) {
+                                return true;
+                            }
+                        }
+                        else {
+                            if (hexCoords.get(indexOfOneCoord - 1) == Integer.parseInt(coords[1]) || hexCoords.get(indexOfOneCoord + 1) == Integer.parseInt(coords[1])) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+            private static boolean checkForSettlement(String boardState, String action) {
+                ArrayList<Integer> coordsWithoutSettlements = new ArrayList<>(Arrays.asList(
+                        3, 4, 5, 6, 11, 12, 13, 14, 15, 38, 39, 40, 41, 42, 47, 48, 49, 50
+                ));
+                for (int i = 21; i < 33; i++) {
+                    coordsWithoutSettlements.add(i); // add middle part
+                }
+                // ###
+                String[] coords = Misc.getRoadCoordsFromAction(action);
+                String playerBoardState = Misc.getPlayerBoardState(boardState);
+                // ##
+                int currentIndex = 0;
+                ArrayList<String> firstCoordsInPlayerState = new ArrayList<>();
+                while (playerBoardState.indexOf("R", currentIndex) != -1) {
+                    int newIndex = playerBoardState.indexOf("R", currentIndex);
+                    firstCoordsInPlayerState.add(Character.toString(playerBoardState.charAt(newIndex+1)) + Character.toString(playerBoardState.charAt(newIndex+2)));
+                    currentIndex = newIndex + 1;
+                }
+                for (String coord : coords) {
+                    for (String firstCoord : firstCoordsInPlayerState) {
+                        if (playerBoardState.contains("R" + coord) || playerBoardState.contains("R" + firstCoord + coord)) { // this means coord is the common coord to check for a settlement
+                            if (coordsWithoutSettlements.contains(Integer.parseInt(coord))) {
+                                return true;
+                            }
+                            else if (playerBoardState.contains("S" + coord)) {
+                                return true;
+                            }
+                            else if (playerBoardState.contains("T" + coord)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false; // no common roads to connect to.
+            }
+            private static boolean roadConnectedToKnight(String playerBoardState, ArrayList<Integer> surroundingCoords) {
+                int currentIndex = 0;
+                while (playerBoardState.indexOf("R", currentIndex) != -1) {
+                    int newIndex = playerBoardState.indexOf("R", currentIndex);
+                    ArrayList<Integer> road = new ArrayList<>();
+                    road.add(
+                            Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex+1)) +
+                            Character.toString(playerBoardState.charAt(newIndex+2)))
+                    );
+                    road.add(
+                            Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex+3)) +
+                            Character.toString(playerBoardState.charAt(newIndex+4)))
+                    );
+
+                    if (surroundingCoords.contains(road.get(0)) && surroundingCoords.contains(road.get(1))) {
+                        int indexOfOneCoord = surroundingCoords.indexOf(road.get(0)); // check if the roads are next to each other
+                        if (indexOfOneCoord == 0) { // borders
+                            if (surroundingCoords.get(1) == road.get(1) || surroundingCoords.get(surroundingCoords.size() - 1) == road.get(1)) {
+                                return true;
+                            }
+                        }
+                        else if (indexOfOneCoord == surroundingCoords.size() - 1) { // borders
+                            if (surroundingCoords.get(0) == road.get(1) || surroundingCoords.get(surroundingCoords.size() - 2) == road.get(1)) {
+                                return true;
+                            }
+                        }
+                        else {
+                            if (surroundingCoords.get(indexOfOneCoord - 1) == road.get(1) || surroundingCoords.get(indexOfOneCoord + 1) == road.get(1)) {
+                                return true;
+                            }
+                        }
+                    }
+                    currentIndex = newIndex + 1;
+                }
+                return false;
+            }
+            private static boolean settlementConnectedToKnight(String playerBoardState, ArrayList<Integer> surroundingCoords) {
+                return settlementConnectedToKnightHelper(playerBoardState, surroundingCoords, "S") || settlementConnectedToKnightHelper(playerBoardState, surroundingCoords, "T");
+            }
+            private static boolean settlementConnectedToKnightHelper (String playerBoardState, ArrayList<Integer> surroundingCoords, String buildtype) {
+                int currentIndex = 0;
+                while (playerBoardState.indexOf(buildtype, currentIndex) != -1) {
+                    int newIndex = playerBoardState.indexOf(buildtype, currentIndex);
+                    int coord  = Integer.parseInt(
+                            Character.toString(playerBoardState.charAt(newIndex+1)) + Character.toString(playerBoardState.charAt(newIndex+2))
+                    );
+                    if (surroundingCoords.contains(coord)) {
+                        return true;
+                    }
+                    currentIndex = newIndex + 1;
+                }
+                return false;
+            }
+        }
+        // ####################################################################################### Miscellaneous Helper functions / constants
+        private class Misc {
+            private static final List<Character> possibleResources = new ArrayList<>(Arrays.asList('b', 'g', 'l', 'm', 'o', 'w'));
+
+            private static final ArrayList<ArrayList<Integer>> knightIndexingToRowIndexing = new ArrayList<>(Arrays.asList(
+                    // # Row 1
+                    new ArrayList<>(Arrays.asList(0, 4, 8, 12, 7, 3)),
+                    new ArrayList<>(Arrays.asList(1, 5, 9, 13, 8, 4)),
+                    new ArrayList<>(Arrays.asList(2, 6, 10, 14, 9, 5)),
+                    // # Row 2
+                    new ArrayList<>(Arrays.asList(7, 12, 17, 22, 16, 11)),
+                    new ArrayList<>(Arrays.asList(8, 13, 18, 23, 17, 12)),
+                    new ArrayList<>(Arrays.asList(9, 14, 19, 24, 18, 13)),
+                    new ArrayList<>(Arrays.asList(10, 15, 20, 25, 19, 14)),
+                    // # Row 3
+                    new ArrayList<>(Arrays.asList(16, 22, 28, 33, 27, 21)),
+                    new ArrayList<>(Arrays.asList(17, 23, 29, 34, 28, 22)),
+
+                    new ArrayList<>(Arrays.asList(18, 24, 30, 35, 29, 23)), // duplication for tile 9 && 10
+                    new ArrayList<>(Arrays.asList(18, 24, 30, 35, 29, 23)),
+
+                    new ArrayList<>(Arrays.asList(19, 25, 31, 36, 30, 24)),
+                    new ArrayList<>(Arrays.asList(20, 26, 32, 37, 31, 25)),
+                    // # Row 4
+                    new ArrayList<>(Arrays.asList(28, 34, 39, 43, 38, 33)),
+                    new ArrayList<>(Arrays.asList(29, 35, 40, 44, 39, 34)),
+                    new ArrayList<>(Arrays.asList(30, 36, 41, 45, 40, 35)),
+                    new ArrayList<>(Arrays.asList(31, 37, 42, 46, 41, 36)),
+                    // # Row 5
+                    new ArrayList<>(Arrays.asList(39, 44, 48, 51, 47, 43)),
+                    new ArrayList<>(Arrays.asList(40, 45, 49, 52, 48, 44)),
+                    new ArrayList<>(Arrays.asList(41, 46, 50, 53, 49, 45))
+            ));
+            final static Character[] coordinateToResource = new Character[]{
+                    // # Row 1
+                    'w',
+                    'g',
+                    'o',
+                    // # Row 2
+                    'o',
+                    'b',
+                    'l',
+                    'w',
+                    // # Row 3
+                    'g',
+                    'l',
+                    'm',
+                    'm',
+                    'b',
+                    'g',
+                    // # Row 4
+                    'w',
+                    'b',
+                    'l',
+                    'o',
+                    // # Row 5
+                    'o',
+                    'g',
+                    'w'
+            };
+            //
+            private static ArrayList<Character> getResourcesFromBoardState(String boardState) {
+                ArrayList<Character> resources = new ArrayList<>();
+                for (Character c : boardState.toCharArray()) {
+                    if (possibleResources.contains(c)) { // might be less than 6 resources so we might cut into a players gamestate, this filters that out.
+                        resources.add(c);
+                    }
+                }
+                return resources;
+            }
+
+            private static String getPlayerBoardState(String boardState) {
+                HashMap<Character, String> switchPlayers = new HashMap<>() {{
+                    put('W', "X");
+                    put('X', "W");
+                }};
+                Character playerTurn = boardState.charAt(0);
+                int startOfPlayerBoardState = boardState.indexOf(Character.toString(playerTurn), 1);
+                int endOfPlayerBoardState = boardState.indexOf(switchPlayers.get(playerTurn), startOfPlayerBoardState);
+                List<Character> playerBoardState = new ArrayList<>();
+                for (Character c : boardState.toCharArray()) {
+                    playerBoardState.add(c);
+                }
+                String result = "";
+                for (Character c : playerBoardState.subList(startOfPlayerBoardState + 1, endOfPlayerBoardState)) {
+                    result += Character.toString(c);
+                }
+                return result;
+            }
+            private static Coordinate convertToCoordinate(int boardCoord) {
+                int yCoord = 0, xCoord = 0;
+                for (int hexIndex = 0; hexIndex < Misc.knightIndexingToRowIndexing.size(); hexIndex++) {
+                    if (Misc.knightIndexingToRowIndexing.get(hexIndex).contains(boardCoord)) {
+                        yCoord = hexIndex;
+                        xCoord = Misc.knightIndexingToRowIndexing.get(hexIndex).indexOf(boardCoord);
+                    }
+                }
+                return new Coordinate(xCoord, yCoord);
+            }
+            private static String[] getRoadCoordsFromAction(String action) {
+                String firstCoord = Character.toString(action.charAt(action.length() - 4)) + Character.toString(action.charAt(action.length() - 3));
+                String secondCoord = Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1));
+                return new String[]{firstCoord, secondCoord};
+            }
+            private static double getDistance(Coordinate a, Coordinate b) {
+                return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+            }
+        }
     }
 
     /**
