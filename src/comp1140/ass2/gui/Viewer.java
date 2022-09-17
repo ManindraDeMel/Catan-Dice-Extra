@@ -180,22 +180,24 @@ public class Viewer extends Application {
         }
     }
 
-//    class ResourceCircle extends Circle{
-//        double startX, startY;
-//        ResourceCircle(){
-//            double centerX = startX;
-//            double centerY = startY + HEX_HEIGHT/5;
-//            double radius = HEX_HEIGHT/8;
-//            Circle circle = new Circle(centerX, centerY, radius);
-//            circle.setFill(Color.WHITE);
-//            circle.setStrokeWidth(2);
-//            circle.setStrokeMiterLimit(10);
-//            circle.setStrokeType(StrokeType.INSIDE);
-//            circle.setStroke(Color.valueOf("0x000000"));
-//            this.board.getChildren().add(circle);
-//
-//        }
-//    }
+    class ResourceCircle extends Circle{
+        double startX, startY;
+        ResourceCircle(double startX, double startY){
+            double centerX = startX;
+            double centerY = startY + HEX_HEIGHT/5;
+            double radius = HEX_HEIGHT/8;
+
+            this.setCenterX(centerX);
+            this.setCenterY(centerY);
+            this.setRadius(radius);
+
+            this.setFill(Color.WHITE);
+            this.setStrokeWidth(2);
+            this.setStrokeMiterLimit(10);
+            this.setStrokeType(StrokeType.INSIDE);
+            this.setStroke(Color.valueOf("0x000000"));
+        }
+    }
 
     class Road extends Rectangle{
         double height, width, startX, startY;
@@ -207,40 +209,22 @@ public class Viewer extends Application {
             this.id = id;
 
             double sideLength = HEX_WIDTH * 3 / 5;
-            double width = HEX_WIDTH/8;
-            double height = width*2.5;
+            this.width = HEX_WIDTH/8;
+            this.height = width*2.5;
 
             double centerX = startX-HEX_WIDTH/2 - width/2;
             double centerY = startY - (sideLength - height)/2;
 
-//            switch (this.id){
-//                case 0 -> {
-//                    this.setX(centerX-HEX_WIDTH/2- width/2);
-//                    this.setY(centerY - (HEX_WIDTH)/2  + (sideLength - height)/2);
-//                    this.setWidth(width);
-//                    this.setHeight(height);
-//                }
-//                case 1 -> {
-//
-//                }
-//                case 3 -> {
-//                    this.setX(centerX + HEX_WIDTH/2 - width/2);
-//                    this.setY(centerY - (HEX_WIDTH)/2  + (sideLength - height)/2);
-//                    this.setWidth(width);
-//                    this.setHeight(height);
-//                }
-//            }
-
             this.setX(centerX);
             this.setY(centerY);
-            this.setWidth(width);
-            this.setHeight(height);
+            this.setWidth(this.width);
+            this.setHeight(this.height);
 
             Rotate rotate = new Rotate();
             rotate.setPivotX(startX);
             rotate.setPivotY(startY);
             this.getTransforms().addAll(rotate);
-            rotate.setAngle(30*id);
+            rotate.setAngle(30*this.id);
             this.getTransforms().add(rotate);
 
             Color fillColour;
@@ -264,6 +248,169 @@ public class Viewer extends Application {
         }
     }
 
+    class Settlement extends Polygon{
+        Settlement (double startX, double startY, boolean isBuilt, int id, char player){
+
+            double sideLength = HEX_WIDTH * 3 / 5;
+            int scale = 7;
+            double centerX;
+            double centerY;
+            Double[] coordinates = new Double[]{
+                    0.0, 0.0,
+                    HEX_WIDTH/scale, 0.0,
+                    HEX_WIDTH/scale, -HEX_WIDTH/(scale+1),
+                    HEX_WIDTH/(scale*2), -1.3*(HEX_WIDTH/(scale+1)),
+                    0.0, -HEX_WIDTH/(scale+1)
+            };
+
+            this.getPoints().addAll(coordinates);
+
+            if(id == 0){
+                // down
+                centerX = startX - (HEX_WIDTH/scale)/2;
+                centerY = startY + HEX_WIDTH/2 + (HEX_WIDTH/(scale+1));
+            }else {
+                // up
+                centerX = startX - (HEX_WIDTH/scale)/2;
+                centerY = startY - HEX_HEIGHT/2 - (HEX_WIDTH/(scale+1))/2;
+            }
+
+            this.setLayoutX(centerX);
+            this.setLayoutY(centerY);
+
+            Color fillColour;
+            Color strokeColour;
+            if (isBuilt == false) {
+                fillColour = Color.DARKGRAY;
+                strokeColour = Color.LIGHTGRAY;
+            }
+            else {
+                strokeColour = Color.BLUE;
+                if (player == 'w')
+                    fillColour = playersColour[0];
+                else
+                    fillColour = playersColour[1];
+            }
+
+            this.setStroke(strokeColour);
+            this.setStrokeWidth(2.0);
+            this.setStrokeType(StrokeType.INSIDE);
+            this.setFill(fillColour);
+        }
+    }
+
+    class CityRight extends Polygon {
+        CityRight (double startX, double startY, boolean isBuilt, int id, char player){
+
+            double sideLength = HEX_WIDTH * 3 / 5;
+            int scale = 7;
+            double centerX;
+            double centerY;
+            Double[] coordinates = new Double[]{
+                    0.0, 0.0,
+                    HEX_WIDTH/scale, 0.0,
+                    HEX_WIDTH/scale, -HEX_WIDTH/(scale-1),
+                    HEX_WIDTH/(scale*2), -1.3*(HEX_WIDTH/(scale-1)),
+                    0.0, -HEX_WIDTH/(scale-1)
+            };
+
+            this.getPoints().addAll(coordinates);
+
+            if(id == 0){
+                // down
+                centerX = startX;
+                centerY = startY + HEX_WIDTH/2 + (HEX_WIDTH/(scale+1));
+            }else {
+                // up
+                centerX = startX;
+                centerY = startY - HEX_HEIGHT/2 - (HEX_WIDTH/(scale+1))/2;
+            }
+
+            this.setLayoutX(centerX);
+            this.setLayoutY(centerY);
+
+            Color fillColour;
+            Color strokeColour;
+            if (isBuilt == false) {
+                fillColour = Color.DARKGRAY;
+                strokeColour = Color.LIGHTGRAY;
+            }
+            else {
+                strokeColour = Color.BLUE;
+                if (player == 'w')
+                    fillColour = playersColour[0];
+                else
+                    fillColour = playersColour[1];
+            }
+
+            this.setStroke(strokeColour);
+            this.setStrokeWidth(2.0);
+            this.setStrokeType(StrokeType.INSIDE);
+            this.setFill(fillColour);
+        }
+    }
+
+    class CityLeft extends Polygon {
+        CityLeft (double startX, double startY, boolean isBuilt, int id, char player){
+
+            double sideLength = HEX_WIDTH * 3 / 5;
+            int scale = 7;
+            double centerX;
+            double centerY;
+            Double[] coordinates = new Double[]{
+                    0.0, 0.0,
+                    HEX_WIDTH/scale, 0.0,
+                    HEX_WIDTH/scale, -HEX_WIDTH/(scale+1),
+                    HEX_WIDTH/(scale*2), -1.3*(HEX_WIDTH/(scale+1)),
+                    0.0, -HEX_WIDTH/(scale+1)
+            };
+
+            this.getPoints().addAll(coordinates);
+
+            if(id == 0){
+                // down
+                centerX = startX - (HEX_WIDTH/scale);
+                centerY = startY + HEX_WIDTH/2 + (HEX_WIDTH/(scale+1));
+            }else {
+                // up
+                centerX = startX - (HEX_WIDTH/scale);
+                centerY = startY - HEX_HEIGHT/2 - (HEX_WIDTH/(scale+1))/2;
+            }
+
+            this.setLayoutX(centerX);
+            this.setLayoutY(centerY);
+
+            Color fillColour;
+            Color strokeColour;
+            if (isBuilt == false) {
+                fillColour = Color.DARKGRAY;
+                strokeColour = Color.LIGHTGRAY;
+            }
+            else {
+                strokeColour = Color.BLUE;
+                if (player == 'w')
+                    fillColour = playersColour[0];
+                else
+                    fillColour = playersColour[1];
+            }
+
+            this.setStroke(strokeColour);
+            this.setStrokeWidth(2.0);
+            this.setStrokeType(StrokeType.INSIDE);
+            this.setFill(fillColour);
+        }
+    }
+
+    class City{
+        CityLeft cityLeft;
+        CityRight cityRight;
+
+        City (double startX, double startY, boolean isBuilt, int id, char player){
+            cityLeft = new CityLeft(startX, startY, isBuilt, id, player);
+            cityRight = new CityRight(startX, startY, isBuilt, id, player);
+        }
+    }
+
     private void makeBoard() {
         this.board.setLayoutX(BOARD_X + MARGIN_X);
         this.board.setLayoutY(BOARD_Y + MARGIN_Y);
@@ -280,143 +427,53 @@ public class Viewer extends Application {
                 continue;
             }
                 double xOffset = y%2==0 ? 0.5 : 0;
-//                double startX = x * HEX_WIDTH;
-//                double startY = (y + yOffset) * HEX_HEIGHT;
                 double startX = (x+xOffset) * HEX_WIDTH;
                 double startY = y * HEX_HEIGHT;
+
                 Hexagon hexagon = new Hexagon(startX, startY);
                 this.board.getChildren().add(hexagon);
 
                 // Making circles
-                double centerX = startX;
-                double centerY = startY + HEX_HEIGHT/5;
-                double radius = HEX_HEIGHT/8;
-                Circle circle = new Circle(centerX, centerY, radius);
-                circle.setFill(Color.WHITE);
-                circle.setStrokeWidth(2);
-                circle.setStrokeMiterLimit(10);
-                circle.setStrokeType(StrokeType.INSIDE);
-                circle.setStroke(Color.valueOf("0x000000"));
+                ResourceCircle circle = new ResourceCircle(startX, startY);
                 this.board.getChildren().add(circle);
 
-                // Making Knight
-//                double centerXK = startX;
-//                double centerYK = startY - HEX_HEIGHT/5;
-//                double radiusK = HEX_HEIGHT/15;
-//                Circle circleK = new Circle(centerXK, centerYK, radiusK);
-//                circleK.setFill(Color.GREEN);
-//                circleK.setStrokeWidth(2);
-//                circleK.setStrokeMiterLimit(10);
-//                circleK.setStrokeType(StrokeType.INSIDE);
-//                circleK.setStroke(Color.valueOf("0x000000"));
-//                this.board.getChildren().add(circleK);
-//
-//                Rectangle rectangle = new Rectangle();
-//                double width = radiusK*2.3;
-//                double height = radiusK*3.5;
-//                //Setting the properties of the rectangle
-//                rectangle.setX(centerXK - width/2);
-//                rectangle.setY(centerYK + radiusK*0.7);
-//                rectangle.setWidth(width);
-//                rectangle.setHeight(height);
-//
-//                rectangle.setFill(Color.GREEN);
-//                rectangle.setStrokeWidth(2);
-//                rectangle.setStrokeMiterLimit(10);
-//                rectangle.setStrokeType(StrokeType.INSIDE);
-//                rectangle.setStroke(Color.valueOf("0x000000"));
-//                this.board.getChildren().add(rectangle);
 
-                // MAKING ROAD
+                // Making house
+//                Polygon house1 = new Polygon();
+//                int scale = 6;
+//                house1.getPoints().addAll(new Double[]{
+//                        0.0, 0.0,
+//                        HEX_WIDTH/scale, 0.0,
+//                        HEX_WIDTH/scale, -HEX_WIDTH/(scale+1),
+//                        HEX_WIDTH/(scale*2), -1.3*(HEX_WIDTH/(scale+1)),
+//                        0.0, -HEX_WIDTH/(scale+1)
+//                        }
+//
+//                );
+//                house1.setLayoutX(startX - (HEX_WIDTH/scale)/2);
+//                house1.setLayoutY(startY + HEX_WIDTH/2 + (HEX_WIDTH/(scale+1)));
+//
+//                // UP
+////                house1.setLayoutX(startX - (HEX_WIDTH/scale)/2);
+////                house1.setLayoutY(startY - HEX_HEIGHT/2 - (HEX_WIDTH/(scale+1))/2);
+//
+//                house1.setFill(Color.YELLOW);
+//                house1.setStroke(Color.GRAY);
+//                house1.setStrokeWidth(2.0);
+//                house1.setStrokeType(StrokeType.INSIDE);
+//                structures.getChildren().add(house1);
 
-                // left
-//                double sideLength = HEX_WIDTH * 3 / 5;
-//                Rectangle rectangle = new Rectangle();
-//                double width = HEX_WIDTH/8;
-//                double height = width*2.5;
-//                //Setting the properties of the rectangle
-////                rectangle.setX(centerX-HEX_WIDTH/2- width/2);
-////                rectangle.setY(centerY - (HEX_WIDTH)/2  + (sideLength - height)/2);
-//
-//                rectangle.setX(startX-HEX_WIDTH/2 - width/2);
-//                rectangle.setY(startY - (sideLength - height)/2);
-//                rectangle.setWidth(width);
-//                rectangle.setHeight(height);
-////                rectangle.setRotate(180);
-//
-//                rectangle.setFill(Color.GREEN);
-//                rectangle.setStrokeWidth(2);
-//                rectangle.setStrokeMiterLimit(10);
-//                rectangle.setStrokeType(StrokeType.INSIDE);
-//                rectangle.setStroke(Color.valueOf("0x000000"));
-//                this.board.getChildren().add(rectangle);
+//                Settlement settlement = new Settlement(startX,  startY, false, 1, 'w');
+//                this.structures.getChildren().add(settlement);
 
-                // right
-//                rectangle = new Rectangle();
-//                //Setting the properties of the rectangle
-//                rectangle.setX(centerX + HEX_WIDTH/2 - width/2);
-//                rectangle.setY(centerY - (HEX_WIDTH)/2  + (sideLength - height)/2);
-//                rectangle.setWidth(width);
-//                rectangle.setHeight(height);
-////                rectangle.setRotate(90);
-//
-//                rectangle.setFill(Color.GREEN);
-//                rectangle.setStrokeWidth(2);
-//                rectangle.setStrokeMiterLimit(10);
-//                rectangle.setStrokeType(StrokeType.INSIDE);
-//                rectangle.setStroke(Color.valueOf("0x000000"));
-//                this.board.getChildren().add(rectangle);
-
-                // top left
-//                rectangle = new Rectangle();
-//                //Setting the properties of the rectangle
-//                rectangle.setX(startX-HEX_WIDTH/2 - width/2);
-//                rectangle.setY(startY - (sideLength - height)/2);
-//                rectangle.setWidth(width);
-//                rectangle.setHeight(height);
-////                rectangle.setRotate(90);
-//
-//                Rotate rotate = new Rotate();
-//                rotate.setPivotX(startX);
-//                rotate.setPivotY(startY);
-//                rectangle.getTransforms().addAll(rotate);
-//                rotate.setAngle(30);
-//                rectangle.getTransforms().add(rotate);
-//
-//                rectangle.setFill(Color.GREEN);
-//                rectangle.setStrokeWidth(2);
-//                rectangle.setStrokeMiterLimit(10);
-//                rectangle.setStrokeType(StrokeType.INSIDE);
-//                rectangle.setStroke(Color.valueOf("0x000000"));
-//                this.board.getChildren().add(rectangle);
-//
-//                // top right
-//                rectangle = new Rectangle();
-//                //Setting the properties of the rectangle
-//                rectangle.setX(startX-HEX_WIDTH/2 - width/2);
-//                rectangle.setY(startY - (sideLength - height)/2);
-//                rectangle.setWidth(width);
-//                rectangle.setHeight(height);
-////                rectangle.setRotate(90);
-//
-//                rotate = new Rotate();
-//                rotate.setPivotX(startX);
-//                rotate.setPivotY(startY);
-//                rectangle.getTransforms().addAll(rotate);
-//                rotate.setAngle(60);
-//                rectangle.getTransforms().add(rotate);
-//
-//                rectangle.setFill(Color.GREEN);
-//                rectangle.setStrokeWidth(2);
-//                rectangle.setStrokeMiterLimit(10);
-//                rectangle.setStrokeType(StrokeType.INSIDE);
-//                rectangle.setStroke(Color.valueOf("0x000000"));
-//                this.board.getChildren().add(rectangle);
+                City city = new City(startX,  startY, false, 1, 'w');
+                this.structures.getChildren().add(city.cityLeft);
+                this.structures.getChildren().add(city.cityRight);
 
 
-//                KnightHead knightHead = new KnightHead(startX, startY, false, 'w');
                 Knight knight;
                 Road road = new Road(startX, startY, false, x,'w');
+
                 switch ((x+y)%3){
 
                     case 0 -> knight = new Knight(startX, startY, false, 'w');
@@ -436,7 +493,7 @@ public class Viewer extends Application {
                         road = new Road(startX, startY, false, x,'w');
                     }
                 }
-//                Knight knight = new Knight(startX, startY, false, 'w');
+
                 this.structures.getChildren().add(knight.knightBody);
                 this.structures.getChildren().add(knight.knightHead);
                 this.structures.getChildren().add(road);
