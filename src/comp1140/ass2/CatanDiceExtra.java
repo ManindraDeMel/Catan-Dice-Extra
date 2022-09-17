@@ -695,37 +695,62 @@ public class CatanDiceExtra {
         public static ArrayList<ArrayList<Integer>> getRoads(Character player, String boardState) {
             return getRoad(validateClass.Misc.getPlayerBoardState(boardState, player));
         }
-        public static HashMap<ArrayList<Integer>, ArrayList<ArrayList<Integer>>> generateGraph(ArrayList<ArrayList<Integer>> roads) {
-            HashMap<ArrayList<Integer>, ArrayList<ArrayList<Integer>>> graph = new HashMap<>();
-            for(ArrayList<Integer> road : roads) {
-                ArrayList<ArrayList<Integer>> connectedRoads = new ArrayList<>();
-                for (ArrayList<Integer> road2 : roads) {
-                    if (road != road2) {
-                        if (road.get(1) == road2.get(0)) {
-                                connectedRoads.add(road2);
+        private static ArrayList<Integer> getDistinctNodesFromRoads(ArrayList<ArrayList<Integer>> roads) {
+            ArrayList<Integer> nodes = new ArrayList<>();
+            for (ArrayList<Integer> road : roads) {
+                for (Integer node : road) {
+                    if (!nodes.contains(node)) {
+                        nodes.add(node);
+                    }
+                }
+            }
+            return nodes;
+        }
+        public static HashMap<Integer, ArrayList<Integer>> generateGraph(ArrayList<ArrayList<Integer>> roads) { // instead of doing roads, we should do nodes and use the roads as vertices im so stupid.
+            HashMap<Integer, ArrayList<Integer>> graph = new HashMap<>();
+            int[] otherIndex = new int[]{1, 0};
+            for (Integer node : getDistinctNodesFromRoads(roads)) {
+                for (ArrayList<Integer> road : roads) {
+                    if (road.contains(node)) {
+                        int connectedPoint = road.get(otherIndex[road.indexOf(node)]);
+                        if (graph.containsKey(node)) {
+                            graph.get(node).add(connectedPoint);
+                        }
+                        else {
+                            graph.put(node, new ArrayList<>(Arrays.asList(connectedPoint)));
                         }
                     }
                 }
-                graph.put(road, connectedRoads);
             }
             return graph;
         }
-        public static int getLongestRoad(HashMap<ArrayList<Integer>, ArrayList<ArrayList<Integer>>> graph) {
+        public static int getLongestRoad(HashMap<Integer, ArrayList<Integer>> graph) {
             ArrayList<Integer> differentLengths = new ArrayList<>();
-            for (ArrayList<Integer> road : graph.keySet()) {
-                differentLengths.add(getLongestRoadHelper(1, graph.get(road), graph));
+            for (Integer node : graph.keySet()) {
+                differentLengths.add(getLongestRoadHelper(new ArrayList<>(), -1, node, graph));
             }
             return Collections.max(differentLengths);
         }
-        public static int getLongestRoadHelper(int counter, ArrayList<ArrayList<Integer>> connectedRoads, HashMap<ArrayList<Integer>, ArrayList<ArrayList<Integer>>> graph) {
-            if (connectedRoads.size() == 0) {
-                return counter;
+        public static int getLongestRoadHelper(ArrayList<Integer> visitedNodes, Integer lastNode, Integer currentNode, HashMap<Integer, ArrayList<Integer>>graph) {
+            ArrayList<Integer> connectedNodes = graph.get(currentNode);
+            ArrayList<Integer> newNodes = new ArrayList<>();
+            for (Integer node : connectedNodes) {
+                if (!visitedNodes.contains(node)) {
+                    newNodes.add(node);
+                }
+            }
+            visitedNodes.add(currentNode);
+            if (newNodes.size() == 0) {
+                for (Integer node : connectedNodes) {
+                    if (lastNode != node) {
+                        return 1;
+                    }
+                }
+                return 0;
             }
             ArrayList<Integer> children = new ArrayList<>();
-            counter++;
-            for (ArrayList<Integer> road : connectedRoads) { // basic recursion
-                int debug = getLongestRoadHelper(counter, graph.get(road), graph);
-                children.add(debug);
+            for (Integer newNode : newNodes) { // basic recursion
+                children.add(1 + getLongestRoadHelper(visitedNodes, currentNode, newNode, graph));
             }
             return Collections.max(children);
         }
@@ -898,4 +923,8 @@ public class CatanDiceExtra {
     public void GameOver() {
 
     }
+
+//    public static void main(String[] args) {
+//        CatanDiceExtra.longestRoad("W61glmmwwWXK02K04K05K06K11K12R0105R0205R0206R0509R0610R0813R0913R0914R1014R1015R1318R1419R1520R1925R2025R2026R2531R2632R3137R3237S02S09S20T10W07X09RA");
+//    }
 }
