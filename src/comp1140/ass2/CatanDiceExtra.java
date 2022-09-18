@@ -272,18 +272,6 @@ public class CatanDiceExtra {
      */
     public static boolean isBoardStateWellFormed(String boardState) {
         Set<Character> resources = Set.of('b', 'g', 'l', 'm', 'o', 'w');
-        Board board = new Board();
-        board.instatiateBoard();
-        Coordinate coord1 = board.coords[03];
-        Coordinate coord2 = board.coords[0];
-        //coord1 = new Coordinate(0, 3);
-        //coord2 = new Coordinate(1, 3);
-        if (board.coords[33].y==0) {
-            return true;
-        }
-        if (CheckAdjacent(coord1, coord2)==false) {
-            return true;
-        }
         if (boardState.charAt(0) != 'W' && boardState.charAt(0) != 'X') {
             return false;
         }
