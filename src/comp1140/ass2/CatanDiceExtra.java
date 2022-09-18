@@ -1,5 +1,4 @@
 package comp1140.ass2;
-
 import java.util.*;
 
 public class CatanDiceExtra {
@@ -352,28 +351,8 @@ public class CatanDiceExtra {
                 return false;
             }
             private static boolean roadOnCoast(String action) {
-                final ArrayList<String> coastalRoadNodes = new ArrayList<>(Arrays.asList(
-                        "03",
-                        "07",
-                        "16",
-                        "21",
-                        "33",
-                        "43",
-                        "47",
-                        "48",
-                        "49",
-                        "50",
-                        "46",
-                        "37",
-                        "32",
-                        "20",
-                        "10",
-                        "06",
-                        "05",
-                        "04"
-                ));
                 for (String s : Misc.getRoadCoordsFromAction(action)) {
-                    if (coastalRoadNodes.contains(s)) {
+                    if (Misc.coastalRoadNodes.contains(s)) {
                         return true;
                     }
                 }
@@ -592,6 +571,26 @@ public class CatanDiceExtra {
                     'g',
                     'w'
             };
+            final static ArrayList<String> coastalRoadNodes = new ArrayList<>(Arrays.asList(
+                    "03",
+                    "07",
+                    "16",
+                    "21",
+                    "33",
+                    "43",
+                    "47",
+                    "48",
+                    "49",
+                    "50",
+                    "46",
+                    "37",
+                    "32",
+                    "20",
+                    "10",
+                    "06",
+                    "05",
+                    "04"
+            ));
             //
             private static ArrayList<Character> getResourcesFromBoardState(String boardState) {
                 ArrayList<Character> resources = new ArrayList<>();
@@ -603,12 +602,22 @@ public class CatanDiceExtra {
                 return resources;
             }
 
-            private static String getPlayerBoardState(String boardState) {
+            public static String getPlayerBoardState(String boardState) {
                 HashMap<Character, String> switchPlayers = new HashMap<>() {{
                     put('W', "X");
                     put('X', "W");
                 }};
                 Character playerTurn = boardState.charAt(0);
+                return getString(boardState, playerTurn, switchPlayers);
+            }
+            public static String getPlayerBoardState(String boardState, Character playerTurn) {
+                HashMap<Character, String> switchPlayers = new HashMap<>() {{
+                    put('W', "X");
+                    put('X', "W");
+                }};
+                return getString(boardState, playerTurn, switchPlayers);
+            }
+            private static String getString(String boardState, Character playerTurn, HashMap<Character, String> switchPlayers) {
                 int startOfPlayerBoardState = boardState.indexOf(Character.toString(playerTurn), 1);
                 int endOfPlayerBoardState = boardState.indexOf(switchPlayers.get(playerTurn), startOfPlayerBoardState);
                 List<Character> playerBoardState = new ArrayList<>();
@@ -621,6 +630,7 @@ public class CatanDiceExtra {
                 }
                 return result;
             }
+
             private static Coordinate convertToCoordinate(int boardCoord) {
                 int yCoord = 0, xCoord = 0;
                 for (int hexIndex = 0; hexIndex < Misc.knightIndexingToRowIndexing.size(); hexIndex++) {
@@ -654,8 +664,96 @@ public class CatanDiceExtra {
      * @return array of contiguous road lengths, one per player.
      */
     public static int[] longestRoad(String boardState) {
-        // FIXME: Task 8a
-        return null;
+        int[] longestRoadArr = new int[2];
+        char[] players = new char[]{'W', 'X'};
+        for (int i = 0; i < players.length; i++) {
+            char player = players[i];
+            ArrayList<ArrayList<Integer>> playerRoads = longestRoadHelper.getRoads(player, boardState);
+            if (playerRoads.size() != 0) { // has at least 1 road
+                longestRoadArr[i] = longestRoadHelper.getLongestRoad(longestRoadHelper.generateGraph(playerRoads));
+            }
+            else {
+                longestRoadArr[i] = 0;
+            }
+        }
+        return longestRoadArr;
+    }
+    private class longestRoadHelper {
+        public static ArrayList<ArrayList<Integer>> getRoad(String playerBoardState) {
+            int currentIndex = 0;
+            ArrayList<ArrayList<Integer>> roads = new ArrayList<>();
+            while (playerBoardState.indexOf("R", currentIndex) != -1) {
+                int newIndex = playerBoardState.indexOf("R", currentIndex);
+                roads.add(new ArrayList<>(Arrays.asList(
+                        Integer.parseInt(Character.toString(playerBoardState.toCharArray()[newIndex+1]) + Character.toString(playerBoardState.toCharArray()[newIndex+2])),
+                        Integer.parseInt(Character.toString(playerBoardState.toCharArray()[newIndex+3]) + Character.toString(playerBoardState.toCharArray()[newIndex+4]))
+                )));
+                currentIndex = newIndex + 1;
+            }
+            return roads;
+        }
+        public static ArrayList<ArrayList<Integer>> getRoads(Character player, String boardState) {
+            return getRoad(validateClass.Misc.getPlayerBoardState(boardState, player));
+        }
+        private static ArrayList<Integer> getDistinctNodesFromRoads(ArrayList<ArrayList<Integer>> roads) {
+            ArrayList<Integer> nodes = new ArrayList<>();
+            for (ArrayList<Integer> road : roads) {
+                for (Integer node : road) {
+                    if (!nodes.contains(node)) {
+                        nodes.add(node);
+                    }
+                }
+            }
+            return nodes;
+        }
+        public static HashMap<Integer, ArrayList<Integer>> generateGraph(ArrayList<ArrayList<Integer>> roads) { // instead of doing roads, we should do nodes and use the roads as vertices im so stupid.
+            HashMap<Integer, ArrayList<Integer>> graph = new HashMap<>();
+            int[] otherIndex = new int[]{1, 0};
+            for (Integer node : getDistinctNodesFromRoads(roads)) {
+                for (ArrayList<Integer> road : roads) {
+                    if (road.contains(node)) {
+                        int connectedPoint = road.get(otherIndex[road.indexOf(node)]);
+                        if (graph.containsKey(node)) {
+                            graph.get(node).add(connectedPoint);
+                        }
+                        else {
+                            graph.put(node, new ArrayList<>(Arrays.asList(connectedPoint)));
+                        }
+                    }
+                }
+            }
+            return graph;
+        }
+        public static int getLongestRoad(HashMap<Integer, ArrayList<Integer>> graph) {
+            ArrayList<Integer> differentLengths = new ArrayList<>();
+            for (Integer node : graph.keySet()) {
+                differentLengths.add(getLongestRoadHelper(new ArrayList<>(), -1, node, graph));
+            }
+            return Collections.max(differentLengths);
+        }
+        public static int getLongestRoadHelper(ArrayList<Integer> visitedNodes, Integer lastNode, Integer currentNode, HashMap<Integer, ArrayList<Integer>>graph) {
+            ArrayList<Integer> connectedNodes = graph.get(currentNode);
+            ArrayList<Integer> newNodes = new ArrayList<>();
+            for (Integer node : connectedNodes) {
+                if (!visitedNodes.contains(node)) {
+                    newNodes.add(node);
+                }
+            }
+            visitedNodes.add(currentNode);
+            if (newNodes.size() == 0) {
+                for (Integer node : connectedNodes) {
+                    if (lastNode != node) {
+                        return 1;
+                    }
+                }
+                return 0;
+            }
+            ArrayList<Integer> children = new ArrayList<>();
+            for (Integer newNode : newNodes) { // basic recursion
+                children.add(1 + getLongestRoadHelper(visitedNodes, currentNode, newNode, graph));
+            }
+            return Collections.max(children);
+        }
     }
 
     /**
@@ -670,8 +768,6 @@ public class CatanDiceExtra {
      * @return array of army sizes, one per player.
      */
     public static int[] largestArmy(String boardState) {
-        // FIXME: Task 8b
-
         int[] largeArmy = new int[2];
 
         // Extracting the Board State of each player
@@ -683,6 +779,7 @@ public class CatanDiceExtra {
         largeArmy[1] = (int) playerX.chars().filter(ch -> ch == 'K').count() + (int) playerX.chars().filter(ch -> ch == 'J').count();
 
         return largeArmy;
+
     }
 
     /**
@@ -826,4 +923,8 @@ public class CatanDiceExtra {
     public void GameOver() {
 
     }
+
+//    public static void main(String[] args) {
+//        CatanDiceExtra.longestRoad("W61glmmwwWXK02K04K05K06K11K12R0105R0205R0206R0509R0610R0813R0913R0914R1014R1015R1318R1419R1520R1925R2025R2026R2531R2632R3137R3237S02S09S20T10W07X09RA");
+//    }
 }
