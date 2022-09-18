@@ -3,7 +3,6 @@ package comp1140.ass2;
 import java.util.HashMap;
 
 public class Board {
-    HashMap <Tile, GamePiece>[][] pieces;
 
     public Tile[] tiles;
     public Coordinate[] coords;
@@ -53,20 +52,33 @@ public class Board {
                     cityable = false;
                 }
                 this.settlements[settlenum] = new Settlement(new Player(""), new Coordinate(x, y), cityable, c);
+                settlenum++;
             }
-            if (y<3) {
+            if (y==2&&x==10) {
+                x = 0;
+                y = 3;
+            } else if (y<3) {
                 rowlen = 2*y+6;
+                if (x==(rowlen-1)) {
+                    x = 0;
+                } else if (x==rowlen) {
+                    x=1;
+                    y++;
+                } else {
+                    x+=2;
+                }
             } else {
                 rowlen = -2*y+16;
+                if (x==(rowlen-1)) {
+                    x = 0;
+                    y++;
+                } else if (x==rowlen) {
+                    x=1;
+                } else {
+                    x+=2;
+                }
             }
-            if (x==(rowlen/2)) {
-                x = 0;
-            } else if (x==rowlen) {
-                x=1;
-                y++;
-            } else {
-                x+=2;
-            }
+
         }
 
     }

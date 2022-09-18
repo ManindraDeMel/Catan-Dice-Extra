@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 
+import static comp1140.ass2.Coordinate.CheckAdjacent;
+
 public class CatanDiceExtra {
     ArrayList<Player> players = new ArrayList<>();
+
+    public Board board;
     ArrayList<String> playersNames = new ArrayList<>(Arrays.asList("Manindra", "Stephen", "Arjun")); // changes when we add GUI stuff (max of 6 players?)
     public void startGame() {
-        Board board = new Board();
-        board.instatiateBoard();
         for (String name : playersNames) {
             players.add(new Player(name));
         }
@@ -19,6 +21,242 @@ public class CatanDiceExtra {
 
     }
 
+
+    public static Boolean isPlayerBoardStateWellFormed(String pBoardState) {
+        int x;
+        Set<Character> ints = Set.of('1', '2', '3', '4', '5', '6', '7', '8', '9', '0');
+        for (x = 0; x < pBoardState.length(); x++) {
+            if ((ints.contains(pBoardState.charAt(x)) == false) && (pBoardState.charAt(x) != 'C')) {
+                break;
+            }
+        }
+        if (x != 0) {
+            if (x%2!=0) {
+                return false;
+            } else {
+                String[] castles = new String[x/2];
+                for (int y=2; y<=x; y+=2) {
+                    castles[(y/2)-1] = pBoardState.substring(y-2, y);
+                }
+                String[] castlesSorted = castles;
+                Arrays.sort(castlesSorted);
+                if (castles.equals(castlesSorted)==false) {
+                    return false;
+                }
+                for (int z=0; z<castles.length; z++) {
+                    if ( ((castles[z].charAt(0)=='C')&&(ints.contains(castles[z].charAt(1))))==false){
+                        return false;
+                    }
+                    int index = Integer.valueOf(castles[z].substring(1,2));
+                    if (index>3) {
+                        return false;
+                    }
+                }
+            }
+        }
+        String pBoardStateNoC = pBoardState.substring(x);
+        for (x = 0; x < pBoardStateNoC.length(); x++) {
+            if ((ints.contains(pBoardStateNoC.charAt(x)) == false) && (pBoardStateNoC.charAt(x) != 'J')) {
+                break;
+            }
+        }
+
+        if (x != 0) {
+            if (x%3!=0) {
+                return false;
+            } else {
+                String[] jKnights = new String[x/3];
+                for (int y=3; y<=x; y+=3) {
+                    jKnights[(y/3)-1] = pBoardStateNoC.substring(y-3, y);
+                }
+                String[] jKnightsSorted = jKnights;
+                Arrays.sort(jKnightsSorted);
+                if (jKnights.equals(jKnightsSorted)==false) {
+                    return false;
+                }
+                for (int z=0; z<jKnights.length; z++) {
+                    if (jKnights[z].charAt(0)!='J') {
+                        return false;
+                    }
+                    for (int n=1; n<=2; n++) {
+                        if (ints.contains(jKnights[z].charAt(1))==false) {
+                            return false;
+                        }
+                    }
+                    int index = Integer.valueOf(jKnights[z].substring(1,3));
+                    if (index>19) {
+                        return false;
+                    }
+                }
+            }
+        }
+        String pBoardStateNoCJ = pBoardStateNoC.substring(x);
+        for (x = 0; x < pBoardStateNoCJ.length(); x++) {
+            if ((ints.contains(pBoardStateNoCJ.charAt(x)) == false) && (pBoardStateNoCJ.charAt(x) != 'K')) {
+                break;
+            }
+        }
+        if (x != 0) {
+            if (x%3!=0) {
+                return false;
+            } else {
+                String[] kKnights = new String[x/3];
+                for (int y=3; y<=x; y+=3) {
+                    kKnights[(y/3)-1] = pBoardStateNoCJ.substring(y-3, y);
+                }
+                String[] kKnightsSorted = kKnights;
+                Arrays.sort(kKnightsSorted);
+                if (kKnights.equals(kKnightsSorted)==false) {
+                    return false;
+                }
+                for (int z=0; z<kKnights.length; z++) {
+                    if (kKnights[z].charAt(0)!='K') {
+                        return false;
+                    }
+                    for (int n=1; n<=2; n++) {
+                        if (ints.contains(kKnights[z].charAt(1))==false) {
+                            return false;
+                        }
+                    }
+                    int index = Integer.valueOf(kKnights[z].substring(1,3));
+                    if (index>19) {
+                        return false;
+                    }
+                }
+            }
+        }
+        String pBoardStateNoCJK = pBoardStateNoCJ.substring(x);
+        for (x = 0; x < pBoardStateNoCJK.length(); x++) {
+            if ((ints.contains(pBoardStateNoCJK.charAt(x)) == false) && (pBoardStateNoCJK.charAt(x) != 'R')) {
+                break;
+            }
+        }
+        if (x != 0) {
+            if (x%5!=0) {
+                return false;
+            } else {
+                String[] roads = new String[x/5];
+                for (int y=5; y<=x; y+=5) {
+                    roads[(y/5)-1] = pBoardStateNoCJK.substring(y-5, y);
+                }
+                String[] roadsSorted = roads;
+                Arrays.sort(roadsSorted);
+                if (roads.equals(roadsSorted)==false) {
+                    return false;
+                }
+                for (int z=0; z<roads.length; z++) {
+                    if (roads[z].charAt(0)!='R') {
+                        return false;
+                    }
+                    for (int n=1; n<=4; n++) {
+                        if (ints.contains(roads[z].charAt(1))==false) {
+                            return false;
+                        }
+                    }
+                    int index1 = Integer.valueOf(roads[z].substring(1,3));
+                    int index2 = Integer.valueOf(roads[z].substring(3,5));
+                    if (index1>=index2||index1>53||index2>53) {
+                        return false;
+                    }
+                }
+            }
+        }
+        String pBoardStateNoCJKR = pBoardStateNoCJK.substring(x);
+        for (x = 0; x < pBoardStateNoCJKR.length(); x++) {
+            if ((ints.contains(pBoardStateNoCJKR.charAt(x)) == false) && (pBoardStateNoCJKR.charAt(x) != 'S')) {
+                break;
+            }
+        }
+        if (x != 0) {
+            if (x%3!=0) {
+                return false;
+            } else {
+                String[] settle = new String[x/3];
+                for (int y=3; y<=x; y+=3) {
+                    settle[(y/3)-1] = pBoardStateNoCJKR.substring(y-3, y);
+                }
+                String[] settleSorted = settle;
+                Arrays.sort(settleSorted);
+                if (settle.equals(settleSorted)==false) {
+                    return false;
+                }
+                for (int z=0; z<settle.length; z++) {
+                    if (settle[z].charAt(0)!='S') {
+                        return false;
+                    }
+                    for (int n=1; n<=2; n++) {
+                        if (ints.contains(settle[z].charAt(1))==false) {
+                            return false;
+                        }
+                    }
+                    int index = Integer.valueOf(settle[z].substring(1,3));
+                    if (index>53) {
+                        return false;
+                    }
+                }
+            }
+        }
+        String pBoardStateNoCJKRS = pBoardStateNoCJKR.substring(x);
+        for (x = 0; x < pBoardStateNoCJKRS.length(); x++) {
+            if ((ints.contains(pBoardStateNoCJKRS.charAt(x)) == false) && (pBoardStateNoCJKRS.charAt(x) != 'T')) {
+                break;
+            }
+        }
+        if (x != 0) {
+            if (x%3!=0) {
+                return false;
+            } else {
+                String[] city = new String[x / 3];
+                for (int y = 3; y <= x; y += 3) {
+                    city[(y / 3) - 1] = pBoardStateNoCJKRS.substring(y - 3, y);
+                }
+                String[] citySorted = city;
+                Arrays.sort(citySorted);
+                if (city.equals(citySorted) == false) {
+                    return false;
+                }
+                for (int z = 0; z < city.length; z++) {
+                    if (city[z].charAt(0) != 'T') {
+                        return false;
+                    }
+                    for (int n = 1; n <= 2; n++) {
+                        if (ints.contains(city[z].charAt(1)) == false) {
+                            return false;
+                        }
+                    }
+                    int index = Integer.valueOf(city[z].substring(1,3));
+                    if (index>53) {
+                        return false;
+                    }
+                }
+            }
+        }
+        if (pBoardStateNoCJKRS.length()!=x) {
+            return false;
+        }
+        return true;
+    }
+    public static boolean isPlayerScoreWellFormed(String pScore) {
+        Set<Character> ints = Set.of('1', '2', '3', '4', '5', '6', '7', '8', '9', '0');
+        int l = pScore.length();
+        if (l >= 2) {
+            if (ints.contains(pScore.charAt(0))&&ints.contains(pScore.charAt(1))) {
+                if (l==2) {
+                    return true;
+                } else if (l == 3) {
+                    if (pScore.charAt(2)=='R'||pScore.charAt(2)=='A') {
+                        return true;
+                    }
+                } else if (l == 4) {
+                    if (pScore.charAt(2)=='R'&&pScore.charAt(3)=='A') {
+                        return true;
+                    }
+                }
+
+            }
+        }
+        return false;
+    }
     /**
      * Check if the string encoding of a board state is well-formed.
      * Note that this does not mean checking if the state is valid
@@ -32,49 +270,30 @@ public class CatanDiceExtra {
      * @return true iff the string is a well-formed representation of
      * a board state, false otherwise.
      */
-    public static boolean isPlayerBoardStateWellFormed(String pBoardState) {
-        int x;
-        Set<Character> ints = Set.of('1', '2', '3', '4', '5', '6', '7', '8', '9', '0');
-        for (x = 0; x < pBoardState.length(); x++) {
-            if ((ints.contains(pBoardState.charAt(x)) == false) && (pBoardState.charAt(x) != 'C')) {
-                break;
-            }
-        }
-        if (x != 0) {
-            if (x%2!=0) {
-                return false;
-            } else {
-                String[] cities = new String[x/2];
-                int[] citynums = new int[x/2+1];
-                citynums[0]=-1;
-                for (int y=2; y<=x; y+=2) {
-                    cities[(y/2)-1] = pBoardState.substring(y-2, y);
-                }
-                for (int z=0; z<cities.length; z++) {
-                    if ((cities[z].charAt(0)=='C')&&(ints.contains(cities[z].charAt(1)))) {
-                        citynums[z+1]= Integer.parseInt(cities[z].substring(1,2));
-                        if (((citynums[z]<citynums[z+1])&&(citynums[z+1]<4))==false) {
-                            return false;
-                        }
-                    } else {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
     public static boolean isBoardStateWellFormed(String boardState) {
-        Set<Character> ints = Set.of('1', '2', '3', '4', '5', '6', '7', '8', '9', '0');
         Set<Character> resources = Set.of('b', 'g', 'l', 'm', 'o', 'w');
+        Board board = new Board();
+        board.instatiateBoard();
+        Coordinate coord1 = board.coords[03];
+        Coordinate coord2 = board.coords[0];
+        //coord1 = new Coordinate(0, 3);
+        //coord2 = new Coordinate(1, 3);
+        if (board.coords[33].y==0) {
+            return true;
+        }
+        if (CheckAdjacent(coord1, coord2)==false) {
+            return true;
+        }
         if (boardState.charAt(0) != 'W' && boardState.charAt(0) != 'X') {
             return false;
         }
-        if (boardState.charAt(1) != '0' && boardState.charAt(1) != '3' && boardState.charAt(1) != '4' && boardState.charAt(1) != '5' && boardState.charAt(1) != '6') {
-            return false;
-        }
-        if (boardState.charAt(2) != '0' && boardState.charAt(2) != '1' && boardState.charAt(2) != '2' && boardState.charAt(2) != '3') {
-            return false;
+        if (boardState.charAt(1)!='0'||boardState.charAt(2) != '0') {
+            if (boardState.charAt(1) != '3' && boardState.charAt(1) != '4' && boardState.charAt(1) != '5' && boardState.charAt(1) != '6') {
+                return false;
+            }
+            if (boardState.charAt(2) != '1' && boardState.charAt(2) != '2' && boardState.charAt(2) != '3') {
+                return false;
+            }
         }
         String boardStateNoDice = boardState.substring(3);
         int x;
@@ -83,11 +302,22 @@ public class CatanDiceExtra {
                 break;
             }
         }
+        if (x>6) {
+            return false;
+        }
+        if (x>0) {
+            String resourceString = (boardStateNoDice.substring(0,x));
+            char[] resourcesSort = resourceString.toCharArray();
+            Arrays.sort(resourcesSort);
+            String resourcesSortS = new String(resourcesSort);
+            if (resourceString.equals(resourcesSortS) == false) {
+                return false;
+            }
+        }
         if (boardStateNoDice.charAt(x)!='W') {
             return false;
         }
-        String sorted = new String(boardStateNoDice.substring(0,x).toCharArray());
-        if (sorted.equals(boardStateNoDice.substring(0,x))==false) {
+        if (boardStateNoDice.length()<=x) {
             return false;
         }
         String boardStateNoTurn = boardStateNoDice.substring(x+1);
@@ -99,6 +329,9 @@ public class CatanDiceExtra {
         if (isPlayerBoardStateWellFormed(boardStateNoTurn.substring(0,x))==false) {
             return false;
         }
+        if (boardStateNoTurn.length()<=x) {
+            return false;
+        }
         String boardStateNoWS = boardStateNoTurn.substring(x+1);
         for (x=0;x<boardStateNoWS.length();x++) {
             if (boardStateNoWS.charAt(x)=='W') {
@@ -108,7 +341,25 @@ public class CatanDiceExtra {
         if (isPlayerBoardStateWellFormed(boardStateNoWS.substring(0,x))==false) {
             return false;
         }
-        String boardStateNoXS = boardStateNoTurn.substring(x+1);
+        if (boardStateNoWS.length()<=x) {
+            return false;
+        }
+        String boardStateNoXS = boardStateNoWS.substring(x+1);
+        for (x=0;x<boardStateNoXS.length();x++) {
+            if (boardStateNoXS.charAt(x)=='X') {
+                break;
+            }
+        }
+        if (isPlayerScoreWellFormed(boardStateNoXS.substring(0,x))==false) {
+            return false;
+        }
+        if (boardStateNoXS.length()<=x) {
+            return false;
+        }
+        String boardStateNoWScore = boardStateNoXS.substring(x+1);
+        if (isPlayerScoreWellFormed(boardStateNoWScore)==false) {
+            return false;
+        }
         // FIXME: Task 3
         return true;
     }
@@ -127,6 +378,89 @@ public class CatanDiceExtra {
      * a player action, false otherwise.
      */
     public static boolean isActionWellFormed(String action) {
+        Set<Character> resources = Set.of('b', 'g', 'l', 'm', 'o', 'w');
+        Set<Character> ints = Set.of('1', '2', '3', '4', '5', '6', '7', '8', '9', '0');
+        int x=0;
+        if (action.startsWith("keep")) {
+            for (x=4;x<action.length();x++) {
+                if (resources.contains(action.charAt(x))==false) {
+                    return false;
+                }
+            }
+            if (x>0) {
+                String resourceString = (action.substring(4));
+                char[] resourcesSort = resourceString.toCharArray();
+                Arrays.sort(resourcesSort);
+                String resourcesSortS = new String(resourcesSort);
+                if (resourceString.equals(resourcesSortS)) {
+                    return true;
+                }
+            }
+        } else if (action.startsWith("trade")) {
+            for (x=5;x<action.length();x++) {
+                if ((resources.contains(action.charAt(x))==false)||(action.charAt(x)=='m')) {
+                    return false;
+                }
+            }
+            if (x>0) {
+                String resourceString = (action.substring(5));
+                char[] resourcesSort = resourceString.toCharArray();
+                Arrays.sort(resourcesSort);
+                String resourcesSortS = new String(resourcesSort);
+                if (resourceString.equals(resourcesSortS)) {
+                    return true;
+                }
+            }
+        } else if (action.startsWith("swap")) {
+            if (action.length()==6) {
+                if (resources.contains(action.charAt(4))&&resources.contains(action.charAt(5))) {
+                    return true;
+                }
+            }
+        } else if (action.startsWith("build")&&action.length()>6) {
+            if (action.charAt(5)=='C'&&action.length()==7) {
+                if (ints.contains(action.charAt(6))) {
+                    int index = Integer.valueOf(action.substring(6));
+                    if (index<4) {
+                        return true;
+                    }
+                }
+            } else if (action.charAt(5)=='K'&&action.length()==8) {
+                if (ints.contains(action.charAt(6))&&ints.contains(action.charAt(7))) {
+                    int index = Integer.valueOf(action.substring(6));
+                    if (index<20) {
+                        return true;
+                    }
+                }
+            } else if (action.charAt(5)=='S'&&action.length()==8) {
+                if (ints.contains(action.charAt(6))&&ints.contains(action.charAt(7))) {
+                    int index = Integer.valueOf(action.substring(6));
+                    if (index<54) {
+                        return true;
+                    }
+                }
+            } else if (action.charAt(5)=='T'&&action.length()==8) {
+                if (ints.contains(action.charAt(6))&&ints.contains(action.charAt(7))) {
+                    int index = Integer.valueOf(action.substring(6));
+                    if (index<54) {
+                        return true;
+                    }
+                }
+            } else if (action.charAt(5)=='R'&&action.length()==10) {
+                for (x=6;x<10;x++) {
+                    if (ints.contains(action.charAt(x))==false) {
+                        return false;
+                    }
+                }
+                int index1= Integer.valueOf(action.substring(6,8));
+                int index2= Integer.valueOf(action.substring(8,10));
+                if (index1<54&&index2<54&&index1<index2) {
+                    return true;
+                }
+
+            }
+
+        }
         // FIXME: Task 4
 	    return false;
     }
