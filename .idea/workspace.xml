@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="59415da8-1692-4726-9ed2-a240c3f25016" name="Changes" comment="idk what the issue is with some of these notwellformed states is. Board initialisation+ a bunch of nice functions like checking index and adjacent tiles implemented and working.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comp1110-ass2.jar" beforeDir="false" afterPath="$PROJECT_DIR$/comp1110-ass2.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/comp1140-ass2/comp1140/ass2/Board.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/comp1140-ass2/comp1140/ass2/Board.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/comp1140-ass2/comp1140/ass2/CatanDiceExtra.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/comp1140-ass2/comp1140/ass2/CatanDiceExtra.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/comp1140-ass2/comp1140/ass2/Coordinate.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/comp1140-ass2/comp1140/ass2/Coordinate.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/comp1140/ass2/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/comp1140/ass2/Board.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/comp1140/ass2/CatanDiceExtra.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/comp1140/ass2/CatanDiceExtra.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/comp1140/ass2/Coordinate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/comp1140/ass2/Coordinate.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2Er1cAe0RKkitAFlI86cpauZ2qW" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager" selected="JUnit.Task 3 isBoardStateWellFormed" />
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="59415da8-1692-4726-9ed2-a240c3f25016" name="Changes" comment="test" />
+      <created>1663338967519</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1663338967519</updated>
+    </task>
+    <task id="LOCAL-00001" summary="test">
+      <created>1663367548585</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1663367548585</updated>
+    </task>
+    <task id="LOCAL-00002" summary="test">
+      <created>1663509776731</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1663509776731</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="test" />
+    <MESSAGE value="idk what the issue is with some of these notwellformed states is. Board initialisation+ a bunch of nice functions like checking index and adjacent tiles implemented and working." />
+    <option name="LAST_COMMIT_MESSAGE" value="idk what the issue is with some of these notwellformed states is. Board initialisation+ a bunch of nice functions like checking index and adjacent tiles implemented and working." />
+  </component>
+</project>
