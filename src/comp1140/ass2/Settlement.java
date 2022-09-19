@@ -6,14 +6,11 @@ public class Settlement extends GamePiece{
     public SettlementState state;
     public Boolean isCityable; // can find with location on board
     public Boolean isCity;
-    public Boolean isBuilt;
-    public Coordinate location;
-    public int intersectionIndex;
+    public Coordinate[] location;
 
-    Settlement(Player player, Coordinate coord, Boolean cityable, int index) {
+    Settlement(Player player, Boolean isCity, Coordinate[] location) {
         super(player);
-        this.location = coord;
-        this.isCityable=cityable;
-        this.intersectionIndex =index;
+        this.isCity = isCity;
+        this.location = location;
     }
 }
