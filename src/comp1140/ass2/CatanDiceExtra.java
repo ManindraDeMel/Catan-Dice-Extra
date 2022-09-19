@@ -1,5 +1,4 @@
 package comp1140.ass2;
-
 import java.util.*;
 
 public class CatanDiceExtra {
@@ -352,28 +351,8 @@ public class CatanDiceExtra {
                 return false;
             }
             private static boolean roadOnCoast(String action) {
-                final ArrayList<String> coastalRoadNodes = new ArrayList<>(Arrays.asList(
-                        "03",
-                        "07",
-                        "16",
-                        "21",
-                        "33",
-                        "43",
-                        "47",
-                        "48",
-                        "49",
-                        "50",
-                        "46",
-                        "37",
-                        "32",
-                        "20",
-                        "10",
-                        "06",
-                        "05",
-                        "04"
-                ));
                 for (String s : Misc.getRoadCoordsFromAction(action)) {
-                    if (coastalRoadNodes.contains(s)) {
+                    if (Misc.coastalRoadNodes.contains(s)) {
                         return true;
                     }
                 }
@@ -592,6 +571,26 @@ public class CatanDiceExtra {
                     'g',
                     'w'
             };
+            final static ArrayList<String> coastalRoadNodes = new ArrayList<>(Arrays.asList(
+                    "03",
+                    "07",
+                    "16",
+                    "21",
+                    "33",
+                    "43",
+                    "47",
+                    "48",
+                    "49",
+                    "50",
+                    "46",
+                    "37",
+                    "32",
+                    "20",
+                    "10",
+                    "06",
+                    "05",
+                    "04"
+            ));
             //
             private static ArrayList<Character> getResourcesFromBoardState(String boardState) {
                 ArrayList<Character> resources = new ArrayList<>();
@@ -603,12 +602,22 @@ public class CatanDiceExtra {
                 return resources;
             }
 
-            private static String getPlayerBoardState(String boardState) {
+            public static String getPlayerBoardState(String boardState) {
                 HashMap<Character, String> switchPlayers = new HashMap<>() {{
                     put('W', "X");
                     put('X', "W");
                 }};
                 Character playerTurn = boardState.charAt(0);
+                return getString(boardState, playerTurn, switchPlayers);
+            }
+            public static String getPlayerBoardState(String boardState, Character playerTurn) {
+                HashMap<Character, String> switchPlayers = new HashMap<>() {{
+                    put('W', "X");
+                    put('X', "W");
+                }};
+                return getString(boardState, playerTurn, switchPlayers);
+            }
+            private static String getString(String boardState, Character playerTurn, HashMap<Character, String> switchPlayers) {
                 int startOfPlayerBoardState = boardState.indexOf(Character.toString(playerTurn), 1);
                 int endOfPlayerBoardState = boardState.indexOf(switchPlayers.get(playerTurn), startOfPlayerBoardState);
                 List<Character> playerBoardState = new ArrayList<>();
@@ -621,6 +630,7 @@ public class CatanDiceExtra {
                 }
                 return result;
             }
+
             private static Coordinate convertToCoordinate(int boardCoord) {
                 int yCoord = 0, xCoord = 0;
                 for (int hexIndex = 0; hexIndex < Misc.knightIndexingToRowIndexing.size(); hexIndex++) {
@@ -758,8 +768,6 @@ public class CatanDiceExtra {
      * @return array of army sizes, one per player.
      */
     public static int[] largestArmy(String boardState) {
-        // FIXME: Task 8b
-
         int[] largeArmy = new int[2];
 
         // Extracting the Board State of each player
@@ -771,6 +779,7 @@ public class CatanDiceExtra {
         largeArmy[1] = (int) playerX.chars().filter(ch -> ch == 'K').count() + (int) playerX.chars().filter(ch -> ch == 'J').count();
 
         return largeArmy;
+
     }
 
     /**
