@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2dfe34ad-5668-409c-b235-8ec34be5aef6" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="Manindra De Mel &lt;u7156805@anu.edu.au&gt;" />
+      </list>
+    </option>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="mani" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="JavaAutoRunManager">
+    <enabled-run-configurations>
+      <run-configuration type="JUnit" name="LongestRoadTest.testFullGame1" />
+    </enabled-run-configurations>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2DTLrbtWat4UNs3wyB35WrtRes1" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/manin/OneDrive - Australian National University/ANU/COMP1140/comp1140-ass2/admin&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\manin\OneDrive - Australian National University\ANU\COMP1140\comp1140-ass2\admin" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="comp1140.ass2" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.Game">
+    <configuration name="CatanDiceExtra" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="comp1140.ass2.CatanDiceExtra" />
+      <module name="comp1140-ass2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="comp1140.ass2.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="IsActionValidTest.testFullGame1" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="comp1140-ass2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="comp1140.ass2.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="comp1140.ass2" />
+      <option name="MAIN_CLASS_NAME" value="comp1140.ass2.IsActionValidTest" />
+      <option name="METHOD_NAME" value="testFullGame1" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="IsActionValidTest.testFullGame2" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="comp1140-ass2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="comp1140.ass2.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="comp1140.ass2" />
+      <option name="MAIN_CLASS_NAME" value="comp1140.ass2.IsActionValidTest" />
+      <option name="METHOD_NAME" value="testFullGame2" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="IsActionValidTest.testInvalidActions" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="comp1140-ass2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="comp1140.ass2.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="comp1140.ass2" />
+      <option name="MAIN_CLASS_NAME" value="comp1140.ass2.IsActionValidTest" />
+      <option name="METHOD_NAME" value="testInvalidActions" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LongestRoadTest.testFullGame1" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="comp1140-ass2" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="comp1140.ass2.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="comp1140.ass2" />
+      <option name="MAIN_CLASS_NAME" value="comp1140.ass2.LongestRoadTest" />
+      <option name="METHOD_NAME" value="testFullGame1" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.LongestRoadTest.testFullGame1" />
+        <item itemvalue="JUnit.IsActionValidTest.testInvalidActions" />
+        <item itemvalue="JUnit.IsActionValidTest.testFullGame2" />
+        <item itemvalue="JUnit.IsActionValidTest.testFullGame1" />
+        <item itemvalue="Application.CatanDiceExtra" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2dfe34ad-5668-409c-b235-8ec34be5aef6" name="Changes" comment="" />
+      <created>1660718327616</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1660718327616</updated>
+      <workItem from="1660718329410" duration="1257000" />
+      <workItem from="1660896444852" duration="3376000" />
+      <workItem from="1660975881614" duration="5000" />
+      <workItem from="1661155214081" duration="6834000" />
+      <workItem from="1661272867165" duration="4751000" />
+      <workItem from="1661318005822" duration="338000" />
+      <workItem from="1662145255383" duration="10241000" />
+      <workItem from="1662155598013" duration="2144000" />
+      <workItem from="1662158199501" duration="1681000" />
+      <workItem from="1662191065430" duration="4662000" />
+      <workItem from="1662212565503" duration="5530000" />
+      <workItem from="1662218965943" duration="11000" />
+      <workItem from="1662231774664" duration="1084000" />
+      <workItem from="1662365702078" duration="5125000" />
+      <workItem from="1662372472008" duration="793000" />
+      <workItem from="1662537386320" duration="534000" />
+      <workItem from="1662648397776" duration="640000" />
+      <workItem from="1662717562781" duration="1603000" />
+      <workItem from="1662787399990" duration="8000" />
+      <workItem from="1662790523985" duration="740000" />
+      <workItem from="1662797771119" duration="4296000" />
+      <workItem from="1662828081896" duration="1679000" />
+      <workItem from="1662907384109" duration="8242000" />
+      <workItem from="1662919256201" duration="7000" />
+      <workItem from="1662961096277" duration="4542000" />
+      <workItem from="1662969360110" duration="10085000" />
+      <workItem from="1662994751508" duration="4385000" />
+      <workItem from="1663001181788" duration="475000" />
+      <workItem from="1663004531914" duration="8690000" />
+      <workItem from="1663049244068" duration="49000" />
+      <workItem from="1663053859651" duration="167000" />
+      <workItem from="1663054047815" duration="2742000" />
+      <workItem from="1663076017664" duration="16239000" />
+      <workItem from="1663094740288" duration="173000" />
+      <workItem from="1663135793111" duration="8770000" />
+      <workItem from="1663227844651" duration="1985000" />
+      <workItem from="1663250504786" duration="1291000" />
+      <workItem from="1663254609852" duration="11236000" />
+      <workItem from="1663310935761" duration="3492000" />
+      <workItem from="1663317165700" duration="9685000" />
+      <workItem from="1663352528218" duration="8000" />
+      <workItem from="1663397247173" duration="6468000" />
+      <workItem from="1663426362045" duration="1640000" />
+      <workItem from="1663428027525" duration="37000" />
+      <workItem from="1663428123891" duration="34000" />
+    </task>
+    <task id="LOCAL-00001" summary="Added Enums">
+      <created>1661159808727</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1661159808727</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Added more Classes &amp; implemented fields and methods">
+      <created>1661162917878</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1661162917878</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Task D2B (code half)">
+      <created>1661276830477</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1661276830477</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Task D2B (Design Half)">
+      <created>1661278540871</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1661278540871</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Added functionality to Prices and exchanges &amp; Sample tests of what has and has not been completed.">
+      <created>1662157724262</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1662157724262</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Added bugfix for one of the tests">
+      <created>1662159111789</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1662159111789</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Added commenting for next functionality">
+      <created>1662159261277</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1662159261277</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Added functionality for Gold Trades + some changes to the abstract classes">
+      <created>1662213849474</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1662213849474</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Fixed bug with test and added valid white-box testing for goldExchange">
+      <created>1662214286831</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1662214286831</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Began functionality for the core game-loop.">
+      <created>1662218133394</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1662218133394</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Fixed bug for AI class">
+      <created>1662231803388</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1662231803388</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Completed Task 5">
+      <created>1662370269119</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1662370269119</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Skeleton for Task 7">
+      <created>1662829135009</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1662829135009</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Finished validateKeep()">
+      <created>1662914989807</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1662914989807</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Finished validateTrade();">
+      <created>1662916489567</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1662916489567</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Finished validateTrade(); (bug fix [cant do math])">
+      <created>1662916552427</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1662916552427</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Added commenting for next tasks">
+      <created>1662916697350</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1662916697350</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Finished validateSwaps()">
+      <created>1662964865344</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1662964865344</updated>
+    </task>
+    <task id="LOCAL-00019" summary="refactor validateSwaps()">
+      <created>1662965566160</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1662965566160</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Begin validateBuild()">
+      <created>1662970834778</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1662970834778</updated>
+    </task>
+    <task id="LOCAL-00021" summary="Added resource check for validateBuild()">
+      <created>1662972409708</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1662972409708</updated>
+    </task>
+    <task id="LOCAL-00022" summary="Added commenting and finished castles">
+      <created>1662972924714</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1662972924714</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Fixed bug so program builds">
+      <created>1662973741571</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1662973741571</updated>
+    </task>
+    <task id="LOCAL-00024" summary="Added commenting (for bugs) and bug fixes">
+      <created>1662998990414</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1662998990414</updated>
+    </task>
+    <task id="LOCAL-00025" summary="Passed all invalid tests for Task 7">
+      <created>1663011289526</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1663011289526</updated>
+    </task>
+    <task id="LOCAL-00026" summary="Passed all invalid tests for Task 7 (bugfix)">
+      <created>1663013272841</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1663013272841</updated>
+    </task>
+    <task id="LOCAL-00027" summary="Passed 3/4 tests for Task 7">
+      <created>1663092079335</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1663092079335</updated>
+    </task>
+    <task id="LOCAL-00028" summary="Finished Task 7">
+      <created>1663094244915</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1663094244915</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Finished Task 7 (bug fix for pipeline?)">
+      <created>1663094786828</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1663094786828</updated>
+    </task>
+    <task id="LOCAL-00030" summary="Fixed a TODO">
+      <created>1663138690828</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1663138690828</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Fixed another TODO">
+      <created>1663140250414</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1663140250414</updated>
+    </task>
+    <task id="LOCAL-00032" summary="Fixed another TODO (2)">
+      <created>1663140426872</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1663140426872</updated>
+    </task>
+    <task id="LOCAL-00033" summary="Fixed final TODO (task 7 complete)">
+      <created>1663144566694</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1663144566694</updated>
+    </task>
+    <task id="LOCAL-00034" summary="Added Design">
+      <created>1663228268427</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1663228268427</updated>
+    </task>
+    <task id="LOCAL-00035" summary="layout for 8a">
+      <created>1663251210537</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1663251210537</updated>
+    </task>
+    <task id="LOCAL-00036" summary="layout for 8a">
+      <created>1663256707198</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1663256707198</updated>
+    </task>
+    <task id="LOCAL-00037" summary="Revert &quot;layout for 8a&quot;&#10;&#10;This reverts commit 42d40c7c64a3c7cb5bad5d2585e8a6c6c4eb71eb.&#10;&#10;# Conflicts:&#10;#&#9;src/comp1140/ass2/CatanDiceExtra.java">
+      <created>1663256996520</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1663256996520</updated>
+    </task>
+    <task id="LOCAL-00038" summary="Revert &quot;layout for 8a&quot;&#10;&#10;This reverts commit 42d40c7c">
+      <created>1663257055521</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1663257055521</updated>
+    </task>
+    <task id="LOCAL-00039" summary="Added Arjun's code">
+      <created>1663257200619</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1663257200619</updated>
+    </task>
+    <task id="LOCAL-00040" summary="more work on 8a">
+      <created>1663258701376</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1663258701376</updated>
+    </task>
+    <task id="LOCAL-00041" summary="8A would work if i could figure out how to get the first road placed on the board for a specific player">
+      <created>1663265766634</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1663265766634</updated>
+    </task>
+    <task id="LOCAL-00042" summary="I tried looping over all the roads and using them as starting points but that still breaks :(">
+      <created>1663266101873</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1663266101873</updated>
+    </task>
+    <task id="LOCAL-00043" summary="Passed 2/4 for 8a">
+      <created>1663428053435</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1663428053435</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Finished validateSwaps()" />
+    <MESSAGE value="refactor validateSwaps()" />
+    <MESSAGE value="Begin validateBuild()" />
+    <MESSAGE value="Added resource check for validateBuild()" />
+    <MESSAGE value="Added commenting and finished castles" />
+    <MESSAGE value="Fixed bug so program builds" />
+    <MESSAGE value="Added commenting (for bugs) and bug fixes" />
+    <MESSAGE value="Passed all invalid tests for Task 7" />
+    <MESSAGE value="Passed all invalid tests for Task 7 (bugfix)" />
+    <MESSAGE value="Passed 3/4 tests for Task 7" />
+    <MESSAGE value="Finished Task 7" />
+    <MESSAGE value="Finished Task 7 (bug fix for pipeline?)" />
+    <MESSAGE value="Fixed a TODO" />
+    <MESSAGE value="Fixed another TODO" />
+    <MESSAGE value="Fixed another TODO (2)" />
+    <MESSAGE value="Fixed final TODO (task 7 complete)" />
+    <MESSAGE value="Added Design" />
+    <MESSAGE value="layout for 8a" />
+    <MESSAGE value="Revert &quot;layout for 8a&quot;&#10;&#10;This reverts commit 42d40c7c64a3c7cb5bad5d2585e8a6c6c4eb71eb.&#10;&#10;# Conflicts:&#10;#&#9;src/comp1140/ass2/CatanDiceExtra.java" />
+    <MESSAGE value="Revert &quot;layout for 8a&quot;&#10;&#10;This reverts commit 42d40c7c" />
+    <MESSAGE value="Added Arjun's code" />
+    <MESSAGE value="more work on 8a" />
+    <MESSAGE value="8A would work if i could figure out how to get the first road placed on the board for a specific player" />
+    <MESSAGE value="I tried looping over all the roads and using them as starting points but that still breaks :(" />
+    <MESSAGE value="Passed 2/4 for 8a" />
+    <option name="LAST_COMMIT_MESSAGE" value="Passed 2/4 for 8a" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <condition expression="expected[0] != actual[0] || expected[1] != actual[1]" language="JAVA" />
+          <url>file://$PROJECT_DIR$/tests/comp1140/ass2/LongestRoadTest.java</url>
+          <line>14</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="java.util.HashMap$Node" memberName="value" />
+      </pinned-members>
+    </pin-to-top-manager>
+  </component>
+</project>
