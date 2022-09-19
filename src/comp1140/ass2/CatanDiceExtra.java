@@ -923,8 +923,4 @@ public class CatanDiceExtra {
     public void GameOver() {
 
     }
-
-//    public static void main(String[] args) {
-//        CatanDiceExtra.longestRoad("W61glmmwwWXK02K04K05K06K11K12R0105R0205R0206R0509R0610R0813R0913R0914R1014R1015R1318R1419R1520R1925R2025R2026R2531R2632R3137R3237S02S09S20T10W07X09RA");
-//    }
 }
