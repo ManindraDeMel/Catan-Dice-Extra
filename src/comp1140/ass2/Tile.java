@@ -3,8 +3,12 @@ package comp1140.ass2;
 public class Tile extends GamePiece{
     public Boolean used;
     public Resource resourceType;
-    public Coordinate[] location = new Coordinate[6];
-    Tile(Player player) {
+    public Coordinate[] location;
+    public int tileIndex;
+    public Tile(Player player, Coordinate[] coords, int index) {
         super(player);
+        this.location = coords;
+        this.tileIndex=index;
     }
+
 }
