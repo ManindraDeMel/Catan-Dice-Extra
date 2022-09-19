@@ -6,21 +6,30 @@ Meetig
 
 ## Week 4
 
-Everyone: create application skeleton - meeting 14:00 19 Mar
+Everyone: create application skeleton
 
 ## Week 5
 
-Zhang San: Task 3 isPlayerStateWellFormed - 23 Mar
+Arjun: Task 8
 
-Jane Bloggs: Task 5 drawTileFromBag - 23 Mar
+Mani: Task 5 & 7
 
-Erika Mustermann: Task 6 refillFactories - 25 Mar (depends on Task 5)
+Stephen: Task 3 & 4
 
 ## Week 6
 
-...
+Arjun: Task 8
 
+Mani: Task 5 & 7
+
+Stephen: Task 3 & 4
 ## Mid-Semester Break
+
+Arjun: Task 8
+
+Mani: Task 5 & 7
+
+Stephen: Task 3 & 4
 
 ## Week 7
 
