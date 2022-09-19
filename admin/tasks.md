@@ -25,9 +25,9 @@ Mani: Task 5 & 7
 Stephen: Task 3 & 4
 ## Mid-Semester Break
 
-Arjun: Task 8
+Arjun: Task 8b & 6
 
-Mani: Task 5 & 7
+Mani: Task 5 & 7 & 8a
 
 Stephen: Task 3 & 4
 
