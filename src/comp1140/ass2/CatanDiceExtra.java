@@ -32,6 +32,9 @@ public class CatanDiceExtra {
      * a board state, false otherwise.
      */
     public static Boolean isPlayerBoardStateWellFormed(String pBoardState) {
+        Board board = new Board();
+        board.instatiateBoard();
+        board.applyPlayerBoardState(pBoardState);
         int x;
         Set<Character> ints = Set.of('1', '2', '3', '4', '5', '6', '7', '8', '9', '0');
         for (x = 0; x < pBoardState.length(); x++) {
@@ -245,26 +248,30 @@ public class CatanDiceExtra {
         }
         return true;
     }
-    public static boolean isPlayerScoreWellFormed(String pScore) {
+    public static boolean[] isPlayerScoreWellFormed(String pScore, boolean[] RA) {
         Set<Character> ints = Set.of('1', '2', '3', '4', '5', '6', '7', '8', '9', '0');
         int l = pScore.length();
         if (l >= 2) {
             if (ints.contains(pScore.charAt(0))&&ints.contains(pScore.charAt(1))) {
-                if (l==2) {
-                    return true;
+                if (Integer.valueOf(pScore.substring(0,2))>11) {
+                    return new boolean[]{false};
+                } else if (l==2) {
+                    return new boolean[]{true, false, false};
                 } else if (l == 3) {
-                    if (pScore.charAt(2)=='R'||pScore.charAt(2)=='A') {
-                        return true;
+                    if (pScore.charAt(2)=='R'&&RA[0]==false) {
+                        return new boolean[]{true, true, false};
+                    } else if (pScore.charAt(2)=='A'&&RA[1]==false) {
+                        return new boolean[]{true, false, true};
                     }
                 } else if (l == 4) {
-                    if (pScore.charAt(2)=='R'&&pScore.charAt(3)=='A') {
-                        return true;
+                    if (pScore.charAt(2)=='R'&&pScore.charAt(3)=='A'&&RA[0]==false&&RA[1]==false) {
+                        return new boolean[]{true, true, true};
                     }
                 }
 
-            }
+            } return new boolean[]{false};
         }
-        return false;
+        return new boolean[]{false};
     }
     /**
      * Check if the string encoding of a board state is well-formed.
@@ -359,14 +366,15 @@ public class CatanDiceExtra {
                 break;
             }
         }
-        if (isPlayerScoreWellFormed(boardStateNoXS.substring(0,x))==false) {
+        boolean[] scoreTest = isPlayerScoreWellFormed(boardStateNoXS.substring(0,x), new boolean[] {false, false});
+        if (scoreTest[0]==false) {
             return false;
         }
         if (boardStateNoXS.length()<=x) {
             return false;
         }
         String boardStateNoWScore = boardStateNoXS.substring(x+1);
-        if (isPlayerScoreWellFormed(boardStateNoWScore)==false) {
+        if (isPlayerScoreWellFormed(boardStateNoWScore, new boolean[] {scoreTest[1], scoreTest[2]})[0] == false) {
             return false;
         }
         // FIXME: Task 3

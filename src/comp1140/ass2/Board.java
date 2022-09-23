@@ -98,6 +98,9 @@ public class Board {
 
     }
     public void applyPlayerBoardState(String playerBoardState) {
+        if (playerBoardState.length()<2) {
+            return;
+        }
         String playerId=playerBoardState.substring(0,1);
         playerBoardState= playerBoardState.substring(1);
         Set<Character> builds = Set.of('C', 'J', 'K', 'R', 'S', 'T');
