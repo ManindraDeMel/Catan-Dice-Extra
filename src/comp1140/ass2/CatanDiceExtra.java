@@ -1234,7 +1234,7 @@ public class CatanDiceExtra {
      */
     public static String applyAction(String boardState, String action) {
         // FIXME: Task 9
-        return null;
+        return boardState;
     }
 
     /**

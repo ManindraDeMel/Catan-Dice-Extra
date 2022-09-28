@@ -1,6 +1,7 @@
 package comp1140.ass2;
 
 public class Tile extends GamePiece{
+    int ID;
     public Boolean used;
     public Resource resourceType;
     public Coordinate[] location;
@@ -10,5 +11,6 @@ public class Tile extends GamePiece{
         this.location = coords;
         this.tileIndex=index;
     }
+
 
 }
