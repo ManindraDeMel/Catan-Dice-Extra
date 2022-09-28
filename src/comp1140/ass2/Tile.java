@@ -14,5 +14,18 @@ public class Tile extends GamePiece{
         this.tileType=tileType;
     }
 
+    @Override
+    public String toString() {
+        String ind = "";
+        if (tileIndex < 10)
+            ind += "0" + tileIndex;
+        else
+            ind += tileIndex;
 
+        if (used)
+            return "K" + ind;
+        else {
+            return "J" + ind;
+        }
+    }
 }

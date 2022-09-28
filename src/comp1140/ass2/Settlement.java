@@ -10,11 +10,18 @@ public class Settlement extends GamePiece{
     public Coordinate coord;
     public int intersectionIndex;
 
-    Settlement(Player player, Coordinate coord, Boolean cityable, int index) {
+    public Settlement(Player player, Coordinate coord, Boolean cityable, int index) {
         super(player);
         this.coord = coord;
         this.isCityable=cityable;
         this.intersectionIndex =index;
     }
 
+    @Override
+    public String toString() {
+        if (isCityable)
+            return "T" + coord.index;
+        else
+            return "S" + coord.index;
+    }
 }

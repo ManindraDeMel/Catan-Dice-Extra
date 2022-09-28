@@ -45,7 +45,9 @@ public class Player {
             structures.get(0).add((Castle) piece);
             return true;
         }
-//        else if (piece instanceof ) // TODO Knight
+        else if (piece instanceof Tile) {
+            structures.get(1).add(piece);
+        }
 
         else if (piece instanceof Road) {
             structures.get(2).add((Road) piece);
@@ -80,21 +82,18 @@ public class Player {
                 StringBuilder struct = new StringBuilder();
 
                 switch (i){
-                    case 0 -> {
-                        struct.append(((Castle) piece).toString());
-                    }
+                    case 0 -> struct.append(((Castle) piece).toString());
 
-                    case 1 -> {} // TODO Knight toString
+                    case 1 -> struct.append(((Tile) piece).toString());
 
-                    case 2 -> {
-//                        struct.append()
-                    }
+                    case 2 -> struct.append(((Road) piece).toString());
+
+                    case 3,4 -> struct.append(((Settlement) piece).toString());
                 }
 
                 playerBoardState.append(struct);
             }
         }
-
-        return super.toString();
+        return playerBoardState.toString();
     }
 }
