@@ -8,6 +8,9 @@ public class Coordinate {
         this.x = x;
         this.y = y;
     }
+    public Coordinate(int index) {
+        this.index = index;
+    }
 
     public void setIndex(int index) {
         this.index = index;

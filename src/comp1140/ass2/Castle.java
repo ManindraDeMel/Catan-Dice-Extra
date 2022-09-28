@@ -6,6 +6,11 @@ public class Castle extends GamePiece {
         super(player);
     }
 
+    public Castle(int index) {
+        super(new Player("-"));
+        this.index = index;
+    }
+
     public Castle(Player player, int index) {
         super(player);
         this.index = index;
