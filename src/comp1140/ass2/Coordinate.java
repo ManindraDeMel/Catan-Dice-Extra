@@ -3,9 +3,25 @@ package comp1140.ass2;
 public class Coordinate {
     public int x;
     public int y;
+    public int index;
     Coordinate(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+    public static boolean CheckEquals(Coordinate coord1, Coordinate coord2) {
+        int y1= coord1.y;
+        int x1= coord1.x;
+        int y2= coord2.y;
+        int x2= coord2.x;
+        if (x2==x1&&y2==y1) {
+            return true;
+        } else {
+            return false;
+        }
     }
     public static boolean CheckAdjacent(Coordinate coord1, Coordinate coord2) {
         int y1= coord1.y;
