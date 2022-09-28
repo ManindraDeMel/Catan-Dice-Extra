@@ -4,7 +4,7 @@
 
 For Deliverable D2D, I contributed the following new statements of original code:
 
-- Added the [instantiateBoard()](https://gitlab.cecs.anu.edu.au/comp1110/comp1140-ass2/-/blob/master/src/comp1140/ass2/gui/Board.java#L17-184) instantiateBoard and applyPlayerBoardState methods (technically instantiateBoard was written before D2C was sumbitted but it wasn't written for that)
+- Added the [instantiateBoard()](https://gitlab.cecs.anu.edu.au/comp1110/comp1140-ass2/-/blob/master/src/comp1140/ass2/gui/Board.java#L17-100) instantiateBoard [applyPlayerBoardState()](https://gitlab.cecs.anu.edu.au/comp1110/comp1140-ass2/-/blob/master/src/comp1140/ass2/gui/Board.java#L101-184) methods (technically instantiateBoard was written before D2C was sumbitted but it wasn't written for that)
 - Added the [start()](https://gitlab.cecs.anu.edu.au/comp1110/comp1140-ass2/-/blob/master/src/comp1140/ass2/gui/Coordinate.java#L15-53) CheckEquals and CheckAjacent methods (technically CheckEquals was written before D2C was sumbitted but it wasn't written for that)
 - etc.
 
