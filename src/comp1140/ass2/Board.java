@@ -37,6 +37,7 @@ public class Board {
         int rowlen = 6;
         for (int c = 0; c <= 53; c++) {
             this.coords[c] = new Coordinate(x, y);
+            this.coords[c].setIndex(c);
             if (x%2==1) {
                 if (y<3) {
                     tilecoords[0] = new Coordinate(x, y);
