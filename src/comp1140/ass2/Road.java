@@ -1,5 +1,7 @@
 package comp1140.ass2;
 
+import java.util.Arrays;
+
 public class Road extends GamePiece{
     Coordinate coord1;
     Coordinate coord2;
@@ -8,5 +10,12 @@ public class Road extends GamePiece{
         super(player);
         this.coord1 = coord1;
         this.coord2 = coord2;
+    }
+
+    @Override
+    public String toString() {
+        return "R" +
+                location[0].y +
+                '}';
     }
 }

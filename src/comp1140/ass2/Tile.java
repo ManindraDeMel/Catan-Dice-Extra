@@ -1,6 +1,7 @@
 package comp1140.ass2;
 
 public class Tile extends GamePiece{
+    int ID;
     public Boolean used;
     public TileType tileType;
     public Coordinate[] location;
@@ -12,5 +13,6 @@ public class Tile extends GamePiece{
         this.used=used;
         this.tileType=tileType;
     }
+
 
 }
