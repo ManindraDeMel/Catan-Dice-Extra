@@ -369,7 +369,6 @@ public class CatanDiceExtra {
         if (isPlayerScoreWellFormed(boardStateNoWScore)==false) {
             return false;
         }
-        // FIXME: Task 3
         return true;
     }
 
@@ -470,7 +469,6 @@ public class CatanDiceExtra {
             }
 
         }
-        // FIXME: Task 4
         return false;
     }
 
