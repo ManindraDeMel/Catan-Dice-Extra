@@ -36,22 +36,195 @@ public class Viewer extends Application {
 
     private final Group board = new Group();
     private final Group structures = new Group();
-
-//    private static final double HEX_HEIGHT = 150;
-//    private static final double HEX_WIDTH = (int) (HEX_HEIGHT * Math.sqrt(3) / 2);
     private static final double HEX_WIDTH = 140;
     private static final double HEX_HEIGHT = (int) (HEX_WIDTH * Math.sqrt(3) / 2);
-
     private static final int MARGIN_X = (int) (HEX_HEIGHT * 0.5);
     private static final int BOARD_X = (int) (HEX_HEIGHT * 0.75);
     private static final int MARGIN_Y = (int) (HEX_HEIGHT * 0.5);
-
     private static final int BOARD_Y = MARGIN_Y;
 
     private static final Color[] playersColour = new Color[]{Color.ORANGE, Color.RED};
 //    private static final int BOARD_WIDTH = PenguinsPoolParty.BOARD_WIDTH * (int) HEX_WIDTH;
 //    private static final int BOARD_HEIGHT = (int) (PenguinsPoolParty.BOARD_HEIGHT * HEX_HEIGHT);
 
+    // Maps the Knight index to a class that contains centre coordinates of the tile the Knight is in
+    HashMap<Integer, BoardTilePair> hmKnight = new HashMap<>() {{
+
+        // Row 1
+        put(0, new BoardTilePair(1, 0));
+        put(1, new BoardTilePair(2, 0));
+        put(2, new BoardTilePair(3, 0));
+
+        // Row 2
+        put(3, new BoardTilePair(1, 1));
+        put(4, new BoardTilePair(2, 1));
+        put(5, new BoardTilePair(3, 1));
+        put(6, new BoardTilePair(4, 1));
+
+        // Row 3
+        put(7, new BoardTilePair(0, 2));
+        put(8, new BoardTilePair(1, 2));
+        put(9, new BoardTilePair(2, 2));
+        put(10, new BoardTilePair(2, 2));
+        put(11, new BoardTilePair(3, 2));
+        put(12, new BoardTilePair(4, 2));
+
+        // Row 4
+        put(13, new BoardTilePair(1, 3));
+        put(14, new BoardTilePair(2, 3));
+        put(15, new BoardTilePair(3, 3));
+        put(16, new BoardTilePair(4, 3));
+
+        // Row 5
+        put(17, new BoardTilePair(1, 4));
+        put(18, new BoardTilePair(2, 4));
+        put(19, new BoardTilePair(3, 4));
+    }};
+
+    // Maps the Road index to a class that contains centre coordinates of the tile the city is in and other
+    // info to create the road
+    HashMap<String, RoadStartID> hmRoads = new HashMap<>() {{
+
+        // Row 1
+        put("0307", new RoadStartID(0, 0));
+        put("0003", new RoadStartID(0, 1));
+        put("0004", new RoadStartID(0, 2));
+        put("0408", new RoadStartID(0, 3));
+        put("0812", new RoadStartID(0, 4));
+        put("0712", new RoadStartID(0, 5));
+
+        put("0104", new RoadStartID(1, 1));
+        put("0105", new RoadStartID(1, 2));
+        put("0509", new RoadStartID(1, 3));
+        put("0913", new RoadStartID(1, 4));
+        put("0813", new RoadStartID(1, 5));
+
+        put("0205", new RoadStartID(2, 1));
+        put("0206", new RoadStartID(2, 2));
+        put("0610", new RoadStartID(2, 3));
+        put("1014", new RoadStartID(2, 4));
+        put("0914", new RoadStartID(2, 5));
+
+        put("1116", new RoadStartID(3, 0));
+        put("0711", new RoadStartID(3, 1));
+        put("1217", new RoadStartID(3, 3));
+        put("1722", new RoadStartID(3, 4));
+        put("1622", new RoadStartID(3, 5));
+
+        put("1318", new RoadStartID(4, 3));
+        put("1823", new RoadStartID(4, 4));
+        put("1723", new RoadStartID(4, 5));
+
+        put("1419", new RoadStartID(5, 3));
+        put("1924", new RoadStartID(5, 4));
+        put("1824", new RoadStartID(5, 5));
+
+        put("1015", new RoadStartID(6, 2));
+        put("1520", new RoadStartID(6, 3));
+        put("2025", new RoadStartID(6, 4));
+        put("1925", new RoadStartID(6, 5));
+
+        put("2127", new RoadStartID(7, 0));
+        put("1621", new RoadStartID(7, 1));
+        put("2228", new RoadStartID(7, 3));
+        put("2833", new RoadStartID(7, 4));
+        put("2733", new RoadStartID(7, 5));
+
+        put("2329", new RoadStartID(8, 3));
+        put("2934", new RoadStartID(8, 4));
+        put("2834", new RoadStartID(8, 5));
+
+        put("2430", new RoadStartID(9, 3));
+        put("3035", new RoadStartID(9, 4));
+        put("2935", new RoadStartID(9, 5));
+
+        put("2531", new RoadStartID(11, 3));
+        put("3136", new RoadStartID(11, 4));
+        put("3036", new RoadStartID(11, 5));
+
+        put("2026", new RoadStartID(12, 2));
+        put("2632", new RoadStartID(12, 3));
+        put("3237", new RoadStartID(12, 4));
+        put("3137", new RoadStartID(12, 5));
+
+        put("3338", new RoadStartID(13, 0));
+        put("3439", new RoadStartID(13, 3));
+        put("3943", new RoadStartID(13, 4));
+        put("3843", new RoadStartID(13, 5));
+
+        put("3540", new RoadStartID(14, 3));
+        put("4044", new RoadStartID(14, 4));
+        put("3944", new RoadStartID(14, 5));
+
+        put("3641", new RoadStartID(15, 3));
+        put("4145", new RoadStartID(15, 4));
+        put("4045", new RoadStartID(15, 5));
+
+        put("3742", new RoadStartID(16, 3));
+        put("4246", new RoadStartID(16, 4));
+        put("4146", new RoadStartID(16, 5));
+
+        put("4347", new RoadStartID(17, 0));
+        put("4448", new RoadStartID(17, 3));
+        put("4851", new RoadStartID(17, 4));
+        put("4751", new RoadStartID(17, 5));
+
+        put("4549", new RoadStartID(18, 3));
+        put("4952", new RoadStartID(18, 4));
+        put("4852", new RoadStartID(18, 5));
+
+        put("4650", new RoadStartID(19, 3));
+        put("5043", new RoadStartID(19, 4));
+        put("4953", new RoadStartID(19, 5));
+    }};
+
+    // Maps the Settlement index to a class that contains centre coordinates of the tile the settlement is in
+    HashMap<String, SettlementStartID> hmSettlements = new HashMap<>() {{
+
+        put("00", new SettlementStartID(0, 0));
+        put("02", new SettlementStartID(2, 0));
+
+        put("08", new SettlementStartID(4, 0));
+        put("09", new SettlementStartID(5, 0));
+
+        put("16", new SettlementStartID(7, 0));
+        put("20", new SettlementStartID(12, 0));
+
+        put("33", new SettlementStartID(7, 1));
+        put("37", new SettlementStartID(12, 1));
+
+        put("44", new SettlementStartID(14, 1));
+        put("45", new SettlementStartID(15, 1));
+
+        put("51", new SettlementStartID(17, 1));
+        put("53", new SettlementStartID(19, 1));
+    }};
+
+    // Maps the City index to a class that contains centre coordinates of the tile the city is in
+    HashMap<String, CityStartID> hmCities = new HashMap<>() {{
+
+        put("01", new CityStartID(1, 0));
+
+        put("07", new CityStartID(3, 0));
+        put("10", new CityStartID(6, 0));
+
+        put("17", new CityStartID(8, 0));
+        put("18", new CityStartID(9, 0));
+        put("19", new CityStartID(11, 0));
+
+        put("34", new CityStartID(8, 1));
+        put("35", new CityStartID(9, 1));
+        put("36", new CityStartID(11, 1));
+
+        put("43", new CityStartID(13, 1));
+        put("46", new CityStartID(16, 1));
+
+        put("52", new CityStartID(18, 1));
+    }};
+
+    /**
+     * Used to create a tile shape
+     */
     class Hexagon extends Polygon {
         double startX, startY;
 
@@ -100,6 +273,9 @@ public class Viewer extends Application {
         }
     }
 
+    /**
+     * Used to create a Knight's Head shape
+     */
     class KnightHead extends Circle{
         double startX, startY;
         KnightHead(double startX, double startY, boolean isBuilt, char player) {
@@ -135,6 +311,9 @@ public class Viewer extends Application {
         }
     }
 
+    /**
+     * Used to create a Knight's Body shape
+     */
     class KnightBody extends Rectangle{
 
         double startX, startY;
@@ -175,6 +354,9 @@ public class Viewer extends Application {
         }
     }
 
+    /**
+     * Used to create a Knight shape
+     */
     class Knight {
         KnightHead knightHead;
         KnightBody knightBody;
@@ -199,6 +381,9 @@ public class Viewer extends Application {
 
     }
 
+    /**
+     * Used to create the resource circle shape under the Knight
+     */
     class ResourceCircle extends Circle{
         double startX, startY;
         ResourceCircle(double startX, double startY, Boolean isUsed){
@@ -224,6 +409,9 @@ public class Viewer extends Application {
         }
     }
 
+    /**
+     * Used to create road shape
+     */
     class Road extends Rectangle{
         double height, width, startX, startY;
         int orientation;
@@ -275,6 +463,9 @@ public class Viewer extends Application {
         }
     }
 
+    /**
+     * Used to create Settlement shape
+     */
     class Settlement extends Polygon{
         String id;
         double centerX;
@@ -330,6 +521,9 @@ public class Viewer extends Application {
         }
     }
 
+    /**
+     * Used to create the right half of a City shape
+     */
     class CityRight extends Polygon {
         CityRight (double startX, double startY, boolean isBuilt, int bottom, char player){
 
@@ -381,6 +575,9 @@ public class Viewer extends Application {
         }
     }
 
+    /**
+     * Used to create the left half of a City shape
+     */
     class CityLeft extends Polygon {
         CityLeft (double startX, double startY, boolean isBuilt, int bottom, char player){
 
@@ -432,6 +629,9 @@ public class Viewer extends Application {
         }
     }
 
+    /**
+     * Used to create a City shape
+     */
     class City{
         CityLeft cityLeft;
         CityRight cityRight;
@@ -444,6 +644,9 @@ public class Viewer extends Application {
         }
     }
 
+    /**
+     * Used to create a Castle shape
+     */
     class Castle extends Polygon{
         int id;
         double centerX;
@@ -478,6 +681,7 @@ public class Viewer extends Application {
                 }
             }
 
+            // Defining coordinates for the shape
             Double[] coordinates = new Double[]{
                     0.0, 0.0,
                     HEX_WIDTH/scale, 0.0,
@@ -490,11 +694,12 @@ public class Viewer extends Application {
                     0.0, -HEX_WIDTH/(scale+1)
             };
 
+            // Setting coordinates
             this.getPoints().addAll(coordinates);
-
             this.setLayoutX(centerX);
             this.setLayoutY(centerY);
 
+            // Setting colour
             Color fillColour;
             Color strokeColour;
             if (isBuilt == false) {
@@ -516,6 +721,12 @@ public class Viewer extends Application {
         }
     }
 
+
+    /**
+     * Coordinate class for tiles.
+     * It stores the center pixel locations of the tiles
+     * Used for Tile Indexing according to Knight Indexing
+     */
     class BoardTilePair{
         int x;
         int y;
@@ -539,6 +750,13 @@ public class Viewer extends Application {
         }
     }
 
+
+    /**
+     * This class stores all the meta-data (eg. position, start pixels, orientation on tile, etc) of a Road structure
+     *
+     * Used to get the tile center coordinate in which the road is in
+     * Also used to get the orientation of the road in the tile
+     */
     class RoadStartID {
         int orientation;
         double startX;
@@ -565,40 +783,12 @@ public class Viewer extends Application {
         }
     }
 
-    HashMap<Integer, BoardTilePair> hmKnight = new HashMap<>() {{
 
-        // Row 1
-        put(0, new BoardTilePair(1, 0));
-        put(1, new BoardTilePair(2, 0));
-        put(2, new BoardTilePair(3, 0));
-
-        // Row 2
-        put(3, new BoardTilePair(1, 1));
-        put(4, new BoardTilePair(2, 1));
-        put(5, new BoardTilePair(3, 1));
-        put(6, new BoardTilePair(4, 1));
-
-        // Row 3
-        put(7, new BoardTilePair(0, 2));
-        put(8, new BoardTilePair(1, 2));
-        put(9, new BoardTilePair(2, 2));
-        put(10, new BoardTilePair(2, 2));
-        put(11, new BoardTilePair(3, 2));
-        put(12, new BoardTilePair(4, 2));
-
-        // Row 4
-        put(13, new BoardTilePair(1, 3));
-        put(14, new BoardTilePair(2, 3));
-        put(15, new BoardTilePair(3, 3));
-        put(16, new BoardTilePair(4, 3));
-
-        // Row 5
-        put(17, new BoardTilePair(1, 4));
-        put(18, new BoardTilePair(2, 4));
-        put(19, new BoardTilePair(3, 4));
-    }};
-
-
+    /**
+     * This class stores all the meta-data (eg. position, start pixels, etc) of a Knight structure
+     *
+     * Used to get the coordinates of the center of the tile the knight is in
+     */
     String getStartKnight(int id){
         String start = "";
 
@@ -616,6 +806,12 @@ public class Viewer extends Application {
         return start;
     }
 
+
+    /**
+     * This class stores all the meta-data (eg. position, start pixels, etc) of a Settlement structure
+     *
+     * Used to get the coordinates of the center of the tile the Settlement is in with other info
+     */
     class SettlementStartID {
         int isBottom;
         double startX;
@@ -642,6 +838,12 @@ public class Viewer extends Application {
         }
     }
 
+
+    /**
+     * This class stores all the meta-data (eg. position, start pixels, etc) of a City structure
+     *
+     * Used to get the coordinates of the center of the tile the City is in with other info
+     */
     class CityStartID {
         int isBottom;
         double startX;
@@ -668,6 +870,9 @@ public class Viewer extends Application {
         }
     }
 
+    /**
+     *  makeBoard() creates tiles (hexagon shaped) on the window
+     */
     private void makeBoard() {
         this.board.setLayoutX(BOARD_X + MARGIN_X);
         this.board.setLayoutY(BOARD_Y + MARGIN_Y);
@@ -689,55 +894,6 @@ public class Viewer extends Application {
 
                 Hexagon hexagon = new Hexagon(startX, startY);
                 this.board.getChildren().add(hexagon);
-
-                // Making circles
-//                ResourceCircle circle = new ResourceCircle(startX, startY);
-//                this.board.getChildren().add(circle);
-//
-//
-//                // Making Settlements
-////                Settlement settlement = new Settlement(startX,  startY, false, 1, 'w');
-////                this.structures.getChildren().add(settlement);
-//
-//                // Making Cities
-//                City city = new City(startX,  startY, false, 1, 'w');
-//                this.structures.getChildren().add(city.cityLeft);
-//                this.structures.getChildren().add(city.cityRight);
-//
-//
-//                // Making Knights and Road
-//                Knight knight;
-//                Road road = new Road(startX, startY, false, x,'w');
-
-//                switch ((x+y)%3){
-//
-//                    case 0 -> knight = new Knight(startX, startY, false, 'w');
-//
-//                    case 1 -> {
-//                        knight = new Knight(startX, startY, true, 'w');
-//                        road = new Road(startX, startY, true, x,'w');
-//                    }
-//
-//                    case 2 -> {
-//                        knight = new Knight(startX, startY, true, 'x');
-//                        road = new Road(startX, startY, true, x,'x');
-//                    }
-//
-//                    default -> {
-//                        knight = new Knight(startX, startY, false, 'w');
-//                        road = new Road(startX, startY, false, x,'w');
-//                    }
-//                }
-
-//                this.structures.getChildren().add(knight.knightBody);
-//                this.structures.getChildren().add(knight.knightHead);
-//                this.structures.getChildren().add(road);
-
-//                Castle castle;
-//                for (int i = 0; i < 4; i++) {
-//                    castle = new Castle(i);
-//                    this.structures.getChildren().add(castle);
-//                }
             }
         }
         this.board.toBack();
@@ -753,149 +909,14 @@ public class Viewer extends Application {
         // FIXME Task 6: implement the state viewer
         /////////////////////////////////////////////
 
-        HashMap<String, RoadStartID> hmRoads = new HashMap<>() {{
-
-            // Row 1
-            put("0307", new RoadStartID(0, 0));
-            put("0003", new RoadStartID(0, 1));
-            put("0004", new RoadStartID(0, 2));
-            put("0408", new RoadStartID(0, 3));
-            put("0812", new RoadStartID(0, 4));
-            put("0712", new RoadStartID(0, 5));
-
-            put("0104", new RoadStartID(1, 1));
-            put("0105", new RoadStartID(1, 2));
-            put("0509", new RoadStartID(1, 3));
-            put("0913", new RoadStartID(1, 4));
-            put("0813", new RoadStartID(1, 5));
-
-            put("0205", new RoadStartID(2, 1));
-            put("0206", new RoadStartID(2, 2));
-            put("0610", new RoadStartID(2, 3));
-            put("1014", new RoadStartID(2, 4));
-            put("0914", new RoadStartID(2, 5));
-
-            put("1116", new RoadStartID(3, 0));
-            put("0711", new RoadStartID(3, 1));
-            put("1217", new RoadStartID(3, 3));
-            put("1722", new RoadStartID(3, 4));
-            put("1622", new RoadStartID(3, 5));
-
-            put("1318", new RoadStartID(4, 3));
-            put("1823", new RoadStartID(4, 4));
-            put("1723", new RoadStartID(4, 5));
-
-            put("1419", new RoadStartID(5, 3));
-            put("1924", new RoadStartID(5, 4));
-            put("1824", new RoadStartID(5, 5));
-
-            put("1015", new RoadStartID(6, 2));
-            put("1520", new RoadStartID(6, 3));
-            put("2025", new RoadStartID(6, 4));
-            put("1925", new RoadStartID(6, 5));
-
-            put("2127", new RoadStartID(7, 0));
-            put("1621", new RoadStartID(7, 1));
-            put("2228", new RoadStartID(7, 3));
-            put("2833", new RoadStartID(7, 4));
-            put("2733", new RoadStartID(7, 5));
-
-            put("2329", new RoadStartID(8, 3));
-            put("2934", new RoadStartID(8, 4));
-            put("2834", new RoadStartID(8, 5));
-
-            put("2430", new RoadStartID(9, 3));
-            put("3035", new RoadStartID(9, 4));
-            put("2935", new RoadStartID(9, 5));
-
-            put("2531", new RoadStartID(11, 3));
-            put("3136", new RoadStartID(11, 4));
-            put("3036", new RoadStartID(11, 5));
-
-            put("2026", new RoadStartID(12, 2));
-            put("2632", new RoadStartID(12, 3));
-            put("3237", new RoadStartID(12, 4));
-            put("3137", new RoadStartID(12, 5));
-
-            put("3338", new RoadStartID(13, 0));
-            put("3439", new RoadStartID(13, 3));
-            put("3943", new RoadStartID(13, 4));
-            put("3843", new RoadStartID(13, 5));
-
-            put("3540", new RoadStartID(14, 3));
-            put("4044", new RoadStartID(14, 4));
-            put("3944", new RoadStartID(14, 5));
-
-            put("3641", new RoadStartID(15, 3));
-            put("4145", new RoadStartID(15, 4));
-            put("4045", new RoadStartID(15, 5));
-
-            put("3742", new RoadStartID(16, 3));
-            put("4246", new RoadStartID(16, 4));
-            put("4146", new RoadStartID(16, 5));
-
-            put("4347", new RoadStartID(17, 0));
-            put("4448", new RoadStartID(17, 3));
-            put("4851", new RoadStartID(17, 4));
-            put("4751", new RoadStartID(17, 5));
-
-            put("4549", new RoadStartID(18, 3));
-            put("4952", new RoadStartID(18, 4));
-            put("4852", new RoadStartID(18, 5));
-
-            put("4650", new RoadStartID(19, 3));
-            put("5043", new RoadStartID(19, 4));
-            put("4953", new RoadStartID(19, 5));
-        }};
-
-        HashMap<String, SettlementStartID> hmSettlements = new HashMap<>() {{
-
-            put("00", new SettlementStartID(0, 0));
-            put("02", new SettlementStartID(2, 0));
-
-            put("08", new SettlementStartID(4, 0));
-            put("09", new SettlementStartID(5, 0));
-
-            put("16", new SettlementStartID(7, 0));
-            put("20", new SettlementStartID(12, 0));
-
-            put("33", new SettlementStartID(7, 1));
-            put("37", new SettlementStartID(12, 1));
-
-            put("44", new SettlementStartID(14, 1));
-            put("45", new SettlementStartID(15, 1));
-
-            put("51", new SettlementStartID(17, 1));
-            put("53", new SettlementStartID(19, 1));
-        }};
-
-        HashMap<String, CityStartID> hmCities = new HashMap<>() {{
-
-            put("01", new CityStartID(1, 0));
-
-            put("07", new CityStartID(3, 0));
-            put("10", new CityStartID(6, 0));
-
-            put("17", new CityStartID(8, 0));
-            put("18", new CityStartID(9, 0));
-            put("19", new CityStartID(11, 0));
-
-            put("34", new CityStartID(8, 1));
-            put("35", new CityStartID(9, 1));
-            put("36", new CityStartID(11, 1));
-
-            put("43", new CityStartID(13, 1));
-            put("46", new CityStartID(16, 1));
-
-            put("52", new CityStartID(18, 1));
-        }};
-
         // Getting strings of different sections
         String turn = boardState.substring(0, boardState.indexOf('W', 1));
         String playerW = boardState.substring(boardState.indexOf('W', 1), boardState.indexOf('X', 1));
         String playerX = boardState.substring(boardState.indexOf('X', 1), boardState.indexOf('W', boardState.indexOf('X', 1)));
 //        String wScore = boardState.substring();
 
+
+        // Outputting useful text for debugging
         System.out.println("BoardState: " + boardState);
         System.out.println("Turn: " + turn);
         System.out.println("PlayerW: " + playerW);
@@ -922,6 +943,8 @@ public class Viewer extends Application {
             placementsArrX.add(new ArrayList<>());
         }
 
+
+        // Creating and storing all the structures in the array for player W
         while (placementsW.length() > 0) {
             String structureType = placementsW.substring(0, 1);
 
@@ -988,6 +1011,8 @@ public class Viewer extends Application {
             }
         }
 
+
+        // Creating and storing all the structures in the array for player X
         while (placementsX.length() > 0) {
             String structureType = placementsX.substring(0, 1);
 
@@ -1054,7 +1079,8 @@ public class Viewer extends Application {
             }
         }
 
-        //Adding Castles to Board
+
+        //Adding Castles on Board
         for (int i = 0; i < 4; i++) {
             Castle toAdd = null;
             boolean ownsW = false;
@@ -1086,7 +1112,7 @@ public class Viewer extends Application {
         }
 
 
-        // Adding Knights
+        // Adding Knights on board
         for (Map.Entry<Integer,BoardTilePair> mapElement : hmKnight.entrySet()) {
             Knight toAdd = null;
             boolean ownsW = false;
@@ -1125,7 +1151,7 @@ public class Viewer extends Application {
             this.structures.getChildren().add(toAdd.resourceCircle);
         }
 
-        // Adding Roads
+        // Adding Roads on board
         for (Map.Entry<String, RoadStartID> mapElement : hmRoads.entrySet()) {
             Road toAdd = null;
             boolean ownsW = false;
@@ -1162,7 +1188,7 @@ public class Viewer extends Application {
             this.structures.getChildren().add(toAdd);
         }
 
-        // Adding Settlements
+        // Adding Settlements on board
         for (Map.Entry<String, SettlementStartID> mapElement : hmSettlements.entrySet()) {
             Settlement toAdd = null;
             boolean ownsW = false;
@@ -1199,7 +1225,7 @@ public class Viewer extends Application {
             this.structures.getChildren().add(toAdd);
         }
 
-        // Adding Cities
+        // Adding Cities on board
         for (Map.Entry<String, CityStartID> mapElement : hmCities.entrySet()) {
             City toAdd = null;
             boolean ownsW = false;
@@ -1237,9 +1263,10 @@ public class Viewer extends Application {
             this.structures.getChildren().add(toAdd.cityLeft);
         }
 
-        System.out.println(this.structures.getChildren());
 
-        System.out.println();
+        // Outputting text for debugging
+//        System.out.println(this.structures.getChildren());
+//        System.out.println();
 
 
         /////////////////////////////////////////////
