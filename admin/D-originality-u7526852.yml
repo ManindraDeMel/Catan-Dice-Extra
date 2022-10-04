@@ -10,8 +10,8 @@
 #
 
 declaration: >-
-  We declare that everything we have submitted for Stage E of this assignment
-  and all stages before it is entirely our own work, with the following
+  I declare that everything I have submitted for stage D of this assignment
+  and all stages before it is entirely my own work, with the following
   exceptions:
 
 # Use this to list names of people who you collaborated with, and a
@@ -19,9 +19,6 @@ declaration: >-
 #
 # Add as many "name+comment" entries as necessary
 # (or remove it altogether if you haven't collaborated with anyone)
-# collaboration:
-#   - name:
-#     comment: >-
 
 # Use this to list any code that you used that you did not write,
 # aside from code provided by the lecturer.  Provide a comment
@@ -30,10 +27,6 @@ declaration: >-
 #
 # Add as many "url+licence+comment" entries as necessary
 # (or remove it altogether if you haven't used any external code)
-# code:
-#   - comment:
-#     url:
-#     licence:
 
 # Use this to list any assets (artwork, sound, etc) that you used.
 # Provide a comment explaining your use of that asset and the URL
@@ -41,18 +34,8 @@ declaration: >-
 #
 # Add as many "url+licence+comment" entries as necessary
 # (or remove it altogether if you haven't used any external assets)
-# assets:
-#   - comment:
-#     url:
-#     licence:
 
 
-# Sign *your* name and uids here. (Remove entries if you have fewer
-# than three members.)
-signatures:
-  - name: Arjun Raj
-    uid: u7526852
-  - name:
-    uid:
-  - name:
-    uid:
+# sign *your* name and uid here
+name: Arjun Raj
+uid: u7526852
