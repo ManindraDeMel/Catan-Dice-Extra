@@ -1244,7 +1244,16 @@ public class CatanDiceExtra {
      */
     public static boolean isActionSequenceValid(String boardState, String[] actionSequence) {
         // FIXME: Task 10a
-        return false;
+
+        // Iterating through each action in the array and checking if valid
+        for (int i = 0; i < actionSequence.length; i++) {
+            if (isActionValid(boardState, actionSequence[i]))
+                boardState = applyAction(boardState, actionSequence[i]);
+            else
+                return false;
+        }
+
+        return true;
     }
 
     /**
@@ -1264,7 +1273,15 @@ public class CatanDiceExtra {
      */
     public static String applyActionSequence(String boardState, String[] actionSequence) {
         // FIXME: Task 10b
-        return null;
+
+        // Iterating through each action in the array and applying action
+        // Returned string is re-stored in boardState
+        for (int i = 0; i < actionSequence.length; i++) {
+            if (isActionValid(boardState, actionSequence[i]))
+                boardState = applyAction(boardState, actionSequence[i]);
+        }
+
+        return boardState;
     }
 
     /**
