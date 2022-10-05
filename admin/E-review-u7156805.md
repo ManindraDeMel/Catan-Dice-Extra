@@ -19,4 +19,4 @@ Furthermore, he utilisies Java FX very well, demonstrating that he has a sound u
 
 ### Further improvements 
 
-I feel that ```hmRoads``` ould've been automated instead of hard-coded coordinates. However, this still gets the job done!
+I feel that ```hmRoads``` could've been automated instead of hard-coded coordinates. However, this still gets the job done!
