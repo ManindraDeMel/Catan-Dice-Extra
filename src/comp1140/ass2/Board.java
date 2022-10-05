@@ -13,7 +13,17 @@ public class Board {
     public Castle[] castles;
 
     public ArrayList<Road> roads;
-
+    /**
+     * Instantiates all the array fields of a Board.
+     * Each Array that can be is indexed the same as the indices for corners and tiles provided.
+     * Loops through all 54 coordinates, changing x and y as appropriate.
+     * Additionally creates unbuilt settlements and tiles where appropriate.
+     * Designed to be modular, allowing for simple changes to things like tiltypes,
+     * but larger changes to the dimension of the board would require a complete rewrite.
+     * Creates everything with an empty player name "", so should only every be executed once.
+     * Authored by Stephen Burg - u7146285, but the system of coordinates it instantiates was created collaboratively
+     * by the team and also Jonte before he left.
+     */
     public void instatiateBoard() {
         this.coords = new Coordinate[54];
         this.tiles = new Tile[20];
@@ -98,6 +108,15 @@ public class Board {
         }
 
     }
+    /**
+     * Applies a Player Board State String to an already instantiated board, changeing the states and ownership of various structures.
+     * Handles roads by adding them to an arraylist, as no clean method of keeping them unbuilt in an array and trying to find them
+     * like settlements was found.
+     * Does not check if things are already owned or in the Road list, should most likely only be used applied to a newly instantiated board.
+     * On a turn by turn basis actions should be applied to an existing board by some yet to be written method, rather than full boardstates.
+     * So far untested.
+     * Authored by Stephen Burg - u7146285
+     */
     public void applyPlayerBoardState(String playerBoardState) {
         if (playerBoardState.length()<2) {
             return;
