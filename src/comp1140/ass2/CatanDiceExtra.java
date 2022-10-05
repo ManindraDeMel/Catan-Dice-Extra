@@ -25,7 +25,7 @@ public class CatanDiceExtra {
      * Returns false if at any point it detects an error, otherwise returns true.
      * Parts of repeated code, could potentially be shorted by handling at least
      * 'J', 'K', 'S' and 'T' with an additional helper function.
-     * Authored by Stephen Burg - u7146285
+     * Authored by Stephen Burg - u7146285.
      */
     public static Boolean isPlayerBoardStateWellFormed(String pBoardState) {
         int x;
