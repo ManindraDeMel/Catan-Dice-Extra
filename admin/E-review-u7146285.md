@@ -1,6 +1,6 @@
 ## Code Review
 
-Reviewed by: <your full name>, <your uid>
+Reviewed by: Stephen Burg, u7146285
 
 Reviewing code written by: <the other person's full name> <other uid>
 
