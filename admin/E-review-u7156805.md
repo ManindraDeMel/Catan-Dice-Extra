@@ -11,4 +11,4 @@ Component: Task 6
 
 The code written by Arjun was not only extremely succient and readable, but the boardstate which is displaye is also well designed and works properly. 
 
-Furthermore, he utilisies Java FX very wel, demonstrating that he has a sound understanding of the library.
+Furthermore, he utilisies Java FX very well, demonstrating that he has a sound understanding of the library.
