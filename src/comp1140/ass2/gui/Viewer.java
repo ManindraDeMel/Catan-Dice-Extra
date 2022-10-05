@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Authored by: Arjun Raj, u7526852
+ */
 public class Viewer extends Application {
 
     private static final int VIEWER_WIDTH = 1200;
