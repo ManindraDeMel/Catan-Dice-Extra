@@ -1,13 +1,13 @@
 ## Code Review
 
-Reviewed by: <your full name>, <your uid>
+Reviewed by: Manindra de Mel, u7156805
 
 Reviewing code written by: <the other person's full name> <other uid>
 
-Component: <the component being reviewed>
+Component: Task 6
 
 ### Comments 
 
-<write your comments here>
+The code written by Arjun was not only extremely succient and readable, but the boardstate which is displaye is also well designed and works properly. 
 
 
