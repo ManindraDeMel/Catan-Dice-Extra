@@ -557,7 +557,7 @@ public class CatanDiceExtra {
         for (int i = 0; i < 4; i++) {
             actionState += characters[i];
         }
-        return switch (actionState) {
+        return switch (actionState) { // here we match for the type of action we received
             case "keep" -> validateClass.validateKeep(boardState, action);
             case "buil" -> validateClass.validateBuild(boardState, action);
             case "trad" -> validateClass.validateTrade(boardState, action);
@@ -565,9 +565,9 @@ public class CatanDiceExtra {
             default -> false;
         };
     }
-    private class validateClass {
+    private class validateClass { // helper class which handles all the different action cases
         public static boolean validateBuild(String boardState, String action) {
-            ArrayList<Character> validformat = new ArrayList<>(Arrays.asList(
+            ArrayList<Character> validformat = new ArrayList<>(Arrays.asList( // a filter for all the accepted characters
                     'b',
                     'u',
                     'i',
@@ -584,14 +584,14 @@ public class CatanDiceExtra {
             }
             for (Character c : action.toCharArray()) {
                 if (!validformat.contains(c)) {
-                    return false; // Check the format
+                    return false; // Check the format (filter out if its not properly formed)
                 }
             }
             // ###########
             Character buildType = action.charAt(5);
             if (ValidateBuildHelperFuncs.sufficentResourcesForBuild(boardState, buildType)) { // check for resources
                 return switch (buildType) {
-                    case 'C' -> ValidateBuildHelperFuncs.validateCastleBuild(boardState, action.charAt(action.length() - 1));
+                    case 'C' -> ValidateBuildHelperFuncs.validateCastleBuild(boardState, action.charAt(action.length() - 1)); // Matching the type of building
                     case 'K' -> ValidateBuildHelperFuncs.validateKnightBuild(boardState, action);
                     case 'R' -> ValidateBuildHelperFuncs.validateRoadBuild(boardState, action);
                     case 'S' -> ValidateBuildHelperFuncs.validateSettlementBuild(boardState, action);
@@ -603,7 +603,7 @@ public class CatanDiceExtra {
         }
         // #######################################################################################
         public static boolean validateTrade(String boardState, String action) {
-            ArrayList<Character> validFormat = new ArrayList<>(Arrays.asList('t', 'r', 'a', 'd', 'e'));
+            ArrayList<Character> validFormat = new ArrayList<>(Arrays.asList('t', 'r', 'a', 'd', 'e')); // another filter
             validFormat.addAll(Misc.possibleResources); // checks for format
             for (Character c : action.toCharArray()) { // can't trade for gold.
                 if (c == 'm' || !validFormat.contains(c)) {
@@ -613,20 +613,20 @@ public class CatanDiceExtra {
             int numResources = action.length() - 5; // the -4 is for "trade"
             ArrayList<Character> resources = Misc.getResourcesFromBoardState(boardState);
             int numGold = 0;
-            for (Character c : resources) {
+            for (Character c : resources) { // count the amount of gold
                 if (c == 'm') {
                     numGold++;
                 }
             }
-            if (numGold >= numResources * 2) {
+            if (numGold >= numResources * 2) { // only if there is sufficient gold to make the trade (ratio of 2 : 1)
                 return true;
             }
             return false;
         }
         // #######################################################################################
-        public static boolean validateKeep(String boardState, String action) {
+        public static boolean validateKeep(String boardState, String action) { // validate keep action
             int numRolls = Integer.parseInt(Character.toString(boardState.toCharArray()[2]));
-            if (numRolls < 3) {
+            if (numRolls < 3) { // check rolls
                 ArrayList<Character> turnBoardState = new ArrayList<>(Arrays.asList('k', 'e', 'e', 'p')); // resources are valid, next check boardstate if the resources exist
                 turnBoardState.addAll(Misc.getResourcesFromBoardState(boardState));
                 for (Character c : action.toCharArray()) { // checking for format of keep[Resources] && check for if resources in gamestate too
@@ -641,7 +641,7 @@ public class CatanDiceExtra {
         // #######################################################################################
         public static boolean validateSwap(String boardState, String action) {
             ArrayList<Character> resources = Misc.getResourcesFromBoardState(boardState);
-            Character resourceIn = action.charAt(4);
+            Character resourceIn = action.charAt(4); // get the traded materials
             Character resourceOut = action.charAt(5);
             if (!resources.contains(resourceIn)) {
                 return false; // Player doesn't have resource to trade.
@@ -652,7 +652,7 @@ public class CatanDiceExtra {
             }
             int currentIndex = 0;
             ArrayList<Integer> locations = new ArrayList<>();
-            while (playerBoardState.indexOf("J", currentIndex) != -1) {
+            while (playerBoardState.indexOf("J", currentIndex) != -1) { // get all the owned (unused) knights
                 int newIndex = playerBoardState.indexOf("J", currentIndex);
                 locations.add(Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex+1)) + Character.toString(playerBoardState.charAt(newIndex+2))));
                 currentIndex = newIndex+1;
@@ -671,7 +671,7 @@ public class CatanDiceExtra {
             return false;
         }
         // ####################################################################################### Helper functions for validateBuild();
-        private class ValidateBuildHelperFuncs {
+        private class ValidateBuildHelperFuncs { // a private helper class for the 'build' action since its complex in comparison to the other actions.
             // #######################################################################################
             private static boolean validateCastleBuild(String boardState, Character castlePosition) {
                 if (boardState.contains("C" + castlePosition)) {
@@ -681,7 +681,7 @@ public class CatanDiceExtra {
             }
             // ####################
             private static boolean validateCityBuild(String boardState, String action) {
-                final ArrayList<Integer> validCityBuildLocations = new ArrayList<>(Arrays.asList(
+                final ArrayList<Integer> validCityBuildLocations = new ArrayList<>(Arrays.asList( // hard coded list of all the locations cityable locations on the board.
                         1,
                         7,
                         10,
@@ -696,7 +696,7 @@ public class CatanDiceExtra {
                         52
                 ));
                 String playerBoardState = Misc.getPlayerBoardState(boardState);
-                String settlement = "S" + Character.toString(action.charAt(6)) + Character.toString(action.charAt(7));
+                String settlement = "S" + Character.toString(action.charAt(6)) + Character.toString(action.charAt(7)); // extract location
                 int location = Integer.parseInt(Character.toString(action.charAt(6)) + Character.toString(action.charAt(7)));
                 if (playerBoardState.contains(settlement) && validCityBuildLocations.contains(location)) { // settlement already built check && location is in a cityable location.
                     return true;
@@ -706,20 +706,21 @@ public class CatanDiceExtra {
             // ####################
             private static boolean validateKnightBuild(String boardState, String action) {
                 int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
-                if (actionCoord >= 0 && actionCoord < 20) {
-                    ArrayList<Integer> surroundingCoords = Misc.knightIndexingToRowIndexing.get(actionCoord);
-                    String playerBoardState = Misc.getPlayerBoardState(boardState);
-                    return roadConnectedToKnight(playerBoardState, surroundingCoords) || settlementConnectedToKnight(playerBoardState, surroundingCoords);
+                if (actionCoord >= 0 && actionCoord < 20) { // validate location
+                    ArrayList<Integer> surroundingCoords = Misc.knightIndexingToRowIndexing.get(actionCoord); // convert to the knight coordinate system
+                    String playerBoardState = Misc.getPlayerBoardState(boardState); // extract coords
+                    return roadConnectedToKnight(playerBoardState, surroundingCoords) || settlementConnectedToKnight(playerBoardState, surroundingCoords); // connected to road || connected to settlement.
                 }
                 return false;
             }
             // ####################
             private static boolean validateRoadBuild(String boardState, String action) {
-                return !checkIfExists(boardState, action) && checkIfConnectedR(boardState, action) && checkForSettlement(boardState, action);
+                return !checkIfExists(boardState, action) && checkIfConnectedR(boardState, action) && checkForSettlement(boardState, action); // check if a road doesnt already exist &&
+                                                                                                                    // check if its connected to another road && check theres a settlement between the roads
             }
             // ####################
             private static boolean validateSettlementBuild(String boardState, String action) {
-                return !checkIfExists(boardState, action) && checkIfConnected(boardState, action);
+                return !checkIfExists(boardState, action) && checkIfConnected(boardState, action); // check if a settlement doesn't already exist and is connected to a road.
             }
             // #################### sub-helper functions below
             private static boolean sufficentResourcesForBuild(String boardState, Character buildType) {
@@ -729,11 +730,11 @@ public class CatanDiceExtra {
                     put('l', Resource.wood);
                     put('m', Resource.gold);
                     put('o', Resource.stone);
-                    put('w', Resource.sheep);
+                    put('w', Resource.sheep); // convert to our system
                 }};
                 final HashMap<String, Character> nameToBuildID = new HashMap<>() {{
                     put("Road", 'R');
-                    put("Solider", 'K');
+                    put("Solider", 'K'); // convert to our system
                     put("Settlement", 'S');
                     put("Castle", 'C');
                     put("City", 'T');
@@ -743,22 +744,22 @@ public class CatanDiceExtra {
                 for (Character c : Misc.getResourcesFromBoardState(boardState)) {
                     resources.add(charToResource.get(c)); // Convert to resource type
                 }
-                ArrayList<ArrayList<String>> possibleBuilds = Prices.findBuilds(resources);
+                ArrayList<ArrayList<String>> possibleBuilds = Prices.findBuilds(resources); // find all the possible builds given a list of resources
                 for (ArrayList<String> i : possibleBuilds) {
                     for (String build : i) {
-                        if (nameToBuildID.get(build) == buildType) {
+                        if (nameToBuildID.get(build) == buildType) { // if the build exists in all the possible builds then it can be done.
                             return true;
                         }
                     }
                 }
                 return false;
             }
-            private static boolean checkBaseCase(String boardState, String action, Character buildType) {
+            private static boolean checkBaseCase(String boardState, String action, Character buildType) { // checking for when a game just starts and players are just choosing their first roads.
                 if (buildType == 'R' && validateRoadLength(action)) {
-                    if (boardState == "W00WXW00X00" || boardState == "X00WXW00X00") {
+                    if (boardState == "W00WXW00X00" || boardState == "X00WXW00X00") { // in this case, its the first turn so we have to check if the road is just on the coast
                         return roadOnCoast(action);
                     }
-                    else if (boardState.length() == 16 && boardState.contains("R")) {
+                    else if (boardState.length() == 16 && boardState.contains("R")) { // if the board length is 16 then its the second turn (first turn of second player)
                         ArrayList<Integer> actionLocations = new ArrayList<>(Arrays.asList(
                                 Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1))),
                                 Integer.parseInt(Character.toString(action.charAt(action.length() - 4)) + Character.toString(action.charAt(action.length() - 3)))
@@ -770,25 +771,26 @@ public class CatanDiceExtra {
                         ));
                         for (int i = 0; i < 2; i++) {
                             for (int j = 0; j < 2; j ++) {
-                                if (Misc.getDistance(Misc.convertToCoordinate(actionLocations.get(i)), Misc.convertToCoordinate((boardLocations.get(j)))) < 5) {
+                                if (Misc.getDistance(Misc.convertToCoordinate(actionLocations.get(i)), Misc.convertToCoordinate((boardLocations.get(j)))) < 5) { // here we check the distance between
+                                                                                                                                                                // the two roads are greater than 5 spaces away
                                     return false;
                                 }
                             }
                         }
-                        return roadOnCoast(action);
+                        return roadOnCoast(action); // then check if its on the coast
                     }
                 }
                 return false;
             }
             private static boolean roadOnCoast(String action) {
                 for (String s : Misc.getRoadCoordsFromAction(action)) {
-                    if (Misc.coastalRoadNodes.contains(s)) {
+                    if (Misc.coastalRoadNodes.contains(s)) { // just checks the list if a road is on the coast
                         return true;
                     }
                 }
                 return false;
             }
-            private static boolean checkIfExists(String boardState, String action) {
+            private static boolean checkIfExists(String boardState, String action) { // checking if some build already exists
                 String build = "";
                 if (action.charAt(5) == 'R') {
                     for (Character c : new char[]{action.charAt(5), action.charAt(6), action.charAt(7), action.charAt(8), action.charAt(9)}) {
@@ -809,11 +811,11 @@ public class CatanDiceExtra {
                 String playerBoardState = Misc.getPlayerBoardState(boardState);
                 int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
                 int currentIndex = 0;
-                while (playerBoardState.indexOf("R", currentIndex) != -1) { // Maybe make this a getRoadsFromPlayerBoardState() function??
+                while (playerBoardState.indexOf("R", currentIndex) != -1) { // get road from player board state
                     int newIndex = playerBoardState.indexOf("R", currentIndex);
                     int firstCoord = Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex + 1)) + Character.toString(playerBoardState.charAt(newIndex + 2)));
-                    int secondCoord = Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex + 3)) + Character.toString(playerBoardState.charAt(newIndex + 4)));
-                    if (actionCoord == firstCoord || actionCoord == secondCoord) {
+                    int secondCoord = Integer.parseInt(Character.toString(playerBoardState.charAt(newIndex + 3)) + Character.toString(playerBoardState.charAt(newIndex + 4))); // get the road coords
+                    if (actionCoord == firstCoord || actionCoord == secondCoord) { // if the head or tail of the road
                         return true;
                     }
                     currentIndex = newIndex + 1;
@@ -1032,7 +1034,7 @@ public class CatanDiceExtra {
                 return resources;
             }
 
-            public static String getPlayerBoardState(String boardState) {
+            public static String getPlayerBoardState(String boardState) { // get the board-state of the current player's turn
                 HashMap<Character, String> switchPlayers = new HashMap<>() {{
                     put('W', "X");
                     put('X', "W");
@@ -1040,14 +1042,14 @@ public class CatanDiceExtra {
                 Character playerTurn = boardState.charAt(0);
                 return getString(boardState, playerTurn, switchPlayers);
             }
-            public static String getPlayerBoardState(String boardState, Character playerTurn) {
+            public static String getPlayerBoardState(String boardState, Character playerTurn) { // get the board-state given a player
                 HashMap<Character, String> switchPlayers = new HashMap<>() {{
                     put('W', "X");
                     put('X', "W");
                 }};
                 return getString(boardState, playerTurn, switchPlayers);
             }
-            private static String getString(String boardState, Character playerTurn, HashMap<Character, String> switchPlayers) {
+            private static String getString(String boardState, Character playerTurn, HashMap<Character, String> switchPlayers) { // common method for both getPlayerBoardState()'s
                 int startOfPlayerBoardState = boardState.indexOf(Character.toString(playerTurn), 1);
                 int endOfPlayerBoardState = boardState.indexOf(switchPlayers.get(playerTurn), startOfPlayerBoardState);
                 List<Character> playerBoardState = new ArrayList<>();
@@ -1061,7 +1063,7 @@ public class CatanDiceExtra {
                 return result;
             }
 
-            private static Coordinate convertToCoordinate(int boardCoord) {
+            private static Coordinate convertToCoordinate(int boardCoord) { // convert to our coordinate system
                 int yCoord = 0, xCoord = 0;
                 for (int hexIndex = 0; hexIndex < Misc.knightIndexingToRowIndexing.size(); hexIndex++) {
                     if (Misc.knightIndexingToRowIndexing.get(hexIndex).contains(boardCoord)) {
@@ -1112,7 +1114,7 @@ public class CatanDiceExtra {
         public static ArrayList<ArrayList<Integer>> getRoad(String playerBoardState) {
             int currentIndex = 0;
             ArrayList<ArrayList<Integer>> roads = new ArrayList<>();
-            while (playerBoardState.indexOf("R", currentIndex) != -1) {
+            while (playerBoardState.indexOf("R", currentIndex) != -1) { // search through a boardstate for all the roads and append their coordinates
                 int newIndex = playerBoardState.indexOf("R", currentIndex);
                 roads.add(new ArrayList<>(Arrays.asList(
                         Integer.parseInt(Character.toString(playerBoardState.toCharArray()[newIndex+1]) + Character.toString(playerBoardState.toCharArray()[newIndex+2])),
@@ -1123,9 +1125,9 @@ public class CatanDiceExtra {
             return roads;
         }
         public static ArrayList<ArrayList<Integer>> getRoads(Character player, String boardState) {
-            return getRoad(validateClass.Misc.getPlayerBoardState(boardState, player));
+            return getRoad(validateClass.Misc.getPlayerBoardState(boardState, player)); // return the roads
         }
-        private static ArrayList<Integer> getDistinctNodesFromRoads(ArrayList<ArrayList<Integer>> roads) {
+        private static ArrayList<Integer> getDistinctNodesFromRoads(ArrayList<ArrayList<Integer>> roads) { // get the nodes to generate a graph
             ArrayList<Integer> nodes = new ArrayList<>();
             for (ArrayList<Integer> road : roads) {
                 for (Integer node : road) {
@@ -1136,7 +1138,7 @@ public class CatanDiceExtra {
             }
             return nodes;
         }
-        public static HashMap<Integer, ArrayList<Integer>> generateGraph(ArrayList<ArrayList<Integer>> roads) { // instead of doing roads, we should do nodes and use the roads as vertices im so stupid.
+        public static HashMap<Integer, ArrayList<Integer>> generateGraph(ArrayList<ArrayList<Integer>> roads) { // Generate a graph where with nodes and roads as vertices
             HashMap<Integer, ArrayList<Integer>> graph = new HashMap<>();
             int[] otherIndex = new int[]{1, 0};
             for (Integer node : getDistinctNodesFromRoads(roads)) {
@@ -1154,14 +1156,14 @@ public class CatanDiceExtra {
             }
             return graph;
         }
-        public static int getLongestRoad(HashMap<Integer, ArrayList<Integer>> graph) {
+        public static int getLongestRoad(HashMap<Integer, ArrayList<Integer>> graph) { // go through each point of the player's road starting nodes and find the longest one
             ArrayList<Integer> differentLengths = new ArrayList<>();
             for (Integer node : graph.keySet()) {
                 differentLengths.add(getLongestRoadHelper(new ArrayList<>(), -1, node, graph));
             }
             return Collections.max(differentLengths);
         }
-        public static int getLongestRoadHelper(ArrayList<Integer> visitedNodes, Integer lastNode, Integer currentNode, HashMap<Integer, ArrayList<Integer>>graph) {
+        public static int getLongestRoadHelper(ArrayList<Integer> visitedNodes, Integer lastNode, Integer currentNode, HashMap<Integer, ArrayList<Integer>>graph) { // a Depth first search implementation for this problem
             ArrayList<Integer> connectedNodes = graph.get(currentNode);
             ArrayList<Integer> newNodes = new ArrayList<>();
             for (Integer node : connectedNodes) {
@@ -1257,7 +1259,16 @@ public class CatanDiceExtra {
      */
     public static boolean isActionSequenceValid(String boardState, String[] actionSequence) {
         // FIXME: Task 10a
-        return false;
+
+        // Iterating through each action in the array and checking if valid
+        for (int i = 0; i < actionSequence.length; i++) {
+            if (isActionValid(boardState, actionSequence[i]))
+                boardState = applyAction(boardState, actionSequence[i]);
+            else
+                return false;
+        }
+
+        return true;
     }
 
     /**
@@ -1277,7 +1288,15 @@ public class CatanDiceExtra {
      */
     public static String applyActionSequence(String boardState, String[] actionSequence) {
         // FIXME: Task 10b
-        return null;
+
+        // Iterating through each action in the array and applying action
+        // Returned string is re-stored in boardState
+        for (int i = 0; i < actionSequence.length; i++) {
+            if (isActionValid(boardState, actionSequence[i]))
+                boardState = applyAction(boardState, actionSequence[i]);
+        }
+
+        return boardState;
     }
 
     /**
