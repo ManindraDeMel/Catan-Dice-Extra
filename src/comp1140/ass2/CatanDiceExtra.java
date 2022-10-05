@@ -19,17 +19,13 @@ public class CatanDiceExtra {
     }
 
     /**
-     * Check if the string encoding of a board state is well-formed.
-     * Note that this does not mean checking if the state is valid
-     * (represents a state that the player could get to in game play),
-     * only that the string representation is syntactically well-formed.
-     *
-     * A description of the board state string will be provided in a
-     * later update of the project README.
-     *
-     * @param : The string representation of the board state.
-     * @return true iff the string is a well-formed representation of
-     * a board state, false otherwise.
+     * Takes as input a Player Board State component of a Board State String
+     * Breaks it down into component sections by checking for the start of the next one,
+     * then checks if the sections are well formed.
+     * Returns false if at any point it detects an error, otherwise returns true.
+     * Parts of repeated code, could potentially be shorted by handling at least
+     * 'J', 'K', 'S' and 'T' with an additional helper function.
+     * Authored by Stephen Burg - u7146285.
      */
     public static Boolean isPlayerBoardStateWellFormed(String pBoardState) {
         int x;
@@ -39,6 +35,7 @@ public class CatanDiceExtra {
                 break;
             }
         }
+
         if (x != 0) {
             if (x%2!=0) {
                 return false;
@@ -245,6 +242,14 @@ public class CatanDiceExtra {
         }
         return true;
     }
+    /**
+     * Takes as input a Player Score component of a Board State String,
+     * as well as an array of two booleans asserting whether Longest Road and Largest Army already exist.
+     * Returns an array of 1 boolean, False, if there is an error in the Score string.
+     * Otherwise returns a 3 boolean array: True, 'Whether longest road exists', 'Whether Largest army exists'.
+     * This is largely redundant for two players, but should allow easier scaling to additional players.
+     * Authored by Stephen Burg - u7146285.
+     */
     public static boolean[] isPlayerScoreWellFormed(String pScore, boolean[] RA) {
         Set<Character> ints = Set.of('1', '2', '3', '4', '5', '6', '7', '8', '9', '0');
         int l = pScore.length();
@@ -282,6 +287,12 @@ public class CatanDiceExtra {
      * @param boardState: The string representation of the board state.
      * @return true iff the string is a well-formed representation of
      * a board state, false otherwise.
+     * -
+     * Breaks the board string into components, first checking the Turn string is well formed
+     * before feeding the other components through the helper functions:
+     * "isPlayerBoardStateWellFormed" and "isPlayerScoreWellFormed".
+     * Returns false if an error is detected at any point, otherwise returns true.
+     * Authored by Stephen Burg - u7146285.
      */
     public static boolean isBoardStateWellFormed(String boardState) {
         Set<Character> resources = Set.of('b', 'g', 'l', 'm', 'o', 'w');
@@ -363,7 +374,6 @@ public class CatanDiceExtra {
         if (isPlayerScoreWellFormed(boardStateNoWScore, new boolean[] {scoreTest[1], scoreTest[2]})[0] == false) {
             return false;
         }
-        // FIXME: Task 3
         return true;
     }
 
@@ -379,6 +389,10 @@ public class CatanDiceExtra {
      * @param action: The string representation of the action.
      * @return true iff the string is a well-formed representation of
      * a player action, false otherwise.
+     * -
+     * Checks first if the string satisfies one of the defined action types, returning True,
+     * otherwise, returns False.
+     * Authored by Stephen Burg - u7146285
      */
     public static boolean isActionWellFormed(String action) {
         Set<Character> resources = Set.of('b', 'g', 'l', 'm', 'o', 'w');
@@ -464,7 +478,6 @@ public class CatanDiceExtra {
             }
 
         }
-        // FIXME: Task 4
         return false;
     }
 
