@@ -1242,8 +1242,8 @@ public class CatanDiceExtra {
     public static String applyAction(String boardState, String action) {
         Board board = new Board();
         board.applyBoardState(boardState); // converting to our boardState
-        System.out.println("hi");
-        return boardState;
+        board.addAction(boardState, action);
+        return board.toString();
     }
 
     /**

@@ -4,6 +4,7 @@ import java.util.*;
 
 import static comp1140.ass2.Coordinate.*;
 import static comp1140.ass2.TileType.*;
+import static java.lang.VersionProps.build;
 
 
 public class Board {
@@ -179,6 +180,29 @@ public class Board {
                 break;
         }
     }
+
+
+    public void addAction(String boardState, String action) { // Task 9 functionality
+        switch (action.substring(0, 5)) { // here we match for the type of action we received
+            case "keep" -> modifyResources();
+            case "buil" -> buildBuilding();
+            case "trad" -> trade(); // TODO
+            case "swap" -> swap();
+        };
+    }
+
+    private void buildBuilding() {
+    }
+
+    private void swap() {
+
+    }
+    private void trade() {
+    }
+
+    private void modifyResources() {
+    }
+
 
     public void applyBoardState(String boardState) {
         for (char p : new char[]{'W', 'X'}) {
