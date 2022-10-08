@@ -1,5 +1,7 @@
 package comp1140.ass2;
 
+import java.util.ArrayList;
+
 public class Coordinate {
     public int x;
     public int y;
@@ -29,7 +31,7 @@ public class Coordinate {
         this.index = index;
     }
     /**
-     * Takes two coordinates, returns True is they are euqal both in y and x
+     * Takes two coordinates, returns True is they are eaual both in y and x
      * otherwise returns false
      * Authored by Stephen Burg - u7146285
      */
@@ -50,7 +52,8 @@ public class Coordinate {
      * otherwise returns false
      * Authored by Stephen Burg - u7146285
      */
-    public static boolean CheckAdjacent(Coordinate coord1, Coordinate coord2) {
+
+    public static boolean checkAdjacent(Coordinate coord1, Coordinate coord2) {
         int y1= coord1.y;
         int x1= coord1.x;
         int y2= coord2.y;

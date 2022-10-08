@@ -1,7 +1,7 @@
 package comp1140.ass2;
 import java.util.*;
 
-import static comp1140.ass2.Coordinate.CheckAdjacent;
+import static comp1140.ass2.Coordinate.checkAdjacent;
 
 public class CatanDiceExtra {
     ArrayList<Player> players = new ArrayList<>();
@@ -1198,6 +1198,8 @@ public class CatanDiceExtra {
      * - The method should return {3, 1}
      * @param boardState: string representation of the board state.
      * @return array of army sizes, one per player.
+     *
+     * Authored by: Arjun Raj, u7526852
      */
     public static int[] largestArmy(String boardState) {
         int[] largeArmy = new int[2];
@@ -1211,7 +1213,6 @@ public class CatanDiceExtra {
         largeArmy[1] = (int) playerX.chars().filter(ch -> ch == 'K').count() + (int) playerX.chars().filter(ch -> ch == 'J').count();
 
         return largeArmy;
-
     }
 
     /**
