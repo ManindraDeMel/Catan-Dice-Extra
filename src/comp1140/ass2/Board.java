@@ -8,12 +8,12 @@ import static comp1140.ass2.TileType.*;
 
 public class Board {
     public Tile[] tiles;
-    public Coordinate[] coords;
+    public static Coordinate[] coords;
 
     public Settlement[] settlements;
     public Castle[] castles;
     public ArrayList<Road> roads;
-    public HashMap<Coordinate, ArrayList<Coordinate>> neighbours;
+    public static HashMap<Coordinate, ArrayList<Coordinate>> neighbours;
     /**
      * Instantiates all the array fields of a Board.
      * Each Array that can be is indexed the same as the indices for corners and tiles provided.
@@ -25,12 +25,12 @@ public class Board {
      * Authored by Stephen Burg - u7146285, but the system of coordinates it instantiates was created collaboratively
      * by the team and also Jonte before he left.
      */
-    public void instatiateBoard() {
-        this.coords = new Coordinate[54];
+    public Board() {
+        coords = new Coordinate[54];
         this.tiles = new Tile[20];
         this.settlements = new Settlement[26];
         this.castles = new Castle[4];
-        this.neighbours = new HashMap<>();
+        neighbours = new HashMap<>();
         for (int i = 0;i<4;i++) {
             this.castles[i] = new Castle(new Player(""));
         }
@@ -48,8 +48,8 @@ public class Board {
         int x = 1;
         int rowlen = 6;
         for (int c = 0; c <= 53; c++) {
-            this.coords[c] = new Coordinate(x, y);
-            this.coords[c].setIndex(c);
+            coords[c] = new Coordinate(x, y);
+            coords[c].setIndex(c);
             if (x%2==1) {
                 if (y<3) {
                     tilecoords[0] = new Coordinate(x, y);
@@ -108,14 +108,14 @@ public class Board {
             }
 
         }
-        for (Coordinate coord : this.coords) {
+        for (Coordinate coord : coords) {
             ArrayList<Coordinate> acc = new ArrayList<>();
-            for (Coordinate nb : this.coords) {
+            for (Coordinate nb : coords) {
                 if (checkAdjacent(coord, nb)) {
                     acc.add(nb);
                 }
             }
-            this.neighbours.put(coord, acc);
+            neighbours.put(coord, acc);
         }
 
     }
@@ -175,8 +175,8 @@ public class Board {
                 } else {
                     this.roads.add(
                             new Road(new Player(playerId),
-                            this.coords[Integer.valueOf(playerBoardState.substring(x - 4, x-2))],
-                            this.coords[Integer.valueOf(playerBoardState.substring(x - 2, x))]));
+                            coords[Integer.valueOf(playerBoardState.substring(x - 4, x-2))],
+                            coords[Integer.valueOf(playerBoardState.substring(x - 2, x))]));
                 }
             }
         }
