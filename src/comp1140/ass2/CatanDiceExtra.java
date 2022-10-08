@@ -1,7 +1,6 @@
 package comp1140.ass2;
-import java.util.*;
 
-import static comp1140.ass2.Coordinate.CheckAdjacent;
+import java.util.*;
 
 public class CatanDiceExtra {
     ArrayList<Player> players = new ArrayList<>();
@@ -1096,96 +1095,288 @@ public class CatanDiceExtra {
      * @return array of contiguous road lengths, one per player.
      */
     public static int[] longestRoad(String boardState) {
+
+        // Defining Arrays and required values
         int[] longestRoadArr = new int[2];
-        char[] players = new char[]{'W', 'X'};
-        for (int i = 0; i < players.length; i++) {
-            char player = players[i];
-            ArrayList<ArrayList<Integer>> playerRoads = longestRoadHelper.getRoads(player, boardState);
-            if (playerRoads.size() != 0) { // has at least 1 road
-                longestRoadArr[i] = longestRoadHelper.getLongestRoad(longestRoadHelper.generateGraph(playerRoads));
+        String playerW = boardState.substring(boardState.indexOf('W', 1), boardState.indexOf('X', 1));
+        String playerX = boardState.substring(boardState.indexOf('X', 1), boardState.indexOf('W', boardState.indexOf('X', 1)));
+
+        // Getting roads and neighbours
+        ArrayList<ArrayList<String>> roads = longestRoadHelper.getRoads(boardState);
+        ArrayList<ArrayList<ArrayList<String>>> neighbours = longestRoadHelper.getNeighbours(roads);
+        HashSet<ArrayList<String>> longestRoads1 = new HashSet<>();
+        HashSet<ArrayList<String>> longestRoads2 = new HashSet<>();
+
+        ArrayList<ArrayList<ArrayList<String>>> allRoadSequence = new ArrayList<ArrayList<ArrayList<String>>>();
+        for (int i = 0; i < roads.size(); i++) {
+            ArrayList<String> playerRoads = (ArrayList<String>) roads.get(i);
+            ArrayList<ArrayList<String>> playerNeighbours = neighbours.get(i);
+
+            ArrayList<String> visited = new ArrayList<>();          // roads visited so far in a given search
+            HashSet<ArrayList<String>> longestRoads = new HashSet<>();  // rotations found so far
+
+
+            if (playerRoads.size() == 1)
+                longestRoads.add((ArrayList<String>) playerRoads.clone());
+
+
+            for (int j = 0; j < playerRoads.size(); j++) {
+                var road = playerRoads.get(j);
+                ArrayList<String> longestRoad = new ArrayList<>();
+
+                visited.add(road);
+                longestRoad.add(road);
+                getAllConnectedRoads(playerRoads, playerNeighbours, visited, longestRoads, longestRoad, j);
+                visited.remove(road);
+
+                System.out.println("Longest roads: " + longestRoads);
             }
-            else {
-                longestRoadArr[i] = 0;
-            }
+
+            if (i == 0)
+                longestRoads1 = longestRoads;
+            else
+                longestRoads2 = longestRoads;
         }
+
+        for (var v : longestRoads1){
+            if (v.size() > longestRoadArr[0])
+                longestRoadArr[0] = v.size();
+        }
+
+        for (var v : longestRoads2){
+            if (v.size() > longestRoadArr[1])
+                longestRoadArr[1] = v.size();
+        }
+
+        // Debugging
+        System.out.println("\n--------------------------------");
+        System.out.println("Board State: " + boardState);
+        System.out.println("playerW: " + playerW);
+        System.out.println("playerX: " + playerX);
+        System.out.println("roadsWArr: " + longestRoadHelper.getRoads(boardState).get(0));
+        System.out.println("FINAL ARRAY: " + Arrays.toString(longestRoadArr));
+        System.out.println("----------------------------------\n");
+
         return longestRoadArr;
     }
+
+    private static void getAllConnectedRoads(ArrayList<String> playerRoads, ArrayList<ArrayList<String>> playerNeighbours, ArrayList<String> visited,
+                                             HashSet<ArrayList<String>> longestRoads, ArrayList<String> longestRoad, int pos) {
+        // FIXME complete this method
+
+        List<String> longestRoadState = new ArrayList<>(longestRoad);
+        System.out.println(1);
+        for (var road : playerNeighbours.get(pos)) {
+//            var road = playerRoads.get(i);
+            if (visited.contains(road)) continue;
+
+            longestRoad = new ArrayList<>(longestRoadState);
+
+            System.out.println("Road: " + road + "\nArray: " + playerNeighbours.get(pos));
+//            if (playerNeighbours.get(i).contains(road)){
+//                System.out.println("HELLOOOO");
+                longestRoad.add(road);
+//            }
+
+            Collections.sort(longestRoad);
+            if (true)
+                longestRoads.add(longestRoad);
+
+            visited.add(road);
+            getAllConnectedRoads(playerRoads, playerNeighbours, visited, longestRoads, longestRoad, playerRoads.indexOf(road));
+            visited.remove(road);
+        }
+    }
+
     private class longestRoadHelper {
-        public static ArrayList<ArrayList<Integer>> getRoad(String playerBoardState) {
-            int currentIndex = 0;
-            ArrayList<ArrayList<Integer>> roads = new ArrayList<>();
-            while (playerBoardState.indexOf("R", currentIndex) != -1) { // search through a boardstate for all the roads and append their coordinates
-                int newIndex = playerBoardState.indexOf("R", currentIndex);
-                roads.add(new ArrayList<>(Arrays.asList(
-                        Integer.parseInt(Character.toString(playerBoardState.toCharArray()[newIndex+1]) + Character.toString(playerBoardState.toCharArray()[newIndex+2])),
-                        Integer.parseInt(Character.toString(playerBoardState.toCharArray()[newIndex+3]) + Character.toString(playerBoardState.toCharArray()[newIndex+4]))
-                )));
-                currentIndex = newIndex + 1;
+        public static ArrayList<ArrayList<String>> getRoads(String boardState) {
+
+            // Defining player strings and arrays
+            String playerW = boardState.substring(boardState.indexOf('W', 1), boardState.indexOf('X', 1));
+            String playerX = boardState.substring(boardState.indexOf('X', 1), boardState.indexOf('W', boardState.indexOf('X', 1)));
+            ArrayList<ArrayList<String>> roadsArr = new ArrayList<ArrayList<String>>();
+            roadsArr.add(new ArrayList<>());
+            roadsArr.add(new ArrayList<>());
+
+            // Extracting roads strings of player W
+            int countW = (int) playerW.chars().filter(ch -> ch == 'R').count();
+            for (int i = 0; i < countW; i++) {
+                roadsArr.get(0).add(playerW.substring(playerW.indexOf('R') + 1 + i * 5, playerW.indexOf('R') + 5 + i * 5));
             }
-            return roads;
+
+            // Extracting roads strings of player X
+            int countX = (int) playerX.chars().filter(ch -> ch == 'R').count();
+            for (int i = 0; i < countX; i++) {
+                roadsArr.get(1).add(playerX.substring(playerX.indexOf('R') + 1 + i * 5, playerX.indexOf('R') + 5 + i * 5));
+            }
+
+            return roadsArr;
         }
-        public static ArrayList<ArrayList<Integer>> getRoads(Character player, String boardState) {
-            return getRoad(validateClass.Misc.getPlayerBoardState(boardState, player)); // return the roads
-        }
-        private static ArrayList<Integer> getDistinctNodesFromRoads(ArrayList<ArrayList<Integer>> roads) { // get the nodes to generate a graph
-            ArrayList<Integer> nodes = new ArrayList<>();
-            for (ArrayList<Integer> road : roads) {
-                for (Integer node : road) {
-                    if (!nodes.contains(node)) {
-                        nodes.add(node);
+
+        public static ArrayList<ArrayList<ArrayList<String>>> getNeighbours(ArrayList<ArrayList<String>> roadArr) {
+
+            ArrayList<ArrayList<ArrayList<String>>> neighbours = new ArrayList<ArrayList<ArrayList<String>>>();
+            neighbours.add(new ArrayList<ArrayList<String>>());
+            neighbours.add(new ArrayList<ArrayList<String>>());
+
+            for (int i = 0; i < 2; i++) { // looping through each player
+                for (int j = 0; j < roadArr.get(i).size(); j++) { // looping through each player's roads
+                    neighbours.get(i).add(new ArrayList<String>());
+                    for (String road : allNeighbourRoads.get(roadArr.get(i).get(j))) { // looping all neighbour roads
+                        if (roadArr.get(i).contains(road))
+                            neighbours.get(i).get(j).add(road);
                     }
                 }
             }
-            return nodes;
+            return neighbours;
         }
-        public static HashMap<Integer, ArrayList<Integer>> generateGraph(ArrayList<ArrayList<Integer>> roads) { // Generate a graph where with nodes and roads as vertices
-            HashMap<Integer, ArrayList<Integer>> graph = new HashMap<>();
-            int[] otherIndex = new int[]{1, 0};
-            for (Integer node : getDistinctNodesFromRoads(roads)) {
-                for (ArrayList<Integer> road : roads) {
-                    if (road.contains(node)) {
-                        int connectedPoint = road.get(otherIndex[road.indexOf(node)]);
-                        if (graph.containsKey(node)) {
-                            graph.get(node).add(connectedPoint);
-                        }
-                        else {
-                            graph.put(node, new ArrayList<>(Arrays.asList(connectedPoint)));
-                        }
-                    }
+
+
+        static HashMap<String, ArrayList<String>> allNeighbourRoads = new HashMap<>();
+
+        static {
+            String[] roads = new String[]{
+                    "0307", "0003", "0004", "0408", "0812", "0712",
+                    "0104", "0105", "0509", "0913", "0813",
+                    "0205", "0206", "0610", "1014", "0914",
+                    "1116", "0711", "1217", "1722", "1622",
+                    "1318", "1823", "1723",
+                    "1419", "1924", "1824",
+                    "1015", "1520", "2025", "1925",
+                    "2127", "1621", "2228", "2833", "2733",
+                    "2329", "2934", "2834",
+                    "2430", "3035", "2935",
+                    "2531", "3136", "3036",
+                    "2026", "2632", "3237", "3137",
+                    "3338", "3439", "3943", "3843",
+                    "3540", "4044", "3944",
+                    "3641", "4145", "4045",
+                    "3742", "4246", "4146",
+                    "4347", "4448", "4851", "4751",
+                    "4549", "4952", "4852",
+                    "4650", "5053", "4953"
+            };
+            ArrayList<String> allRoadsOnBoard = new ArrayList<>();
+
+
+            for (int i = 0; i < roads.length; i++) {
+                int index1 = Integer.parseInt(roads[i].substring(0, 2));
+                int index2 = Integer.parseInt(roads[i].substring(2));
+                ArrayList<String> neighbours = new ArrayList<>();
+
+                for (int j = 0; j < roads.length; j++) {
+                    if (i==j) continue;
+
+                    int neighbourIndex1 = Integer.parseInt(roads[j].substring(0, 2));
+                    int neighbourIndex2 = Integer.parseInt(roads[j].substring(2));
+
+                    if (index1 == neighbourIndex1 || index1 == neighbourIndex2 || index2 == neighbourIndex1 || index2 == neighbourIndex2)
+                        neighbours.add(roads[j]);
                 }
+
+                allNeighbourRoads.put(roads[i], neighbours);
             }
-            return graph;
+
+            System.out.println("0004: " + allNeighbourRoads.get("0004"));
+            System.out.println("0104: " + allNeighbourRoads.get("0104"));
+            System.out.println("0408: " + allNeighbourRoads.get("0408"));
         }
-        public static int getLongestRoad(HashMap<Integer, ArrayList<Integer>> graph) { // go through each point of the player's road starting nodes and find the longest one
-            ArrayList<Integer> differentLengths = new ArrayList<>();
-            for (Integer node : graph.keySet()) {
-                differentLengths.add(getLongestRoadHelper(new ArrayList<>(), -1, node, graph));
-            }
-            return Collections.max(differentLengths);
-        }
-        public static int getLongestRoadHelper(ArrayList<Integer> visitedNodes, Integer lastNode, Integer currentNode, HashMap<Integer, ArrayList<Integer>>graph) { // a Depth first search implementation for this problem
-            ArrayList<Integer> connectedNodes = graph.get(currentNode);
-            ArrayList<Integer> newNodes = new ArrayList<>();
-            for (Integer node : connectedNodes) {
-                if (!visitedNodes.contains(node)) {
-                    newNodes.add(node);
-                }
-            }
-            visitedNodes.add(currentNode);
-            if (newNodes.size() == 0) {
-                for (Integer node : connectedNodes) {
-                    if (lastNode != node) {
-                        return 1;
-                    }
-                }
-                return 0;
-            }
-            ArrayList<Integer> children = new ArrayList<>();
-            for (Integer newNode : newNodes) { // basic recursion
-                children.add(1 + getLongestRoadHelper(visitedNodes, currentNode, newNode, graph));
-            }
-            return Collections.max(children);
-        }
+
+//        static HashMap<String, ArrayList<String>> allNeighbourRoads = new HashMap<>() {{
+//
+//            // Row 1
+//            put("0307", new ArrayList<String>(Arrays.asList("0003", "0711", "0712")));
+//            put("0003", new ArrayList<String>(Arrays.asList("0307", "0004")));
+//            put("0004", new ArrayList<String>(Arrays.asList("0003", "0104", "0408")));
+//            put("0408", new ArrayList<String>(Arrays.asList("0004", "0104", "0812", "0813")));
+//            put("0812", new ArrayList<String>(Arrays.asList("0408", "0813", "0712", "1217")));
+//            put("0712", new ArrayList<String>(Arrays.asList("0307", "0711", "0812", "1217")));
+//
+//            put("0104", new ArrayList<String>(Arrays.asList("0004", "0408", "0105")));
+//            put("0105", new ArrayList<String>(Arrays.asList("0104", "0205", "0509"))); // DONE ----------------
+////            put("0509", new Viewer.RoadStartID(1, 3)); //TODO
+////            put("0913", new Viewer.RoadStartID(1, 4));
+////            put("0813", new Viewer.RoadStartID(1, 5));
+////
+////            put("0205", new Viewer.RoadStartID(2, 1));
+////            put("0206", new Viewer.RoadStartID(2, 2));
+////            put("0610", new Viewer.RoadStartID(2, 3));
+////            put("1014", new Viewer.RoadStartID(2, 4));
+////            put("0914", new Viewer.RoadStartID(2, 5));
+////
+////            put("1116", new Viewer.RoadStartID(3, 0));
+////            put("0711", new Viewer.RoadStartID(3, 1));
+////            put("1217", new Viewer.RoadStartID(3, 3));
+////            put("1722", new Viewer.RoadStartID(3, 4));
+////            put("1622", new Viewer.RoadStartID(3, 5));
+////
+////            put("1318", new Viewer.RoadStartID(4, 3));
+////            put("1823", new Viewer.RoadStartID(4, 4));
+////            put("1723", new Viewer.RoadStartID(4, 5));
+////
+////            put("1419", new Viewer.RoadStartID(5, 3));
+////            put("1924", new Viewer.RoadStartID(5, 4));
+////            put("1824", new Viewer.RoadStartID(5, 5));
+////
+////            put("1015", new Viewer.RoadStartID(6, 2));
+////            put("1520", new Viewer.RoadStartID(6, 3));
+////            put("2025", new Viewer.RoadStartID(6, 4));
+////            put("1925", new Viewer.RoadStartID(6, 5));
+////
+////            put("2127", new Viewer.RoadStartID(7, 0));
+////            put("1621", new Viewer.RoadStartID(7, 1));
+////            put("2228", new Viewer.RoadStartID(7, 3));
+////            put("2833", new Viewer.RoadStartID(7, 4));
+////            put("2733", new Viewer.RoadStartID(7, 5));
+////
+////            put("2329", new Viewer.RoadStartID(8, 3));
+////            put("2934", new Viewer.RoadStartID(8, 4));
+////            put("2834", new Viewer.RoadStartID(8, 5));
+////
+////            put("2430", new Viewer.RoadStartID(9, 3));
+////            put("3035", new Viewer.RoadStartID(9, 4));
+////            put("2935", new Viewer.RoadStartID(9, 5));
+////
+////            put("2531", new Viewer.RoadStartID(11, 3));
+////            put("3136", new Viewer.RoadStartID(11, 4));
+////            put("3036", new Viewer.RoadStartID(11, 5));
+////
+////            put("2026", new Viewer.RoadStartID(12, 2));
+////            put("2632", new Viewer.RoadStartID(12, 3));
+////            put("3237", new Viewer.RoadStartID(12, 4));
+////            put("3137", new Viewer.RoadStartID(12, 5));
+////
+////            put("3338", new Viewer.RoadStartID(13, 0));
+////            put("3439", new Viewer.RoadStartID(13, 3));
+////            put("3943", new Viewer.RoadStartID(13, 4));
+////            put("3843", new Viewer.RoadStartID(13, 5));
+////
+////            put("3540", new Viewer.RoadStartID(14, 3));
+////            put("4044", new Viewer.RoadStartID(14, 4));
+////            put("3944", new Viewer.RoadStartID(14, 5));
+////
+////            put("3641", new Viewer.RoadStartID(15, 3));
+////            put("4145", new Viewer.RoadStartID(15, 4));
+////            put("4045", new Viewer.RoadStartID(15, 5));
+////
+////            put("3742", new Viewer.RoadStartID(16, 3));
+////            put("4246", new Viewer.RoadStartID(16, 4));
+////            put("4146", new Viewer.RoadStartID(16, 5));
+////
+////            put("4347", new Viewer.RoadStartID(17, 0));
+////            put("4448", new Viewer.RoadStartID(17, 3));
+////            put("4851", new Viewer.RoadStartID(17, 4));
+////            put("4751", new Viewer.RoadStartID(17, 5));
+////
+////            put("4549", new Viewer.RoadStartID(18, 3));
+////            put("4952", new Viewer.RoadStartID(18, 4));
+////            put("4852", new Viewer.RoadStartID(18, 5));
+////
+//            put("4650", new Viewer.RoadStartID(19, 3));
+//            put("5043", new Viewer.RoadStartID(19, 4));
+//            put("4953", new Viewer.RoadStartID(19, 5));
+//        }};
+
     }
 
     /**
