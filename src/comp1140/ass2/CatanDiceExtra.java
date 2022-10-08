@@ -1,8 +1,6 @@
 package comp1140.ass2;
 import java.util.*;
 
-import static comp1140.ass2.Coordinate.checkAdjacent;
-
 public class CatanDiceExtra {
     ArrayList<Player> players = new ArrayList<>();
     ArrayList<String> playersNames = new ArrayList<>(Arrays.asList("Manindra", "Stephen", "Arjun")); // changes when we add GUI stuff (max of 6 players?)
@@ -1242,7 +1240,8 @@ public class CatanDiceExtra {
      * @return string representation of the updated board state.
      */
     public static String applyAction(String boardState, String action) {
-        // FIXME: Task 9
+        Board board = new Board();
+        board.applyPlayerBoardState(boardState); // converting to our boardState
         return boardState;
     }
 
