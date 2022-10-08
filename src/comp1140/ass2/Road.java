@@ -19,6 +19,7 @@ public class Road extends GamePiece{
         this.coord2 = coord2;
     }
 
+
     @Override
     public String toString() {
         String ind = "";

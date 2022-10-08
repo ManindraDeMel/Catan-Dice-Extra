@@ -27,8 +27,9 @@ public class Board {
      */
     public Board() {
         coords = new Coordinate[54];
+        roads = new ArrayList<>();
         this.tiles = new Tile[20];
-        this.settlements = new Settlement[26];
+        this.settlements = new Settlement[24]; // isn't there only 24 settlements?
         this.castles = new Castle[4];
         neighbours = new HashMap<>();
         for (int i = 0;i<4;i++) {
@@ -117,8 +118,8 @@ public class Board {
             }
             neighbours.put(coord, acc);
         }
-
     }
+
     /**
      * Applies a Player Board State String to an already instantiated board, changeing the states and ownership of various structures.
      * Handles roads by adding them to an arraylist, as no clean method of keeping them unbuilt in an array and trying to find them
@@ -128,95 +129,73 @@ public class Board {
      * So far untested.
      * Authored by Stephen Burg - u7146285
      */
-    public void applyPlayerBoardState(String playerBoardState) {
-        if (playerBoardState.length()<2) {
+    public void applyPlayerBoardState(String playerBoardState, String playerId) {
+        if (playerBoardState == "") {
             return;
         }
-        String playerId=playerBoardState.substring(0,1);
-        playerBoardState= playerBoardState.substring(1);
-        Set<Character> builds = Set.of('C', 'J', 'K', 'R', 'S', 'T');
-        if (playerBoardState.charAt(0)=='C') {
-            for (int x = 2; x< playerBoardState.length();x+=2) {
-                if (builds.contains(playerBoardState.charAt(x-2))) {
-                    playerBoardState= playerBoardState.substring(x-1);
-                    break;
-                } else {
-                    this.castles[Integer.valueOf(playerBoardState.substring(x-1,x))].Owner.name = playerId;
-                }
-            }
-        }
-        if (playerBoardState.charAt(0)=='J') {
-            for (int x = 3; x < playerBoardState.length(); x += 3) {
-                if (builds.contains(playerBoardState.charAt(x - 3))) {
-                    playerBoardState = playerBoardState.substring(x - 3);
-                    break;
-                } else {
-                    this.tiles[Integer.valueOf(playerBoardState.substring(x - 2, x))].Owner.name = playerId;
-                    this.tiles[Integer.valueOf(playerBoardState.substring(x - 2, x))].used = true;
-                }
-            }
-        }
-        if (playerBoardState.charAt(0)=='K') {
-            for (int x = 3; x < playerBoardState.length(); x += 3) {
-                if (builds.contains(playerBoardState.charAt(x - 3))) {
-                    playerBoardState = playerBoardState.substring(x - 3);
-                    break;
-                } else {
-                    this.tiles[Integer.valueOf(playerBoardState.substring(x - 2, x))].Owner.name = playerId;
-                    this.tiles[Integer.valueOf(playerBoardState.substring(x - 2, x))].used = false;
-                }
-            }
-        }
-        if (playerBoardState.charAt(0)=='R') {
-            for (int x = 5; x < playerBoardState.length(); x += 5) {
-                if (builds.contains(playerBoardState.charAt(x - 5))) {
-                    playerBoardState = playerBoardState.substring(x - 5);
-                    break;
-                } else {
-                    this.roads.add(
-                            new Road(new Player(playerId),
-                            coords[Integer.valueOf(playerBoardState.substring(x - 4, x-2))],
-                            coords[Integer.valueOf(playerBoardState.substring(x - 2, x))]));
-                }
-            }
-        }
-        if (playerBoardState.charAt(0)=='S') {
-            for (int x = 3; x < playerBoardState.length(); x += 3) {
-                if (builds.contains(playerBoardState.charAt(x - 3))) {
-                    playerBoardState = playerBoardState.substring(x - 3);
-                    break;
-                } else {
-                    for (int y = 0; y<this.settlements.length; y++) {
-                        if (this.settlements[y].intersectionIndex == Integer.valueOf(playerBoardState.substring(x - 2, x))) {
-                            this.settlements[y].isBuilt = true;
-                            this.settlements[y].isCity = false;
-                            this.settlements[y].Owner.name = playerId;
-                        }
+        switch (playerBoardState.charAt(0)) {
+            case 'C':
+                this.castles[Integer.valueOf(playerBoardState.substring(1,2))].Owner.name = playerId;
+                applyPlayerBoardState(playerBoardState.substring(2), playerId);
+                break;
+            case 'J':
+                this.tiles[Integer.valueOf(playerBoardState.substring(1, 4))].Owner.name = playerId;
+                this.tiles[Integer.valueOf(playerBoardState.substring(1, 4))].used = true;
+                applyPlayerBoardState(playerBoardState.substring(4), playerId);
+                break;
+            case 'K':
+                this.tiles[Integer.valueOf(playerBoardState.substring(1, 4))].Owner.name = playerId;
+                this.tiles[Integer.valueOf(playerBoardState.substring(1, 4))].used = false;
+                applyPlayerBoardState(playerBoardState.substring(4), playerId);
+                break;
+            case 'R':
+                roads.add(
+                        new Road(new Player(playerId),
+                                coords[Integer.valueOf(playerBoardState.substring(1, 3))],
+                                coords[Integer.valueOf(playerBoardState.substring(3, 5))]
+                        )
+                );
+                applyPlayerBoardState(playerBoardState.substring(5), playerId);
+                break;
+            case 'S':
+                for (int y = 0; y<this.settlements.length; y++) {
+                    if (this.settlements[y].intersectionIndex == Integer.valueOf(playerBoardState.substring(1, 3))) {
+                        this.settlements[y].isBuilt = true;
+                        this.settlements[y].isCity = false;
+                        this.settlements[y].Owner.name = playerId;
                     }
                 }
-            }
-        }
-        if (playerBoardState.charAt(0)=='T') {
-            for (int x = 3; x < playerBoardState.length(); x += 3) {
-                if (builds.contains(playerBoardState.charAt(x - 3))) {
-                    break;
-                } else {
-                    for (int y = 0; y<this.settlements.length; y++) {
-                        if (this.settlements[y].intersectionIndex == Integer.valueOf(playerBoardState.substring(x - 2, x))) {
-                            this.settlements[y].isBuilt = true;
-                            this.settlements[y].isCity = true;
-                            this.settlements[y].Owner.name = playerId;
-                        }
+                applyPlayerBoardState(playerBoardState.substring(3), playerId);
+                break;
+            case 'T':
+                for (int y = 0; y<this.settlements.length; y++) {
+                    if (this.settlements[y].intersectionIndex == Integer.valueOf(playerBoardState.substring(1, 3))) {
+                        this.settlements[y].isBuilt = true;
+                        this.settlements[y].isCity = true;
+                        this.settlements[y].Owner.name = playerId;
                     }
                 }
-            }
+                applyPlayerBoardState(playerBoardState.substring(3), playerId);
+                break;
         }
     }
+
+    public void applyBoardState(String boardState) {
+        for (char p : new char[]{'W', 'X'}) {
+            applyPlayerBoardState(CatanDiceExtra.validateClass.Misc.getPlayerBoardState(boardState, p), Character.toString(p));
+        }
+    }
+
     public Tile getTile() {
         return null;
     }
 
     public GamePiece getGamePiece() {
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }

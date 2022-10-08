@@ -562,7 +562,7 @@ public class CatanDiceExtra {
             default -> false;
         };
     }
-    private class validateClass { // helper class which handles all the different action cases
+    public class validateClass { // helper class which handles all the different action cases
         public static boolean validateBuild(String boardState, String action) {
             ArrayList<Character> validformat = new ArrayList<>(Arrays.asList( // a filter for all the accepted characters
                     'b',
@@ -941,7 +941,7 @@ public class CatanDiceExtra {
             }
         }
         // ####################################################################################### Miscellaneous Helper functions / constants
-        private class Misc {
+        public class Misc {
             private static final List<Character> possibleResources = new ArrayList<>(Arrays.asList('b', 'g', 'l', 'm', 'o', 'w'));
 
             private static final ArrayList<ArrayList<Integer>> knightIndexingToRowIndexing = new ArrayList<>(Arrays.asList(
@@ -1241,7 +1241,8 @@ public class CatanDiceExtra {
      */
     public static String applyAction(String boardState, String action) {
         Board board = new Board();
-        board.applyPlayerBoardState(boardState); // converting to our boardState
+        board.applyBoardState(boardState); // converting to our boardState
+        System.out.println("hi");
         return boardState;
     }
 

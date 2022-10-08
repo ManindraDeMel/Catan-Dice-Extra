@@ -26,7 +26,7 @@ public class Settlement extends GamePiece{
         this.isCityable=cityable;
         this.isBuilt = false;
         this.isCity = false;
-        this.intersectionIndex =index;
+        this.intersectionIndex = index;
     }
 
     @Override
