@@ -2,6 +2,7 @@ package comp1140.ass2;
 
 import java.util.*;
 
+import static comp1140.ass2.Coordinate.*;
 import static comp1140.ass2.TileType.*;
 
 
@@ -11,8 +12,8 @@ public class Board {
 
     public Settlement[] settlements;
     public Castle[] castles;
-
     public ArrayList<Road> roads;
+    public HashMap<Coordinate, ArrayList<Coordinate>> neighbours;
     /**
      * Instantiates all the array fields of a Board.
      * Each Array that can be is indexed the same as the indices for corners and tiles provided.
@@ -29,6 +30,7 @@ public class Board {
         this.tiles = new Tile[20];
         this.settlements = new Settlement[26];
         this.castles = new Castle[4];
+        this.neighbours = new HashMap<>();
         for (int i = 0;i<4;i++) {
             this.castles[i] = new Castle(new Player(""));
         }
@@ -105,6 +107,15 @@ public class Board {
                 }
             }
 
+        }
+        for (Coordinate coord : this.coords) {
+            ArrayList<Coordinate> acc = new ArrayList<>();
+            for (Coordinate nb : this.coords) {
+                if (checkAdjacent(coord, nb)) {
+                    acc.add(nb);
+                }
+            }
+            this.neighbours.put(coord, acc);
         }
 
     }

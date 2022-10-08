@@ -1,7 +1,7 @@
 package comp1140.ass2;
 import java.util.*;
 
-import static comp1140.ass2.Coordinate.CheckAdjacent;
+import static comp1140.ass2.Coordinate.checkAdjacent;
 
 public class CatanDiceExtra {
     ArrayList<Player> players = new ArrayList<>();
