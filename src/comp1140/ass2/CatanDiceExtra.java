@@ -8,7 +8,6 @@ public class CatanDiceExtra {
     ArrayList<String> playersNames = new ArrayList<>(Arrays.asList("Manindra", "Stephen", "Arjun")); // changes when we add GUI stuff (max of 6 players?)
     public void startGame() {
         Board board = new Board();
-        board.instatiateBoard();
         for (String name : playersNames) {
             players.add(new Player(name));
         }
