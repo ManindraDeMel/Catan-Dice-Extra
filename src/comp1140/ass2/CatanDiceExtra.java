@@ -502,6 +502,10 @@ public class CatanDiceExtra {
         for (int i = 0; i < numOfDice; i++) {
             resources += String.format("%s", mapToDiceVal.get(random.nextInt(6) + 1));
         }
+        return sortString(resources);
+    }
+
+    static String sortString(String resources) {
         char[] sortedResource = resources.toCharArray();
         Arrays.sort(sortedResource);
         String sortedResourcesStr = "";
@@ -510,7 +514,6 @@ public class CatanDiceExtra {
         }
         return sortedResourcesStr;
     }
-
     /**
      * Given a valid board state and player action, determine whether the
      * action can be executed.
@@ -1240,12 +1243,34 @@ public class CatanDiceExtra {
      * @return string representation of the updated board state.
      */
     public static String applyAction(String boardState, String action) {
+        if (isGameOver(boardState)) {
+            return GameOver();
+        }
+        String playerId = Character.toString(boardState.charAt(0));
+        return switch (action.substring(0, 4)) { // here we match for the type of action we received
+            case "keep" -> keep(boardState, action, playerId); //DONE
+            case "buil" -> addNewBuild(boardState, action, playerId); // DONE (untested)
+            case "trad" -> Prices.trade(boardState, action); //DONE
+            case "swap" -> Prices.swap(action.substring(4), playerId);
+            default -> boardState;
+        };
+    }
+
+    private static String addNewBuild(String boardState, String action, String playerId) {
         Board board = new Board();
-        board.applyBoardState(boardState); // converting to our boardState
-        board.addAction(boardState, action);
+        board.applyBoardState(boardState);
+        board.buildBuilding(action.substring(5), playerId);
         return board.toString();
     }
 
+    private static String keep(String boardState, String action, String playerId) {
+        boardState = boardState.substring(0, 2) + String.valueOf(Integer.parseInt(boardState.substring(2, 3)) + 1) + boardState.substring(3); // +1 to roll counter
+        int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
+        String oldResources = boardState.substring(3, endOfResourcesIndex);
+        String newResources = Prices.modifyResources(oldResources, action.substring(4), Integer.parseInt(boardState.substring(1, 2)));
+        boardState = boardState.replace(oldResources, newResources);
+        return boardState;
+    }
     /**
      * Given valid board state, this method checks if a sequence of player
      * actions is executable.
@@ -1258,8 +1283,6 @@ public class CatanDiceExtra {
      * @return true if the sequence is executable, false otherwise.
      */
     public static boolean isActionSequenceValid(String boardState, String[] actionSequence) {
-        // FIXME: Task 10a
-
         // Iterating through each action in the array and checking if valid
         for (int i = 0; i < actionSequence.length; i++) {
             if (isActionValid(boardState, actionSequence[i]))
@@ -1287,8 +1310,6 @@ public class CatanDiceExtra {
      * @return string representation of the new board state
      */
     public static String applyActionSequence(String boardState, String[] actionSequence) {
-        // FIXME: Task 10b
-
         // Iterating through each action in the array and applying action
         // Returned string is re-stored in boardState
         for (int i = 0; i < actionSequence.length; i++) {
@@ -1365,11 +1386,11 @@ public class CatanDiceExtra {
         return null;
     }
 
-    public Boolean isGameOver() {
-        return null;
+    public static Boolean isGameOver(String boardState) {
+        return false;
     }
 
-    public void GameOver() {
-
+    public static String GameOver() {
+        return "";
     }
 }

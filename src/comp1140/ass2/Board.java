@@ -4,7 +4,6 @@ import java.util.*;
 
 import static comp1140.ass2.Coordinate.*;
 import static comp1140.ass2.TileType.*;
-import static java.lang.VersionProps.build;
 
 
 public class Board {
@@ -159,50 +158,65 @@ public class Board {
                 applyPlayerBoardState(playerBoardState.substring(5), playerId);
                 break;
             case 'S':
-                for (int y = 0; y<this.settlements.length; y++) {
-                    if (this.settlements[y].intersectionIndex == Integer.valueOf(playerBoardState.substring(1, 3))) {
-                        this.settlements[y].isBuilt = true;
-                        this.settlements[y].isCity = false;
-                        this.settlements[y].Owner.name = playerId;
-                    }
-                }
+                buildSettlement(playerBoardState, playerId);
                 applyPlayerBoardState(playerBoardState.substring(3), playerId);
                 break;
             case 'T':
-                for (int y = 0; y<this.settlements.length; y++) {
-                    if (this.settlements[y].intersectionIndex == Integer.valueOf(playerBoardState.substring(1, 3))) {
-                        this.settlements[y].isBuilt = true;
-                        this.settlements[y].isCity = true;
-                        this.settlements[y].Owner.name = playerId;
-                    }
-                }
+                buildCity(playerBoardState, playerId);
                 applyPlayerBoardState(playerBoardState.substring(3), playerId);
                 break;
         }
     }
 
-
-    public void addAction(String boardState, String action) { // Task 9 functionality
-        switch (action.substring(0, 5)) { // here we match for the type of action we received
-            case "keep" -> modifyResources();
-            case "buil" -> buildBuilding();
-            case "trad" -> trade(); // TODO
-            case "swap" -> swap();
-        };
+    public void buildBuilding(String actionSub, String playerId) {
+        switch (actionSub.charAt(0)) {
+            case 'C':
+                this.castles[Integer.valueOf(actionSub.substring(1,2))].Owner.name = playerId;
+                break;
+            case 'J':
+                this.tiles[Integer.valueOf(actionSub.substring(1, 4))].Owner.name = playerId;
+                this.tiles[Integer.valueOf(actionSub.substring(1, 4))].used = true;
+                break;
+            case 'K':
+                this.tiles[Integer.valueOf(actionSub.substring(1, 4))].Owner.name = playerId;
+                this.tiles[Integer.valueOf(actionSub.substring(1, 4))].used = false;
+                break;
+            case 'R':
+                roads.add(
+                        new Road(new Player(playerId),
+                                coords[Integer.valueOf(actionSub.substring(1, 3))],
+                                coords[Integer.valueOf(actionSub.substring(3, 5))]
+                        )
+                );
+                break;
+            case 'S':
+                buildSettlement(actionSub, playerId);
+                break;
+            case 'T':
+                buildCity(actionSub, playerId);
+                break;
+        }
     }
 
-    private void buildBuilding() {
+    private void buildSettlement(String actionSub, String playerId) {
+        for (int y = 0; y<this.settlements.length; y++) {
+            if (this.settlements[y].intersectionIndex == Integer.valueOf(actionSub.substring(1, 3))) {
+                this.settlements[y].isBuilt = true;
+                this.settlements[y].isCity = false;
+                this.settlements[y].Owner.name = playerId;
+            }
+        }
     }
 
-    private void swap() {
-
+    private void buildCity(String actionSub, String playerId) {
+        for (int y = 0; y<this.settlements.length; y++) {
+            if (this.settlements[y].intersectionIndex == Integer.valueOf(actionSub.substring(1, 3))) {
+                this.settlements[y].isBuilt = true;
+                this.settlements[y].isCity = true;
+                this.settlements[y].Owner.name = playerId;
+            }
+        }
     }
-    private void trade() {
-    }
-
-    private void modifyResources() {
-    }
-
 
     public void applyBoardState(String boardState) {
         for (char p : new char[]{'W', 'X'}) {
@@ -220,6 +234,39 @@ public class Board {
 
     @Override
     public String toString() {
-        return super.toString();
+        String[] playerBoardStates = new String[2];
+        int index = 0;
+        List<Coordinate> coordinateList = Arrays.asList(coords);
+        for (String name : new String[]{"W", "X"}) {
+
+            String playerBoardState = "";
+            playerBoardState += name;
+
+            List<Castle> castleList = Arrays.asList(castles); // filter by owner
+            castleList.stream().filter(castle -> castle.Owner.name == name);
+            List<Tile> tileList = Arrays.asList(tiles);
+            tileList.stream().filter(tile -> tile.Owner.name == name);
+            List<Road> roadList = new ArrayList<>();
+            roadList.addAll(roads);
+            roadList.stream().filter(road -> road.Owner.name == name);
+            List<Settlement> settlementList = Arrays.asList(settlements);
+            settlementList.stream().filter(settlement -> settlement.Owner.name == name);
+
+            for (Castle castle : castleList) { // add to each boardstate
+                playerBoardState += castle.toString();
+            }
+            for (Tile tile : tileList) {
+                playerBoardState += tile.toString();
+            }
+            for (Road road : roadList) {
+                playerBoardState += road.toString();
+            }
+            for (Settlement settlement : settlementList) {
+                playerBoardState += settlement.toString();
+            }
+            playerBoardStates[index] = playerBoardState;
+            index++;
+        }
+        return playerBoardStates[0] + playerBoardStates[1];
     }
 }

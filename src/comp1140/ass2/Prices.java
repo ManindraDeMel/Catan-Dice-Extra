@@ -1,4 +1,6 @@
 package comp1140.ass2;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -121,4 +123,36 @@ public class Prices {
         return findBuilds(resources);
     }
     // Create one which finds the most efficient gold trade automatically (for the AI)
+
+    public static String swap(String actionSub, String playerId) {
+        return "";
+    }
+    public static String trade(String boardState, String action) {
+        int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
+        String oldResources = boardState.substring(3, endOfResourcesIndex);
+        String newResources = "";
+        newResources = oldResources;
+        for (char c : action.substring(1).toCharArray()) {
+            newResources = newResources.replaceFirst("g", "");
+            newResources.replaceFirst("g", Character.toString(c));
+        }
+        newResources = CatanDiceExtra.sortString(newResources);
+        return boardState.replace(oldResources, newResources);
+    }
+
+    public static String modifyResources(String resources, String actionSub, int numDice) {
+        ArrayList<Character> actionSubList = new ArrayList<>();
+        for (Character c : actionSub.toCharArray()) {
+            actionSubList.add(c);
+        }
+        for (Character c : resources.toCharArray()) {
+            if (actionSubList.contains(c)) {
+                resources = resources.replaceFirst(Character.toString(c), "");
+                actionSubList.remove(actionSubList.indexOf(c));
+            }
+        }
+        String newResources = CatanDiceExtra.rollDice(numDice - actionSub.length());
+        return CatanDiceExtra.sortString(actionSub + newResources);
+    }
+
 }
