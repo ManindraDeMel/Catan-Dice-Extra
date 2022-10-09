@@ -1081,6 +1081,12 @@ public class CatanDiceExtra {
             private static double getDistance(Coordinate a, Coordinate b) {
                 return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
             }
+            public static String addZero(int n) {
+                if (n < 10) {
+                    return "0" + n;
+                }
+                return String.valueOf(n);
+            }
         }
     }
 
@@ -1260,7 +1266,18 @@ public class CatanDiceExtra {
         Board board = new Board();
         board.applyBoardState(boardState);
         board.buildBuilding(action.substring(5), playerId);
-        return board.toString();
+        String turn = boardState.substring(0, boardState.indexOf('W', 2));
+
+        if (turn.charAt(0) == 'W') {
+            turn = turn.replaceFirst("W", "X");
+        }
+        else {
+            turn = turn.replaceFirst("X", "W");
+        }
+//        String oldScores = boardState.substring(boardState.indexOf('W', boardState.indexOf('W', 2) + 1));
+        int[] newScores = Board.calculateScores(boardState);
+        String newScoreStr = "W" + validateClass.Misc.addZero(newScores[0]) + "X" + validateClass.Misc.addZero(newScores[1]);
+        return turn + board + newScoreStr;
     }
 
     private static String keep(String boardState, String action, String playerId) {
@@ -1392,5 +1409,9 @@ public class CatanDiceExtra {
 
     public static String GameOver() {
         return "";
+    }
+
+    public static void main(String[] args) {
+        CatanDiceExtra.applyAction("W00WXW00X00", "buildR0205");
     }
 }

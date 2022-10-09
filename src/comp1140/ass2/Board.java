@@ -1,6 +1,9 @@
 package comp1140.ass2;
 
+import comp1140.ass2.gui.Game;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static comp1140.ass2.Coordinate.*;
 import static comp1140.ass2.TileType.*;
@@ -120,6 +123,35 @@ public class Board {
         }
     }
 
+
+    public static int[] calculateScores(String boardState) { // calculates the points for each player [W,X] given a board-state.
+        int[] scores = new int[2];
+        int index = 0;
+        for (Character player : new Character[]{'W', 'X'}) {
+            String playerBoardState = CatanDiceExtra.validateClass.Misc.getPlayerBoardState(boardState, player);
+            for (Character c : playerBoardState.toCharArray()) {
+                int score = 0;
+                if (c == 'C') {
+                    score++;
+                }
+                else if (c == 'T' || c == 'T') {
+                    score += 2;
+                }
+                int[] largestArmy = CatanDiceExtra.largestArmy(boardState);
+                int[] longestRoad = CatanDiceExtra.longestRoad(boardState);
+                if (largestArmy[index] == Arrays.stream(largestArmy).max().getAsInt()) {
+                    score += 2;
+                }
+                if (longestRoad[index] == Arrays.stream(longestRoad).max().getAsInt()) {
+                    score++;
+                }
+                scores[index] = score;
+                index++;
+            }
+        }
+        return scores;
+    }
+
     /**
      * Applies a Player Board State String to an already instantiated board, changeing the states and ownership of various structures.
      * Handles roads by adding them to an arraylist, as no clean method of keeping them unbuilt in an array and trying to find them
@@ -222,6 +254,7 @@ public class Board {
         for (char p : new char[]{'W', 'X'}) {
             applyPlayerBoardState(CatanDiceExtra.validateClass.Misc.getPlayerBoardState(boardState, p), Character.toString(p));
         }
+        System.out.println("hi");
     }
 
     public Tile getTile() {
@@ -236,22 +269,20 @@ public class Board {
     public String toString() {
         String[] playerBoardStates = new String[2];
         int index = 0;
-        List<Coordinate> coordinateList = Arrays.asList(coords);
         for (String name : new String[]{"W", "X"}) {
 
             String playerBoardState = "";
             playerBoardState += name;
 
             List<Castle> castleList = Arrays.asList(castles); // filter by owner
-            castleList.stream().filter(castle -> castle.Owner.name == name);
+            castleList = castleList.stream().filter(castle -> castle.Owner.name == name).collect(Collectors.toList());
             List<Tile> tileList = Arrays.asList(tiles);
-            tileList.stream().filter(tile -> tile.Owner.name == name);
+            tileList = tileList.stream().filter(castle -> castle.Owner.name == name).collect(Collectors.toList());
             List<Road> roadList = new ArrayList<>();
-            roadList.addAll(roads);
-            roadList.stream().filter(road -> road.Owner.name == name);
+            roadList.addAll(roads); // TODO
+            roadList = roadList.stream().filter(castle -> castle.Owner.name == name).collect(Collectors.toList());
             List<Settlement> settlementList = Arrays.asList(settlements);
-            settlementList.stream().filter(settlement -> settlement.Owner.name == name);
-
+            settlementList = settlementList.stream().filter(castle -> castle.Owner.name == name).collect(Collectors.toList());
             for (Castle castle : castleList) { // add to each boardstate
                 playerBoardState += castle.toString();
             }
