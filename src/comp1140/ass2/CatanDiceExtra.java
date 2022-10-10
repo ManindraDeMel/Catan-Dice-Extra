@@ -1268,12 +1268,12 @@ public class CatanDiceExtra {
         board.buildBuilding(action.substring(5), playerId);
         String turn = boardState.substring(0, boardState.indexOf('W', 2));
 
-        if (turn.charAt(0) == 'W') {
-            turn = turn.replaceFirst("W", "X");
-        }
-        else {
-            turn = turn.replaceFirst("X", "W");
-        }
+//        if (turn.charAt(0) == 'W') {
+//            turn = turn.replaceFirst("W", "X");
+//        }
+//        else {
+//            turn = turn.replaceFirst("X", "W");
+//        }
         turn = turn.substring(0, 3) + Board.removeResources(turn.substring(3), action.charAt(5));
 //        String oldScores = boardState.substring(boardState.indexOf('W', boardState.indexOf('W', 2) + 1));
         int[] newScores = Board.calculateScores(boardState);

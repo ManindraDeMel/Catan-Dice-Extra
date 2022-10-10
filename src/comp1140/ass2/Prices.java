@@ -141,11 +141,18 @@ public class Prices {
         Board board = new Board();
         board.applyBoardState(boardState);
         for (int i = 0; i < board.tiles.length; i++) {
-            if (board.tiles[i].Owner.name != "") {
+            if (board.tiles[i].Owner.name != "") { // check material specific knights
                 if (board.tiles[i].Owner.name.charAt(0) == playerId.charAt(0)) {
                     if (board.tiles[i].tileType == convertToTileType.get(actionSub.substring(1))) {
                         board.tiles[i].used = true;
                     }
+                }
+            }
+        }
+        for (int i = 9; i < 11; i++) { // check multipurpose knight
+            if (board.tiles[i].Owner.name.charAt(0) == playerId.charAt(0)) {
+                if (board.tiles[i].tileType == convertToTileType.get(actionSub.substring(1))) {
+                    board.tiles[i].used = true;
                 }
             }
         }

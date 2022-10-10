@@ -140,10 +140,10 @@ public class Board {
                 else if (c == 'T' || c == 'T') {
                     score += 2;
                 }
-                if (largestArmy[index] == Arrays.stream(largestArmy).max().getAsInt()) {
+                if (largestArmy[index] == Arrays.stream(largestArmy).max().getAsInt() && largestArmy[index] >= 3) {
                     score += 2;
                 }
-                if (longestRoad[index] == Arrays.stream(longestRoad).max().getAsInt()) {
+                if (longestRoad[index] == Arrays.stream(longestRoad).max().getAsInt() && longestRoad[index] >= 5) {
                     score++;
                 }
                 scores[index] = score;
@@ -288,6 +288,8 @@ public class Board {
             List<Road> roadList = new ArrayList<>();
             roadList.addAll(roads); // TODO
             roadList = roadList.stream().filter(road -> filterCondition(road, name.charAt(0))).collect(Collectors.toList());
+            Object[] roadArr = roadList.toArray();
+            Arrays.sort(roadArr);
             List<Settlement> settlementList = Arrays.asList(settlements);
             settlementList = settlementList.stream().filter(settlement -> filterCondition(settlement, name.charAt(0))).collect(Collectors.toList());
 
@@ -297,7 +299,7 @@ public class Board {
             for (Tile tile : tileList) {
                 playerBoardState += tile.toString();
             }
-            for (Road road : roadList) {
+            for (Object road : roadArr) {
                 playerBoardState += road.toString();
             }
             for (Settlement settlement : settlementList) {
