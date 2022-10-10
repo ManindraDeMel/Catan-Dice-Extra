@@ -13,6 +13,13 @@ public class Board {
     public Tile[] tiles;
     public static Coordinate[] coords;
 
+    public static final TileType[] tileTypes= {
+            wool, grain, ore,
+            ore, bricks, timber, wool,
+            grain, timber, desert, desert, bricks, grain,
+            wool, bricks, timber, ore,
+            ore, grain, wool
+    };
     public Settlement[] settlements;
     public Castle[] castles;
     public ArrayList<Road> roads;
@@ -38,12 +45,6 @@ public class Board {
         for (int i = 0;i<4;i++) {
             this.castles[i] = new Castle(new Player(""));
         }
-        TileType[] tileTypes= {
-                wool, grain, ore,
-                ore, bricks, timber, wool,
-                grain, timber, desert, desert, bricks, grain,
-                wool, bricks, timber, ore,
-                ore,grain, wool};
         int tilenum=0;
         int settlenum = 0;
         Boolean cityable = false;
@@ -127,6 +128,8 @@ public class Board {
     public static int[] calculateScores(String boardState) { // calculates the points for each player [W,X] given a board-state.
         int[] scores = new int[2];
         int index = 0;
+        int[] largestArmy = CatanDiceExtra.largestArmy(boardState);
+        int[] longestRoad = CatanDiceExtra.longestRoad(boardState);
         for (Character player : new Character[]{'W', 'X'}) {
             String playerBoardState = CatanDiceExtra.validateClass.Misc.getPlayerBoardState(boardState, player);
             for (Character c : playerBoardState.toCharArray()) {
@@ -137,8 +140,6 @@ public class Board {
                 else if (c == 'T' || c == 'T') {
                     score += 2;
                 }
-                int[] largestArmy = CatanDiceExtra.largestArmy(boardState);
-                int[] longestRoad = CatanDiceExtra.longestRoad(boardState);
                 if (largestArmy[index] == Arrays.stream(largestArmy).max().getAsInt()) {
                     score += 2;
                 }
@@ -146,8 +147,8 @@ public class Board {
                     score++;
                 }
                 scores[index] = score;
-                index++;
             }
+            index++;
         }
         return scores;
     }
@@ -171,14 +172,14 @@ public class Board {
                 applyPlayerBoardState(playerBoardState.substring(2), playerId);
                 break;
             case 'J':
-                this.tiles[Integer.valueOf(playerBoardState.substring(1, 4))].Owner.name = playerId;
-                this.tiles[Integer.valueOf(playerBoardState.substring(1, 4))].used = true;
-                applyPlayerBoardState(playerBoardState.substring(4), playerId);
+                this.tiles[Integer.valueOf(playerBoardState.substring(1, 3))].Owner.name = playerId;
+                this.tiles[Integer.valueOf(playerBoardState.substring(1, 3))].used = false;
+                applyPlayerBoardState(playerBoardState.substring(3), playerId);
                 break;
             case 'K':
-                this.tiles[Integer.valueOf(playerBoardState.substring(1, 4))].Owner.name = playerId;
-                this.tiles[Integer.valueOf(playerBoardState.substring(1, 4))].used = false;
-                applyPlayerBoardState(playerBoardState.substring(4), playerId);
+                this.tiles[Integer.valueOf(playerBoardState.substring(1, 3))].Owner.name = playerId;
+                this.tiles[Integer.valueOf(playerBoardState.substring(1, 3))].used = true;
+                applyPlayerBoardState(playerBoardState.substring(3), playerId);
                 break;
             case 'R':
                 roads.add(
@@ -206,12 +207,12 @@ public class Board {
                 this.castles[Integer.valueOf(actionSub.substring(1,2))].Owner.name = playerId;
                 break;
             case 'J':
-                this.tiles[Integer.valueOf(actionSub.substring(1, 4))].Owner.name = playerId;
-                this.tiles[Integer.valueOf(actionSub.substring(1, 4))].used = true;
+                this.tiles[Integer.valueOf(actionSub.substring(1, 3))].Owner.name = playerId;
+                this.tiles[Integer.valueOf(actionSub.substring(1, 3))].used = true;
                 break;
             case 'K':
-                this.tiles[Integer.valueOf(actionSub.substring(1, 4))].Owner.name = playerId;
-                this.tiles[Integer.valueOf(actionSub.substring(1, 4))].used = false;
+                this.tiles[Integer.valueOf(actionSub.substring(1, 3))].Owner.name = playerId;
+                this.tiles[Integer.valueOf(actionSub.substring(1, 3))].used = false;
                 break;
             case 'R':
                 roads.add(
@@ -250,19 +251,26 @@ public class Board {
         }
     }
 
+    public static String removeResources(String turn, char actionType) {
+        return switch (actionType) {
+            case 'R' -> removeResourcesHelper(turn, new String[]{"b", "l"});
+            case 'S' -> removeResourcesHelper(turn, new String[]{"b", "l", "w", "g"});
+            case 'T' -> removeResourcesHelper(turn, new String[]{"o", "o", "o", "g", "g"});
+            case 'J'->  removeResourcesHelper(turn, new String[]{"o", "w", "g"});
+            default -> turn;
+        };
+    }
+
+    private static String removeResourcesHelper(String turn, String[] resourcesToRemove) {
+        for (String s : resourcesToRemove) {
+            turn = turn.replaceFirst(s, "");
+        }
+        return turn;
+    }
     public void applyBoardState(String boardState) {
         for (char p : new char[]{'W', 'X'}) {
             applyPlayerBoardState(CatanDiceExtra.validateClass.Misc.getPlayerBoardState(boardState, p), Character.toString(p));
         }
-        System.out.println("hi");
-    }
-
-    public Tile getTile() {
-        return null;
-    }
-
-    public GamePiece getGamePiece() {
-        return null;
     }
 
     @Override
@@ -270,19 +278,19 @@ public class Board {
         String[] playerBoardStates = new String[2];
         int index = 0;
         for (String name : new String[]{"W", "X"}) {
-
             String playerBoardState = "";
             playerBoardState += name;
 
             List<Castle> castleList = Arrays.asList(castles); // filter by owner
-            castleList = castleList.stream().filter(castle -> castle.Owner.name == name).collect(Collectors.toList());
+            castleList = castleList.stream().filter(castle -> filterCondition(castle, name.charAt(0))).collect(Collectors.toList());
             List<Tile> tileList = Arrays.asList(tiles);
-            tileList = tileList.stream().filter(castle -> castle.Owner.name == name).collect(Collectors.toList());
+            tileList = tileList.stream().filter(tile -> filterCondition(tile, name.charAt(0))).collect(Collectors.toList());
             List<Road> roadList = new ArrayList<>();
             roadList.addAll(roads); // TODO
-            roadList = roadList.stream().filter(castle -> castle.Owner.name == name).collect(Collectors.toList());
+            roadList = roadList.stream().filter(road -> filterCondition(road, name.charAt(0))).collect(Collectors.toList());
             List<Settlement> settlementList = Arrays.asList(settlements);
-            settlementList = settlementList.stream().filter(castle -> castle.Owner.name == name).collect(Collectors.toList());
+            settlementList = settlementList.stream().filter(settlement -> filterCondition(settlement, name.charAt(0))).collect(Collectors.toList());
+
             for (Castle castle : castleList) { // add to each boardstate
                 playerBoardState += castle.toString();
             }
@@ -299,5 +307,11 @@ public class Board {
             index++;
         }
         return playerBoardStates[0] + playerBoardStates[1];
+    }
+    private static boolean filterCondition(GamePiece g, char playerToMatch) {
+        if (g.Owner.name != "") {
+            return g.Owner.name.charAt(0) == playerToMatch;
+        }
+        return false;
     }
 }

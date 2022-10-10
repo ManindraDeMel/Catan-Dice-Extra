@@ -124,8 +124,32 @@ public class Prices {
     }
     // Create one which finds the most efficient gold trade automatically (for the AI)
 
-    public static String swap(String actionSub, String playerId) {
-        return "";
+    public static String swap(String boardState, String actionSub, String playerId) {
+
+        HashMap<String, TileType> convertToTileType = new HashMap<>(){{
+            put("b", TileType.bricks);
+            put("g", TileType.grain);
+            put("l", TileType.timber);
+            put("o", TileType.ore);
+            put("w", TileType.wool);
+        }};
+
+        boardState = boardState.replaceFirst(actionSub.substring(0,1), actionSub.substring(1));
+        String turn = boardState.substring(0, boardState.indexOf('W', 2));
+        String scores = boardState.substring(boardState.indexOf('W', boardState.indexOf('W', 2) + 1));
+
+        Board board = new Board();
+        board.applyBoardState(boardState);
+        for (int i = 0; i < board.tiles.length; i++) {
+            if (board.tiles[i].Owner.name != "") {
+                if (board.tiles[i].Owner.name.charAt(0) == playerId.charAt(0)) {
+                    if (board.tiles[i].tileType == convertToTileType.get(actionSub.substring(1))) {
+                        board.tiles[i].used = true;
+                    }
+                }
+            }
+        }
+        return turn + board + scores;
     }
     public static String trade(String boardState, String action) {
         int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
@@ -133,8 +157,8 @@ public class Prices {
         String newResources = "";
         newResources = oldResources;
         for (char c : action.substring(1).toCharArray()) {
-            newResources = newResources.replaceFirst("g", "");
-            newResources.replaceFirst("g", Character.toString(c));
+            newResources = newResources.replaceFirst("m", "");
+            newResources.replaceFirst("m", Character.toString(c));
         }
         newResources = CatanDiceExtra.sortString(newResources);
         return boardState.replace(oldResources, newResources);

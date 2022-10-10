@@ -1255,9 +1255,9 @@ public class CatanDiceExtra {
         String playerId = Character.toString(boardState.charAt(0));
         return switch (action.substring(0, 4)) { // here we match for the type of action we received
             case "keep" -> keep(boardState, action, playerId); //DONE
-            case "buil" -> addNewBuild(boardState, action, playerId); // DONE (untested)
+            case "buil" -> addNewBuild(boardState, action, playerId); // DONE
             case "trad" -> Prices.trade(boardState, action); //DONE
-            case "swap" -> Prices.swap(action.substring(4), playerId);
+            case "swap" -> Prices.swap(boardState, action.substring(4), playerId);
             default -> boardState;
         };
     }
@@ -1274,6 +1274,7 @@ public class CatanDiceExtra {
         else {
             turn = turn.replaceFirst("X", "W");
         }
+        turn = turn.substring(0, 3) + Board.removeResources(turn.substring(3), action.charAt(5));
 //        String oldScores = boardState.substring(boardState.indexOf('W', boardState.indexOf('W', 2) + 1));
         int[] newScores = Board.calculateScores(boardState);
         String newScoreStr = "W" + validateClass.Misc.addZero(newScores[0]) + "X" + validateClass.Misc.addZero(newScores[1]);
@@ -1411,7 +1412,4 @@ public class CatanDiceExtra {
         return "";
     }
 
-    public static void main(String[] args) {
-        CatanDiceExtra.applyAction("W00WXW00X00", "buildR0205");
-    }
 }
