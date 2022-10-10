@@ -1095,6 +1095,7 @@ public class CatanDiceExtra {
      * @return array of contiguous road lengths, one per player.
      */
     public static int[] longestRoad(String boardState) {
+        // FIXME complete this method
 
         // Defining Arrays and required values
         int[] longestRoadArr = new int[2];
@@ -1103,92 +1104,119 @@ public class CatanDiceExtra {
 
         // Getting roads and neighbours
         ArrayList<ArrayList<String>> roads = longestRoadHelper.getRoads(boardState);
-        ArrayList<ArrayList<ArrayList<String>>> neighbours = longestRoadHelper.getNeighbours(roads);
-        HashSet<ArrayList<String>> longestRoads1 = new HashSet<>();
-        HashSet<ArrayList<String>> longestRoads2 = new HashSet<>();
+        ArrayList<ArrayList<String>> roadIndexes = longestRoadHelper.getIndexes(boardState);
+        ArrayList<ArrayList<ArrayList<String>>> neighbours = longestRoadHelper.getIndexNeighbours(roadIndexes, roads);
 
-        ArrayList<ArrayList<ArrayList<String>>> allRoadSequence = new ArrayList<ArrayList<ArrayList<String>>>();
-        for (int i = 0; i < roads.size(); i++) {
-            ArrayList<String> playerRoads = (ArrayList<String>) roads.get(i);
+        HashSet<ArrayList<String>> longestRoadsW = new HashSet<>();
+        HashSet<ArrayList<String>> longestRoadsX = new HashSet<>();
+
+        for (int i = 0; i < roadIndexes.size(); i++) {
+            ArrayList<String> playerIndexes = roadIndexes.get(i);
             ArrayList<ArrayList<String>> playerNeighbours = neighbours.get(i);
 
             ArrayList<String> visited = new ArrayList<>();          // roads visited so far in a given search
-            HashSet<ArrayList<String>> longestRoads = new HashSet<>();  // rotations found so far
+            HashSet<ArrayList<String>> longestRoads = new HashSet<>();  // all roads sequences found so far
 
 
-            if (playerRoads.size() == 1)
-                longestRoads.add((ArrayList<String>) playerRoads.clone());
+            ArrayList<ArrayList<String>> visitedTest = new ArrayList<>(longestRoadHelper.getIndexNeighbours(roadIndexes, roads).get(i));
 
-
-            for (int j = 0; j < playerRoads.size(); j++) {
-                var road = playerRoads.get(j);
+            for (int j = 0; j < playerIndexes.size(); j++) {
+                var index = playerIndexes.get(j);
                 ArrayList<String> longestRoad = new ArrayList<>();
 
-                visited.add(road);
-                longestRoad.add(road);
-                getAllConnectedRoads(playerRoads, playerNeighbours, visited, longestRoads, longestRoad, j);
-                visited.remove(road);
-
-                System.out.println("Longest roads: " + longestRoads);
+                visited.add(index);
+                longestRoad.add(index);
+                getAllConnectedRoads(playerIndexes, playerNeighbours, visited, longestRoads, longestRoad, j, visitedTest);
+                visited.remove(index);
             }
 
+
             if (i == 0)
-                longestRoads1 = longestRoads;
+                longestRoadsW = longestRoads;
             else
-                longestRoads2 = longestRoads;
+                longestRoadsX = longestRoads;
         }
 
-        for (var v : longestRoads1){
+        for (var v : longestRoadsW){
             if (v.size() > longestRoadArr[0])
                 longestRoadArr[0] = v.size();
         }
 
-        for (var v : longestRoads2){
+        for (var v : longestRoadsX){
             if (v.size() > longestRoadArr[1])
                 longestRoadArr[1] = v.size();
         }
 
-        // Debugging
-        System.out.println("\n--------------------------------");
-        System.out.println("Board State: " + boardState);
-        System.out.println("playerW: " + playerW);
-        System.out.println("playerX: " + playerX);
-        System.out.println("roadsWArr: " + longestRoadHelper.getRoads(boardState).get(0));
-        System.out.println("FINAL ARRAY: " + Arrays.toString(longestRoadArr));
-        System.out.println("----------------------------------\n");
+        longestRoadArr[0] = Math.max(0, longestRoadArr[0] - 1);
+        longestRoadArr[1] = Math.max(0, longestRoadArr[1] - 1);
 
         return longestRoadArr;
     }
 
-    private static void getAllConnectedRoads(ArrayList<String> playerRoads, ArrayList<ArrayList<String>> playerNeighbours, ArrayList<String> visited,
-                                             HashSet<ArrayList<String>> longestRoads, ArrayList<String> longestRoad, int pos) {
-        // FIXME complete this method
+    private static void getAllConnectedRoads(ArrayList<String> playerIndexes, ArrayList<ArrayList<String>> playerNeighbours, ArrayList<String> visited,
+                                             HashSet<ArrayList<String>> longestRoads, ArrayList<String> longestRoad, int pos,
+                                             ArrayList<ArrayList<String>> visitedTest) {
 
         List<String> longestRoadState = new ArrayList<>(longestRoad);
-        System.out.println(1);
+
         for (var road : playerNeighbours.get(pos)) {
-//            var road = playerRoads.get(i);
-            if (visited.contains(road)) continue;
+
+            if (!visitedTest.get(pos).contains(road)) continue;
 
             longestRoad = new ArrayList<>(longestRoadState);
+            longestRoad.add(road);
 
-            System.out.println("Road: " + road + "\nArray: " + playerNeighbours.get(pos));
-//            if (playerNeighbours.get(i).contains(road)){
-//                System.out.println("HELLOOOO");
-                longestRoad.add(road);
-//            }
+            longestRoads.add(longestRoad);
 
-            Collections.sort(longestRoad);
-            if (true)
-                longestRoads.add(longestRoad);
+            visitedTest.get(pos).remove(road);
+            visitedTest.get(playerIndexes.indexOf(road)).remove(playerIndexes.get(pos));
 
             visited.add(road);
-            getAllConnectedRoads(playerRoads, playerNeighbours, visited, longestRoads, longestRoad, playerRoads.indexOf(road));
+            getAllConnectedRoads(playerIndexes, playerNeighbours, visited, longestRoads, longestRoad, playerIndexes.indexOf(road), visitedTest);
             visited.remove(road);
+
+            visitedTest.get(pos).add(road);
+            visitedTest.get(playerIndexes.indexOf(road)).add(playerIndexes.get(pos));
         }
     }
 
     private class longestRoadHelper {
+
+        public static ArrayList<ArrayList<String>> getIndexes(String boardState) {
+
+            // Defining player strings and arrays
+            String playerW = boardState.substring(boardState.indexOf('W', 1), boardState.indexOf('X', 1));
+            String playerX = boardState.substring(boardState.indexOf('X', 1), boardState.indexOf('W', boardState.indexOf('X', 1)));
+            ArrayList<ArrayList<String>> indexArr = new ArrayList<ArrayList<String>>();
+            indexArr.add(new ArrayList<>());
+            indexArr.add(new ArrayList<>());
+
+            // Extracting road index strings of player W
+            int countW = (int) playerW.chars().filter(ch -> ch == 'R').count();
+            for (int i = 0; i < countW; i++) {
+                String index1 = playerW.substring(playerW.indexOf('R') + 1 + i * 5, playerW.indexOf('R') + 3 + i * 5);
+                String index2 = playerW.substring(playerW.indexOf('R') + 3 + i * 5, playerW.indexOf('R') + 5 + i * 5);
+                if (!indexArr.get(0).contains(index1))
+                    indexArr.get(0).add(index1);
+                
+                if (!indexArr.get(0).contains(index2))
+                    indexArr.get(0).add(index2);
+            }
+
+            // Extracting roads strings of player X
+            int countX = (int) playerX.chars().filter(ch -> ch == 'R').count();
+            for (int i = 0; i < countX; i++) {
+                String index1 = playerX.substring(playerX.indexOf('R') + 1 + i * 5, playerX.indexOf('R') + 3 + i * 5);
+                String index2 = playerX.substring(playerX.indexOf('R') + 3 + i * 5, playerX.indexOf('R') + 5 + i * 5);
+                if (!indexArr.get(1).contains(index1))
+                    indexArr.get(1).add(index1);
+
+                if (!indexArr.get(1).contains(index2))
+                    indexArr.get(1).add(index2);
+            }
+
+            return indexArr;
+        }
         public static ArrayList<ArrayList<String>> getRoads(String boardState) {
 
             // Defining player strings and arrays
@@ -1213,6 +1241,24 @@ public class CatanDiceExtra {
             return roadsArr;
         }
 
+        public static ArrayList<ArrayList<ArrayList<String>>> getIndexNeighbours(ArrayList<ArrayList<String>> indexArr, ArrayList<ArrayList<String>> playerRoads) {
+
+            ArrayList<ArrayList<ArrayList<String>>> neighbours = new ArrayList<ArrayList<ArrayList<String>>>();
+            neighbours.add(new ArrayList<ArrayList<String>>());
+            neighbours.add(new ArrayList<ArrayList<String>>());
+
+            for (int i = 0; i < 2; i++) { // looping through each player
+                for (int j = 0; j < indexArr.get(i).size(); j++) { // looping through each player's roads
+                    neighbours.get(i).add(new ArrayList<String>());
+                    for (String road : allNeighbourIndexes.get(indexArr.get(i).get(j))) { // looping all neighbour roads
+                        if (indexArr.get(i).contains(road) && (playerRoads.get(i).contains(indexArr.get(i).get(j) + road) || playerRoads.get(i).contains(road + indexArr.get(i).get(j))))
+                            neighbours.get(i).get(j).add(road);
+                    }
+                }
+            }
+            return neighbours;
+        }
+
         public static ArrayList<ArrayList<ArrayList<String>>> getNeighbours(ArrayList<ArrayList<String>> roadArr) {
 
             ArrayList<ArrayList<ArrayList<String>>> neighbours = new ArrayList<ArrayList<ArrayList<String>>>();
@@ -1231,9 +1277,55 @@ public class CatanDiceExtra {
             return neighbours;
         }
 
+        static HashMap<String, ArrayList<String>> allNeighbourIndexes = new HashMap<>();
+        static {
+            String[] roads = new String[]{
+                    "0307", "0003", "0004", "0408", "0812", "0712",
+                    "0104", "0105", "0509", "0913", "0813",
+                    "0205", "0206", "0610", "1014", "0914",
+                    "1116", "0711", "1217", "1722", "1622",
+                    "1318", "1823", "1723",
+                    "1419", "1924", "1824",
+                    "1015", "1520", "2025", "1925",
+                    "2127", "1621", "2228", "2833", "2733",
+                    "2329", "2934", "2834",
+                    "2430", "3035", "2935",
+                    "2531", "3136", "3036",
+                    "2026", "2632", "3237", "3137",
+                    "3338", "3439", "3943", "3843",
+                    "3540", "4044", "3944",
+                    "3641", "4145", "4045",
+                    "3742", "4246", "4146",
+                    "4347", "4448", "4851", "4751",
+                    "4549", "4952", "4852",
+                    "4650", "5053", "4953"
+            };
+
+            for (int i = 0; i < 54; i++) {
+                ArrayList<String> neighbours = new ArrayList<>();
+
+                for (var road : roads) {
+                    String index1 = road.substring(0, 2);
+                    String index2 = road.substring(2);
+
+                    if (Integer.parseInt(index1) == i && !neighbours.contains(index2)) {
+                        neighbours.add(index2);
+                    } else if (Integer.parseInt(index2) == i && !neighbours.contains(index1)) {
+                        neighbours.add(index1);
+                    }
+
+                }
+                String key = "";
+                if (i < 10)
+                    key = "0" + i;
+                else
+                    key = Integer.toString(i);
+
+                allNeighbourIndexes.put(key, neighbours);
+            }
+        }
 
         static HashMap<String, ArrayList<String>> allNeighbourRoads = new HashMap<>();
-
         static {
             String[] roads = new String[]{
                     "0307", "0003", "0004", "0408", "0812", "0712",
@@ -1276,10 +1368,6 @@ public class CatanDiceExtra {
 
                 allNeighbourRoads.put(roads[i], neighbours);
             }
-
-            System.out.println("0004: " + allNeighbourRoads.get("0004"));
-            System.out.println("0104: " + allNeighbourRoads.get("0104"));
-            System.out.println("0408: " + allNeighbourRoads.get("0408"));
         }
 
 //        static HashMap<String, ArrayList<String>> allNeighbourRoads = new HashMap<>() {{
