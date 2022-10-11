@@ -909,7 +909,6 @@ public class Viewer extends Application {
      * @param boardState The string representation of the board state.
      */
     void displayState(String boardState) {
-        // FIXME Task 6: implement the state viewer
         /////////////////////////////////////////////
 
         // Getting strings of different sections

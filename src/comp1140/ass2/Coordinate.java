@@ -1,9 +1,21 @@
 package comp1140.ass2;
 
+import java.util.ArrayList;
+
 public class Coordinate {
     public int x;
     public int y;
     public int index;
+    /**
+     * Coordinate:
+     * Has fields:
+     * x - the x coordinate
+     * y - the y coordinate
+     * index - its position in the provided location indexing system,
+     * left empty in the constructor as it is not always possible to provide,
+     * ie when creating the 6 coordinate array of a tile
+     * Authored by Stephen Burg - u7146285 based on ideas created collaboratively with the group
+     */
     Coordinate(int x, int y) {
         this.x = x;
         this.y = y;
@@ -11,10 +23,18 @@ public class Coordinate {
     public Coordinate(int index) {
         this.index = index;
     }
-
+    /**
+     * Sets the index when possible
+     * Authored by Stephen Burg - u7146285
+     */
     public void setIndex(int index) {
         this.index = index;
     }
+    /**
+     * Takes two coordinates, returns True is they are eaual both in y and x
+     * otherwise returns false
+     * Authored by Stephen Burg - u7146285
+     */
     public static boolean CheckEquals(Coordinate coord1, Coordinate coord2) {
         int y1= coord1.y;
         int x1= coord1.x;
@@ -26,7 +46,14 @@ public class Coordinate {
             return false;
         }
     }
-    public static boolean CheckAdjacent(Coordinate coord1, Coordinate coord2) {
+    /**
+     * Takes two coordinates, returns True if they are adjacent
+     * (ie a road could be built between them)
+     * otherwise returns false
+     * Authored by Stephen Burg - u7146285
+     */
+
+    public static boolean checkAdjacent(Coordinate coord1, Coordinate coord2) {
         int y1= coord1.y;
         int x1= coord1.x;
         int y2= coord2.y;
