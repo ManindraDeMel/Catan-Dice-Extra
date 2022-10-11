@@ -1,8 +1,7 @@
 package comp1140.ass2;
 
-import java.util.Arrays;
 
-public class Road extends GamePiece{
+public class Road extends GamePiece implements Comparable<Road>{
     Coordinate coord1;
     Coordinate coord2;
     /**
@@ -19,6 +18,7 @@ public class Road extends GamePiece{
         this.coord2 = coord2;
     }
 
+
     @Override
     public String toString() {
         String ind = "";
@@ -34,5 +34,10 @@ public class Road extends GamePiece{
             ind += coord2.index;
 
         return "R" + ind;
+    }
+
+    @Override
+    public int compareTo(Road r) {
+        return (coord1 == r.coord1) ? 0 : coord1.index < r.coord1.index ? -1 : 1;
     }
 }

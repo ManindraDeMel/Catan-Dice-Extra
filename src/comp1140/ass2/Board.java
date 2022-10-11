@@ -1,6 +1,9 @@
 package comp1140.ass2;
 
+import comp1140.ass2.gui.Game;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static comp1140.ass2.Coordinate.*;
 import static comp1140.ass2.TileType.*;
@@ -10,6 +13,13 @@ public class Board {
     public Tile[] tiles;
     public static Coordinate[] coords;
 
+    public static final TileType[] tileTypes= {
+            wool, grain, ore,
+            ore, bricks, timber, wool,
+            grain, timber, desert, desert, bricks, grain,
+            wool, bricks, timber, ore,
+            ore, grain, wool
+    };
     public Settlement[] settlements;
     public Castle[] castles;
     public ArrayList<Road> roads;
@@ -27,19 +37,14 @@ public class Board {
      */
     public Board() {
         coords = new Coordinate[54];
+        roads = new ArrayList<>();
         this.tiles = new Tile[20];
-        this.settlements = new Settlement[26];
+        this.settlements = new Settlement[24]; // isn't there only 24 settlements?
         this.castles = new Castle[4];
         neighbours = new HashMap<>();
         for (int i = 0;i<4;i++) {
             this.castles[i] = new Castle(new Player(""));
         }
-        TileType[] tileTypes= {
-                wool, grain, ore,
-                ore, bricks, timber, wool,
-                grain, timber, desert, desert, bricks, grain,
-                wool, bricks, timber, ore,
-                ore,grain, wool};
         int tilenum=0;
         int settlenum = 0;
         Boolean cityable = false;
@@ -117,8 +122,37 @@ public class Board {
             }
             neighbours.put(coord, acc);
         }
-
     }
+
+
+    public static int[] calculateScores(String boardState) { // calculates the points for each player [W,X] given a board-state.
+        int[] scores = new int[2];
+        int index = 0;
+        int[] largestArmy = CatanDiceExtra.largestArmy(boardState);
+        int[] longestRoad = CatanDiceExtra.longestRoad(boardState);
+        for (Character player : new Character[]{'W', 'X'}) {
+            String playerBoardState = CatanDiceExtra.validateClass.Misc.getPlayerBoardState(boardState, player);
+            for (Character c : playerBoardState.toCharArray()) {
+                int score = 0;
+                if (c == 'C') {
+                    score++;
+                }
+                else if (c == 'T' || c == 'T') {
+                    score += 2;
+                }
+                if (largestArmy[index] == Arrays.stream(largestArmy).max().getAsInt() && largestArmy[index] >= 3) {
+                    score += 2;
+                }
+                if (longestRoad[index] == Arrays.stream(longestRoad).max().getAsInt() && longestRoad[index] >= 5) {
+                    score++;
+                }
+                scores[index] = score;
+            }
+            index++;
+        }
+        return scores;
+    }
+
     /**
      * Applies a Player Board State String to an already instantiated board, changeing the states and ownership of various structures.
      * Handles roads by adding them to an arraylist, as no clean method of keeping them unbuilt in an array and trying to find them
@@ -128,95 +162,158 @@ public class Board {
      * So far untested.
      * Authored by Stephen Burg - u7146285
      */
-    public void applyPlayerBoardState(String playerBoardState) {
-        if (playerBoardState.length()<2) {
+    public void applyPlayerBoardState(String playerBoardState, String playerId) {
+        if (playerBoardState == "") {
             return;
         }
-        String playerId=playerBoardState.substring(0,1);
-        playerBoardState= playerBoardState.substring(1);
-        Set<Character> builds = Set.of('C', 'J', 'K', 'R', 'S', 'T');
-        if (playerBoardState.charAt(0)=='C') {
-            for (int x = 2; x< playerBoardState.length();x+=2) {
-                if (builds.contains(playerBoardState.charAt(x-2))) {
-                    playerBoardState= playerBoardState.substring(x-1);
-                    break;
-                } else {
-                    this.castles[Integer.valueOf(playerBoardState.substring(x-1,x))].Owner.name = playerId;
-                }
-            }
+        switch (playerBoardState.charAt(0)) {
+            case 'C':
+                this.castles[Integer.valueOf(playerBoardState.substring(1,2))].Owner.name = playerId;
+                applyPlayerBoardState(playerBoardState.substring(2), playerId);
+                break;
+            case 'J':
+                this.tiles[Integer.valueOf(playerBoardState.substring(1, 3))].Owner.name = playerId;
+                this.tiles[Integer.valueOf(playerBoardState.substring(1, 3))].used = false;
+                applyPlayerBoardState(playerBoardState.substring(3), playerId);
+                break;
+            case 'K':
+                this.tiles[Integer.valueOf(playerBoardState.substring(1, 3))].Owner.name = playerId;
+                this.tiles[Integer.valueOf(playerBoardState.substring(1, 3))].used = true;
+                applyPlayerBoardState(playerBoardState.substring(3), playerId);
+                break;
+            case 'R':
+                roads.add(
+                        new Road(new Player(playerId),
+                                coords[Integer.valueOf(playerBoardState.substring(1, 3))],
+                                coords[Integer.valueOf(playerBoardState.substring(3, 5))]
+                        )
+                );
+                applyPlayerBoardState(playerBoardState.substring(5), playerId);
+                break;
+            case 'S':
+                buildSettlement(playerBoardState, playerId);
+                applyPlayerBoardState(playerBoardState.substring(3), playerId);
+                break;
+            case 'T':
+                buildCity(playerBoardState, playerId);
+                applyPlayerBoardState(playerBoardState.substring(3), playerId);
+                break;
         }
-        if (playerBoardState.charAt(0)=='J') {
-            for (int x = 3; x < playerBoardState.length(); x += 3) {
-                if (builds.contains(playerBoardState.charAt(x - 3))) {
-                    playerBoardState = playerBoardState.substring(x - 3);
-                    break;
-                } else {
-                    this.tiles[Integer.valueOf(playerBoardState.substring(x - 2, x))].Owner.name = playerId;
-                    this.tiles[Integer.valueOf(playerBoardState.substring(x - 2, x))].used = true;
-                }
-            }
-        }
-        if (playerBoardState.charAt(0)=='K') {
-            for (int x = 3; x < playerBoardState.length(); x += 3) {
-                if (builds.contains(playerBoardState.charAt(x - 3))) {
-                    playerBoardState = playerBoardState.substring(x - 3);
-                    break;
-                } else {
-                    this.tiles[Integer.valueOf(playerBoardState.substring(x - 2, x))].Owner.name = playerId;
-                    this.tiles[Integer.valueOf(playerBoardState.substring(x - 2, x))].used = false;
-                }
-            }
-        }
-        if (playerBoardState.charAt(0)=='R') {
-            for (int x = 5; x < playerBoardState.length(); x += 5) {
-                if (builds.contains(playerBoardState.charAt(x - 5))) {
-                    playerBoardState = playerBoardState.substring(x - 5);
-                    break;
-                } else {
-                    this.roads.add(
-                            new Road(new Player(playerId),
-                            coords[Integer.valueOf(playerBoardState.substring(x - 4, x-2))],
-                            coords[Integer.valueOf(playerBoardState.substring(x - 2, x))]));
-                }
-            }
-        }
-        if (playerBoardState.charAt(0)=='S') {
-            for (int x = 3; x < playerBoardState.length(); x += 3) {
-                if (builds.contains(playerBoardState.charAt(x - 3))) {
-                    playerBoardState = playerBoardState.substring(x - 3);
-                    break;
-                } else {
-                    for (int y = 0; y<this.settlements.length; y++) {
-                        if (this.settlements[y].intersectionIndex == Integer.valueOf(playerBoardState.substring(x - 2, x))) {
-                            this.settlements[y].isBuilt = true;
-                            this.settlements[y].isCity = false;
-                            this.settlements[y].Owner.name = playerId;
-                        }
-                    }
-                }
-            }
-        }
-        if (playerBoardState.charAt(0)=='T') {
-            for (int x = 3; x < playerBoardState.length(); x += 3) {
-                if (builds.contains(playerBoardState.charAt(x - 3))) {
-                    break;
-                } else {
-                    for (int y = 0; y<this.settlements.length; y++) {
-                        if (this.settlements[y].intersectionIndex == Integer.valueOf(playerBoardState.substring(x - 2, x))) {
-                            this.settlements[y].isBuilt = true;
-                            this.settlements[y].isCity = true;
-                            this.settlements[y].Owner.name = playerId;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    public Tile getTile() {
-        return null;
     }
 
-    public GamePiece getGamePiece() {
-        return null;
+    public void buildBuilding(String actionSub, String playerId) {
+        switch (actionSub.charAt(0)) {
+            case 'C':
+                this.castles[Integer.valueOf(actionSub.substring(1,2))].Owner.name = playerId;
+                break;
+            case 'J':
+                this.tiles[Integer.valueOf(actionSub.substring(1, 3))].Owner.name = playerId;
+                this.tiles[Integer.valueOf(actionSub.substring(1, 3))].used = true;
+                break;
+            case 'K':
+                this.tiles[Integer.valueOf(actionSub.substring(1, 3))].Owner.name = playerId;
+                this.tiles[Integer.valueOf(actionSub.substring(1, 3))].used = false;
+                break;
+            case 'R':
+                roads.add(
+                        new Road(new Player(playerId),
+                                coords[Integer.valueOf(actionSub.substring(1, 3))],
+                                coords[Integer.valueOf(actionSub.substring(3, 5))]
+                        )
+                );
+                break;
+            case 'S':
+                buildSettlement(actionSub, playerId);
+                break;
+            case 'T':
+                buildCity(actionSub, playerId);
+                break;
+        }
+    }
+
+    private void buildSettlement(String actionSub, String playerId) {
+        for (int y = 0; y<this.settlements.length; y++) {
+            if (this.settlements[y].intersectionIndex == Integer.valueOf(actionSub.substring(1, 3))) {
+                this.settlements[y].isBuilt = true;
+                this.settlements[y].isCity = false;
+                this.settlements[y].Owner.name = playerId;
+            }
+        }
+    }
+
+    private void buildCity(String actionSub, String playerId) {
+        for (int y = 0; y<this.settlements.length; y++) {
+            if (this.settlements[y].intersectionIndex == Integer.valueOf(actionSub.substring(1, 3))) {
+                this.settlements[y].isBuilt = true;
+                this.settlements[y].isCity = true;
+                this.settlements[y].Owner.name = playerId;
+            }
+        }
+    }
+
+    public static String removeResources(String turn, char actionType) {
+        return switch (actionType) {
+            case 'R' -> removeResourcesHelper(turn, new String[]{"b", "l"});
+            case 'S' -> removeResourcesHelper(turn, new String[]{"b", "l", "w", "g"});
+            case 'T' -> removeResourcesHelper(turn, new String[]{"o", "o", "o", "g", "g"});
+            case 'J'->  removeResourcesHelper(turn, new String[]{"o", "w", "g"});
+            default -> turn;
+        };
+    }
+
+    private static String removeResourcesHelper(String turn, String[] resourcesToRemove) {
+        for (String s : resourcesToRemove) {
+            turn = turn.replaceFirst(s, "");
+        }
+        return turn;
+    }
+    public void applyBoardState(String boardState) {
+        for (char p : new char[]{'W', 'X'}) {
+            applyPlayerBoardState(CatanDiceExtra.validateClass.Misc.getPlayerBoardState(boardState, p), Character.toString(p));
+        }
+    }
+
+    @Override
+    public String toString() {
+        String[] playerBoardStates = new String[2];
+        int index = 0;
+        for (String name : new String[]{"W", "X"}) {
+            String playerBoardState = "";
+            playerBoardState += name;
+
+            List<Castle> castleList = Arrays.asList(castles); // filter by owner
+            castleList = castleList.stream().filter(castle -> filterCondition(castle, name.charAt(0))).collect(Collectors.toList());
+            List<Tile> tileList = Arrays.asList(tiles);
+            tileList = tileList.stream().filter(tile -> filterCondition(tile, name.charAt(0))).collect(Collectors.toList());
+            List<Road> roadList = new ArrayList<>();
+            roadList.addAll(roads); // TODO
+            roadList = roadList.stream().filter(road -> filterCondition(road, name.charAt(0))).collect(Collectors.toList());
+            Object[] roadArr = roadList.toArray();
+            Arrays.sort(roadArr);
+            List<Settlement> settlementList = Arrays.asList(settlements);
+            settlementList = settlementList.stream().filter(settlement -> filterCondition(settlement, name.charAt(0))).collect(Collectors.toList());
+
+            for (Castle castle : castleList) { // add to each boardstate
+                playerBoardState += castle.toString();
+            }
+            for (Tile tile : tileList) {
+                playerBoardState += tile.toString();
+            }
+            for (Object road : roadArr) {
+                playerBoardState += road.toString();
+            }
+            for (Settlement settlement : settlementList) {
+                playerBoardState += settlement.toString();
+            }
+            playerBoardStates[index] = playerBoardState;
+            index++;
+        }
+        return playerBoardStates[0] + playerBoardStates[1];
+    }
+    private static boolean filterCondition(GamePiece g, char playerToMatch) {
+        if (g.Owner.name != "") {
+            return g.Owner.name.charAt(0) == playerToMatch;
+        }
+        return false;
     }
 }
