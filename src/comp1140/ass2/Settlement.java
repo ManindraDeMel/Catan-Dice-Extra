@@ -26,14 +26,14 @@ public class Settlement extends GamePiece{
         this.isCityable=cityable;
         this.isBuilt = false;
         this.isCity = false;
-        this.intersectionIndex =index;
+        this.intersectionIndex = index;
     }
 
     @Override
     public String toString() {
         if (isCityable)
-            return "T" + coord.index;
+            return "T" + CatanDiceExtra.validateClass.Misc.addZero(coord.index);
         else
-            return "S" + coord.index;
+            return "S" + CatanDiceExtra.validateClass.Misc.addZero(coord.index);
     }
 }
