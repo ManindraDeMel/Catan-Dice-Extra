@@ -1097,10 +1097,8 @@ public class CatanDiceExtra {
     public static int[] longestRoad(String boardState) {
         // FIXME complete this method
 
-        // Defining Arrays and required values
+        // Defining array to hold length of the longest road
         int[] longestRoadArr = new int[2];
-        String playerW = boardState.substring(boardState.indexOf('W', 1), boardState.indexOf('X', 1));
-        String playerX = boardState.substring(boardState.indexOf('X', 1), boardState.indexOf('W', boardState.indexOf('X', 1)));
 
         // Getting roads and neighbours
         ArrayList<ArrayList<String>> roads = longestRoadHelper.getRoads(boardState);
@@ -1111,77 +1109,89 @@ public class CatanDiceExtra {
         HashSet<ArrayList<String>> longestRoadsX = new HashSet<>();
 
         for (int i = 0; i < roadIndexes.size(); i++) {
+            // Getting road indexes and indexes of the movable neighbours for a particular player
             ArrayList<String> playerIndexes = roadIndexes.get(i);
             ArrayList<ArrayList<String>> playerNeighbours = neighbours.get(i);
 
-            ArrayList<String> visited = new ArrayList<>();          // roads visited so far in a given search
-            HashSet<ArrayList<String>> longestRoads = new HashSet<>();  // all roads sequences found so far
+            HashSet<ArrayList<String>> allRoadSequence = new HashSet<>();  // all roads sequences found so far
+            ArrayList<ArrayList<String>> notVisited = new ArrayList<>(longestRoadHelper.getIndexNeighbours(roadIndexes, roads).get(i)); // roads not visited so far in a given search
 
-
-            ArrayList<ArrayList<String>> visitedTest = new ArrayList<>(longestRoadHelper.getIndexNeighbours(roadIndexes, roads).get(i));
-
+            // Finding all connected roads for a particular player
             for (int j = 0; j < playerIndexes.size(); j++) {
                 var index = playerIndexes.get(j);
-                ArrayList<String> longestRoad = new ArrayList<>();
 
-                visited.add(index);
-                longestRoad.add(index);
-                getAllConnectedRoads(playerIndexes, playerNeighbours, visited, longestRoads, longestRoad, j, visitedTest);
-                visited.remove(index);
+                ArrayList<String> roadSequence = new ArrayList<>();
+                roadSequence.add(index);
+
+                getAllConnectedRoads(playerIndexes, playerNeighbours, allRoadSequence, roadSequence, j, notVisited);
             }
 
-
+            // Assigning the allRoadSequence Arraylist to the correct player
             if (i == 0)
-                longestRoadsW = longestRoads;
+                longestRoadsW = allRoadSequence;
             else
-                longestRoadsX = longestRoads;
+                longestRoadsX = allRoadSequence;
         }
 
+        // Finding the length of the longest road for player W
         for (var v : longestRoadsW){
             if (v.size() > longestRoadArr[0])
                 longestRoadArr[0] = v.size();
         }
 
+        // Finding the length of the longest road for player X
         for (var v : longestRoadsX){
             if (v.size() > longestRoadArr[1])
                 longestRoadArr[1] = v.size();
         }
 
+        // Adjusting the length of road (as we implemented using indexes)
         longestRoadArr[0] = Math.max(0, longestRoadArr[0] - 1);
         longestRoadArr[1] = Math.max(0, longestRoadArr[1] - 1);
 
         return longestRoadArr;
     }
 
-    private static void getAllConnectedRoads(ArrayList<String> playerIndexes, ArrayList<ArrayList<String>> playerNeighbours, ArrayList<String> visited,
-                                             HashSet<ArrayList<String>> longestRoads, ArrayList<String> longestRoad, int pos,
-                                             ArrayList<ArrayList<String>> visitedTest) {
+    /**
+     * Finds all the roads sequences for a player
+     *
+     * @param playerIndexes road indexes of a player
+     * @param playerNeighbours connected movable neighbouring road indexes
+     * @param allRoadSequence all the road sequence found so far
+     * @param roadSequence current road sequence found
+     * @param pos current index
+     * @param notVisited indexes of roads where not visited
+     */
+    private static void getAllConnectedRoads(ArrayList<String> playerIndexes, ArrayList<ArrayList<String>> playerNeighbours,
+                                             HashSet<ArrayList<String>> allRoadSequence, ArrayList<String> roadSequence, int pos,
+                                             ArrayList<ArrayList<String>> notVisited) {
 
-        List<String> longestRoadState = new ArrayList<>(longestRoad);
+        List<String> longestRoadState = new ArrayList<>(roadSequence);
 
         for (var road : playerNeighbours.get(pos)) {
+            if (!notVisited.get(pos).contains(road)) continue;
 
-            if (!visitedTest.get(pos).contains(road)) continue;
+            roadSequence = new ArrayList<>(longestRoadState);
+            roadSequence.add(road);
 
-            longestRoad = new ArrayList<>(longestRoadState);
-            longestRoad.add(road);
+            allRoadSequence.add(roadSequence);
 
-            longestRoads.add(longestRoad);
-
-            visitedTest.get(pos).remove(road);
-            visitedTest.get(playerIndexes.indexOf(road)).remove(playerIndexes.get(pos));
-
-            visited.add(road);
-            getAllConnectedRoads(playerIndexes, playerNeighbours, visited, longestRoads, longestRoad, playerIndexes.indexOf(road), visitedTest);
-            visited.remove(road);
-
-            visitedTest.get(pos).add(road);
-            visitedTest.get(playerIndexes.indexOf(road)).add(playerIndexes.get(pos));
+            notVisited.get(pos).remove(road);
+            notVisited.get(playerIndexes.indexOf(road)).remove(playerIndexes.get(pos));
+            getAllConnectedRoads(playerIndexes, playerNeighbours, allRoadSequence, roadSequence, playerIndexes.indexOf(road), notVisited);
+            notVisited.get(pos).add(road);
+            notVisited.get(playerIndexes.indexOf(road)).add(playerIndexes.get(pos));
         }
     }
 
     private class longestRoadHelper {
 
+        /**
+         * Finds and returns road indexes for both players in a single array list
+         *
+         * @param boardState board state of the game
+         * @return the road indexes for both players in a single array list
+         */
         public static ArrayList<ArrayList<String>> getIndexes(String boardState) {
 
             // Defining player strings and arrays
@@ -1217,6 +1227,13 @@ public class CatanDiceExtra {
 
             return indexArr;
         }
+
+        /**
+         * Finds all the roads for each player in the board state
+         *
+         * @param boardState board state of the game
+         * @return ArrayList containing all roads constructed by each player
+         */
         public static ArrayList<ArrayList<String>> getRoads(String boardState) {
 
             // Defining player strings and arrays
@@ -1278,6 +1295,8 @@ public class CatanDiceExtra {
         }
 
         static HashMap<String, ArrayList<String>> allNeighbourIndexes = new HashMap<>();
+        static HashMap<String, ArrayList<String>> allNeighbourRoads = new HashMap<>();
+
         static {
             String[] roads = new String[]{
                     "0307", "0003", "0004", "0408", "0812", "0712",
@@ -1323,31 +1342,8 @@ public class CatanDiceExtra {
 
                 allNeighbourIndexes.put(key, neighbours);
             }
-        }
 
-        static HashMap<String, ArrayList<String>> allNeighbourRoads = new HashMap<>();
-        static {
-            String[] roads = new String[]{
-                    "0307", "0003", "0004", "0408", "0812", "0712",
-                    "0104", "0105", "0509", "0913", "0813",
-                    "0205", "0206", "0610", "1014", "0914",
-                    "1116", "0711", "1217", "1722", "1622",
-                    "1318", "1823", "1723",
-                    "1419", "1924", "1824",
-                    "1015", "1520", "2025", "1925",
-                    "2127", "1621", "2228", "2833", "2733",
-                    "2329", "2934", "2834",
-                    "2430", "3035", "2935",
-                    "2531", "3136", "3036",
-                    "2026", "2632", "3237", "3137",
-                    "3338", "3439", "3943", "3843",
-                    "3540", "4044", "3944",
-                    "3641", "4145", "4045",
-                    "3742", "4246", "4146",
-                    "4347", "4448", "4851", "4751",
-                    "4549", "4952", "4852",
-                    "4650", "5053", "4953"
-            };
+
             ArrayList<String> allRoadsOnBoard = new ArrayList<>();
 
 
@@ -1369,102 +1365,6 @@ public class CatanDiceExtra {
                 allNeighbourRoads.put(roads[i], neighbours);
             }
         }
-
-//        static HashMap<String, ArrayList<String>> allNeighbourRoads = new HashMap<>() {{
-//
-//            // Row 1
-//            put("0307", new ArrayList<String>(Arrays.asList("0003", "0711", "0712")));
-//            put("0003", new ArrayList<String>(Arrays.asList("0307", "0004")));
-//            put("0004", new ArrayList<String>(Arrays.asList("0003", "0104", "0408")));
-//            put("0408", new ArrayList<String>(Arrays.asList("0004", "0104", "0812", "0813")));
-//            put("0812", new ArrayList<String>(Arrays.asList("0408", "0813", "0712", "1217")));
-//            put("0712", new ArrayList<String>(Arrays.asList("0307", "0711", "0812", "1217")));
-//
-//            put("0104", new ArrayList<String>(Arrays.asList("0004", "0408", "0105")));
-//            put("0105", new ArrayList<String>(Arrays.asList("0104", "0205", "0509"))); // DONE ----------------
-////            put("0509", new Viewer.RoadStartID(1, 3)); //TODO
-////            put("0913", new Viewer.RoadStartID(1, 4));
-////            put("0813", new Viewer.RoadStartID(1, 5));
-////
-////            put("0205", new Viewer.RoadStartID(2, 1));
-////            put("0206", new Viewer.RoadStartID(2, 2));
-////            put("0610", new Viewer.RoadStartID(2, 3));
-////            put("1014", new Viewer.RoadStartID(2, 4));
-////            put("0914", new Viewer.RoadStartID(2, 5));
-////
-////            put("1116", new Viewer.RoadStartID(3, 0));
-////            put("0711", new Viewer.RoadStartID(3, 1));
-////            put("1217", new Viewer.RoadStartID(3, 3));
-////            put("1722", new Viewer.RoadStartID(3, 4));
-////            put("1622", new Viewer.RoadStartID(3, 5));
-////
-////            put("1318", new Viewer.RoadStartID(4, 3));
-////            put("1823", new Viewer.RoadStartID(4, 4));
-////            put("1723", new Viewer.RoadStartID(4, 5));
-////
-////            put("1419", new Viewer.RoadStartID(5, 3));
-////            put("1924", new Viewer.RoadStartID(5, 4));
-////            put("1824", new Viewer.RoadStartID(5, 5));
-////
-////            put("1015", new Viewer.RoadStartID(6, 2));
-////            put("1520", new Viewer.RoadStartID(6, 3));
-////            put("2025", new Viewer.RoadStartID(6, 4));
-////            put("1925", new Viewer.RoadStartID(6, 5));
-////
-////            put("2127", new Viewer.RoadStartID(7, 0));
-////            put("1621", new Viewer.RoadStartID(7, 1));
-////            put("2228", new Viewer.RoadStartID(7, 3));
-////            put("2833", new Viewer.RoadStartID(7, 4));
-////            put("2733", new Viewer.RoadStartID(7, 5));
-////
-////            put("2329", new Viewer.RoadStartID(8, 3));
-////            put("2934", new Viewer.RoadStartID(8, 4));
-////            put("2834", new Viewer.RoadStartID(8, 5));
-////
-////            put("2430", new Viewer.RoadStartID(9, 3));
-////            put("3035", new Viewer.RoadStartID(9, 4));
-////            put("2935", new Viewer.RoadStartID(9, 5));
-////
-////            put("2531", new Viewer.RoadStartID(11, 3));
-////            put("3136", new Viewer.RoadStartID(11, 4));
-////            put("3036", new Viewer.RoadStartID(11, 5));
-////
-////            put("2026", new Viewer.RoadStartID(12, 2));
-////            put("2632", new Viewer.RoadStartID(12, 3));
-////            put("3237", new Viewer.RoadStartID(12, 4));
-////            put("3137", new Viewer.RoadStartID(12, 5));
-////
-////            put("3338", new Viewer.RoadStartID(13, 0));
-////            put("3439", new Viewer.RoadStartID(13, 3));
-////            put("3943", new Viewer.RoadStartID(13, 4));
-////            put("3843", new Viewer.RoadStartID(13, 5));
-////
-////            put("3540", new Viewer.RoadStartID(14, 3));
-////            put("4044", new Viewer.RoadStartID(14, 4));
-////            put("3944", new Viewer.RoadStartID(14, 5));
-////
-////            put("3641", new Viewer.RoadStartID(15, 3));
-////            put("4145", new Viewer.RoadStartID(15, 4));
-////            put("4045", new Viewer.RoadStartID(15, 5));
-////
-////            put("3742", new Viewer.RoadStartID(16, 3));
-////            put("4246", new Viewer.RoadStartID(16, 4));
-////            put("4146", new Viewer.RoadStartID(16, 5));
-////
-////            put("4347", new Viewer.RoadStartID(17, 0));
-////            put("4448", new Viewer.RoadStartID(17, 3));
-////            put("4851", new Viewer.RoadStartID(17, 4));
-////            put("4751", new Viewer.RoadStartID(17, 5));
-////
-////            put("4549", new Viewer.RoadStartID(18, 3));
-////            put("4952", new Viewer.RoadStartID(18, 4));
-////            put("4852", new Viewer.RoadStartID(18, 5));
-////
-//            put("4650", new Viewer.RoadStartID(19, 3));
-//            put("5043", new Viewer.RoadStartID(19, 4));
-//            put("4953", new Viewer.RoadStartID(19, 5));
-//        }};
-
     }
 
     /**
