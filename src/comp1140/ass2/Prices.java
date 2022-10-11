@@ -133,37 +133,36 @@ public class Prices {
         }};
 
         boardState = boardState.replaceFirst(actionSub.substring(0,1), actionSub.substring(1));
-        String turn = boardState.substring(0, boardState.indexOf('W', 2));
-        String scores = boardState.substring(boardState.indexOf('W', boardState.indexOf('W', 2) + 1));
 
-        Board board = new Board();
+        Board board = new Board(boardState.substring(0, boardState.indexOf('W', 2)));
         board.applyBoardState(boardState);
         for (int i = 0; i < board.tiles.length; i++) {
-            if (board.tiles[i].Owner.name != "") { // check material specific knights
-                if (board.tiles[i].Owner.name.charAt(0) == playerId.charAt(0)) {
-                    if (board.tiles[i].tileType == convertToTileType.get(actionSub.substring(1))) {
-                        board.tiles[i].used = true;
-                    }
-                }
-            }
+            setUsedTrue(actionSub, playerId, convertToTileType, board, i);
         }
         for (int i = 9; i < 11; i++) { // check multipurpose knight
+            setUsedTrue(actionSub, playerId, convertToTileType, board, i);
+        }
+        return Board.toStringWithScore(board);
+    }
+
+    private static void setUsedTrue(String actionSub, String playerId, HashMap<String, TileType> convertToTileType, Board board, int i) {
+        if (board.tiles[i].Owner.name != "") {
             if (board.tiles[i].Owner.name.charAt(0) == playerId.charAt(0)) {
                 if (board.tiles[i].tileType == convertToTileType.get(actionSub.substring(1))) {
                     board.tiles[i].used = true;
                 }
             }
         }
-        return turn + board + scores;
     }
+
     public static String trade(String boardState, String action) {
         int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
         String oldResources = boardState.substring(3, endOfResourcesIndex);
         String newResources = "";
         newResources = oldResources;
-        for (char c : action.substring(1).toCharArray()) {
+        for (char c : action.substring(5).toCharArray()) {
             newResources = newResources.replaceFirst("m", "");
-            newResources.replaceFirst("m", Character.toString(c));
+            newResources = newResources.replaceFirst("m", Character.toString(c));
         }
         newResources = CatanDiceExtra.sortString(newResources);
         return boardState.replace(oldResources, newResources);

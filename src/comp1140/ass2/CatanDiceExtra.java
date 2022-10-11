@@ -6,10 +6,6 @@ public class CatanDiceExtra {
     ArrayList<Player> players = new ArrayList<>();
     ArrayList<String> playersNames = new ArrayList<>(Arrays.asList("Manindra", "Stephen", "Arjun")); // changes when we add GUI stuff (max of 6 players?)
     public void startGame() {
-        Board board = new Board();
-        for (String name : playersNames) {
-            players.add(new Player(name));
-        }
     }
 
     public void newTurn(Player player) {
@@ -1103,8 +1099,6 @@ public class CatanDiceExtra {
      * @return array of contiguous road lengths, one per player.
      */
     public static int[] longestRoad(String boardState) {
-        // FIXME complete this method
-
         // Defining array to hold length of the longest road
         int[] longestRoadArr = new int[2];
 
@@ -1444,22 +1438,10 @@ public class CatanDiceExtra {
     }
 
     private static String addNewBuild(String boardState, String action, String playerId) {
-        Board board = new Board();
+        Board board = new Board(boardState.substring(0, boardState.indexOf('W', 2)));
         board.applyBoardState(boardState);
         board.buildBuilding(action.substring(5), playerId);
-        String turn = boardState.substring(0, boardState.indexOf('W', 2));
-
-//        if (turn.charAt(0) == 'W') {
-//            turn = turn.replaceFirst("W", "X");
-//        }
-//        else {
-//            turn = turn.replaceFirst("X", "W");
-//        }
-        turn = turn.substring(0, 3) + Board.removeResources(turn.substring(3), action.charAt(5));
-//        String oldScores = boardState.substring(boardState.indexOf('W', boardState.indexOf('W', 2) + 1));
-        int[] newScores = Board.calculateScores(boardState);
-        String newScoreStr = "W" + validateClass.Misc.addZero(newScores[0]) + "X" + validateClass.Misc.addZero(newScores[1]);
-        return turn + board + newScoreStr;
+        return Board.toStringWithScore(board);
     }
 
     private static String keep(String boardState, String action, String playerId) {

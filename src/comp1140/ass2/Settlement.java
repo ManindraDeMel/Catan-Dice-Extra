@@ -31,9 +31,9 @@ public class Settlement extends GamePiece{
 
     @Override
     public String toString() {
-        if (isCityable)
-            return "T" + CatanDiceExtra.validateClass.Misc.addZero(coord.index);
+        if (isCityable && isCity)
+            return "T" + CatanDiceExtra.validateClass.Misc.addZero(intersectionIndex);
         else
-            return "S" + CatanDiceExtra.validateClass.Misc.addZero(coord.index);
+            return "S" + CatanDiceExtra.validateClass.Misc.addZero(intersectionIndex);
     }
 }
