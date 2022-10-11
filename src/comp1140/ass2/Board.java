@@ -149,10 +149,10 @@ public class Board {
         }
         if (longestRoad[0] == longestRoad[1]) {
             if (boardState.charAt(0) == 'W') {
-                scores[0]++;
+                scores[0]+=2;
             }
             else {
-                scores[1]++;
+                scores[1]+=2;
             }
             checkedTitles = true;
         }
