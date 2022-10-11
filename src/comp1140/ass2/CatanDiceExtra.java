@@ -1425,25 +1425,24 @@ public class CatanDiceExtra {
      */
     public static String applyAction(String boardState, String action) {
         if (isGameOver(boardState)) {
-            return GameOver();
+            return boardState;
         }
         String playerId = Character.toString(boardState.charAt(0));
         return switch (action.substring(0, 4)) { // here we match for the type of action we received
-            case "keep" -> keep(boardState, action, playerId); //DONE
-            case "buil" -> addNewBuild(boardState, action, playerId); // DONE
-            case "trad" -> Prices.trade(boardState, action); //DONE
+            case "keep" -> keep(boardState, action, playerId);
+            case "buil" -> addNewBuild(boardState, action, playerId);
+            case "trad" -> Prices.trade(boardState, action);
             case "swap" -> Prices.swap(boardState, action.substring(4), playerId);
             default -> boardState;
         };
     }
 
     private static String addNewBuild(String boardState, String action, String playerId) {
-        Board board = new Board(boardState.substring(0, boardState.indexOf('W', 2)));
+        Board board = new Board(Board.getTurnFromBoardState(boardState), Board.getScoreFromBoardState(boardState));
         board.applyBoardState(boardState);
         board.buildBuilding(action.substring(5), playerId);
-        return Board.toStringWithScore(board);
+        return Board.toStringWithNewScore(board);
     }
-
     private static String keep(String boardState, String action, String playerId) {
         boardState = boardState.substring(0, 2) + String.valueOf(Integer.parseInt(boardState.substring(2, 3)) + 1) + boardState.substring(3); // +1 to roll counter
         int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
@@ -1568,11 +1567,15 @@ public class CatanDiceExtra {
     }
 
     public static Boolean isGameOver(String boardState) {
-        return false;
+        String scores = Board.getScoreFromBoardState(boardState);
+        return Integer.parseInt(scores.substring(1, 3)) == 10 || Integer.parseInt(scores.substring(scores.indexOf('X') + 1, scores.indexOf('X') + 2)) == 10;
     }
 
     public static String GameOver() {
         return "";
     }
 
+    public static void main(String[] args) {
+        applyAction("X63bgllwWK00K01R0003R0004R0104R0307R0408R0712S00S01S07XK02K05K06R0105R0206R0509R0610R0913R0914R1014R1015R1318R1419R1520S09T10W03X07RA", "buildS20");
+    }
 }

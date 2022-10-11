@@ -1,7 +1,5 @@
 package comp1140.ass2;
 
-import comp1140.ass2.gui.Game;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,6 +24,8 @@ public class Board {
     public static HashMap<Coordinate, ArrayList<Coordinate>> neighbours;
 
     public String turn = "";
+
+    public String oldScore = "";
     /**
      * Instantiates all the array fields of a Board.
      * Each Array that can be is indexed the same as the indices for corners and tiles provided.
@@ -37,7 +37,7 @@ public class Board {
      * Authored by Stephen Burg - u7146285, but the system of coordinates it instantiates was created collaboratively
      * by the team and also Jonte before he left.
      */
-    public Board(String turn) {
+    public Board(String turn, String oldScore) {
         coords = new Coordinate[54];
         roads = new ArrayList<>();
         this.tiles = new Tile[20];
@@ -45,6 +45,7 @@ public class Board {
         this.castles = new Castle[4];
         neighbours = new HashMap<>();
         this.turn = turn;
+        this.oldScore = oldScore;
         for (int i = 0;i<4;i++) {
             this.castles[i] = new Castle(new Player(""));
         }
@@ -131,16 +132,42 @@ public class Board {
     public static int[] calculateScores(String boardState) { // calculates the points for each player [W,X] of this boardstate.
         int[] scores = new int[2];
         int index = 0;
+        boolean checkedTitles = false;
         int[] largestArmy = CatanDiceExtra.largestArmy(boardState);
         int[] longestRoad = CatanDiceExtra.longestRoad(boardState);
+
+        if (largestArmy[0] == largestArmy[1]) { // the first player to build a Road sequence of length 5 gains
+                                                // the longest road title; if another player also builds a sequence of length
+                                                // 5, the title stays with the player who did it first.
+            if (boardState.charAt(0) == 'W') {
+                scores[0] += 2;
+            }
+            else {
+                scores[1] += 2;
+            }
+            checkedTitles = true;
+        }
+        if (longestRoad[0] == longestRoad[1]) {
+            if (boardState.charAt(0) == 'W') {
+                scores[0]++;
+            }
+            else {
+                scores[1]++;
+            }
+            checkedTitles = true;
+        }
+
         for (Character player : new Character[]{'W', 'X'}) {
             int score = 0;
             String playerBoardState = CatanDiceExtra.validateClass.Misc.getPlayerBoardState(boardState, player);
-            if (largestArmy[index] == Arrays.stream(largestArmy).max().getAsInt() && largestArmy[index] >= 3) {
-                score += 2;
-            }
-            if (longestRoad[index] == Arrays.stream(longestRoad).max().getAsInt() && longestRoad[index] >= 5) {
-                score++;
+
+            if (!checkedTitles) {
+                if (largestArmy[index] == Arrays.stream(largestArmy).max().getAsInt() && largestArmy[index] >= 3) {
+                    score += 2;
+                }
+                if (longestRoad[index] == Arrays.stream(longestRoad).max().getAsInt() && longestRoad[index] >= 5) {
+                    score++;
+                }
             }
             for (Character c : playerBoardState.toCharArray()) {
                 if (c == 'S') {
@@ -155,6 +182,31 @@ public class Board {
         }
         return scores;
     }
+
+    public static HashMap<Character, String[]> getTitleHoldersFromBoardState(String boardState) {
+        HashMap<Character, String[]> playerToTitle = new HashMap<>(){{
+            put('W', new String[]{"", ""});
+            put('X', new String[]{"", ""});
+        }};
+        String oldScore = Board.getScoreFromBoardState(boardState);
+        if (!(oldScore.contains("A") || oldScore.contains("R"))) {
+            return null;
+        }
+        String wScore = oldScore.substring(0, oldScore.indexOf('X'));
+        String xScore = oldScore.substring(oldScore.indexOf('X'));
+        String[] titles = new String[]{"R", "A"};
+        for (int i = 0; i < titles.length; i++) {
+            String t = titles[i];
+            if (wScore.contains(t)) {
+                playerToTitle.get('W')[i] = t;
+            }
+            else if (xScore.contains(t)) {
+                playerToTitle.get('X')[i] = t;
+            }
+        }
+
+        return playerToTitle;
+    } // gets TitleHolders. I.e. {'W' : ['R', 'A'], 'X' : []} means player W has both the longest road and largest army.
 
     /**
      * Applies a Player Board State String to an already instantiated board, changeing the states and ownership of various structures.
@@ -251,7 +303,7 @@ public class Board {
             case 'R' -> removeResourcesHelper(turn, new String[]{"b", "l"});
             case 'S' -> removeResourcesHelper(turn, new String[]{"b", "l", "w", "g"});
             case 'T' -> removeResourcesHelper(turn, new String[]{"o", "o", "o", "g", "g"});
-            case 'J'->  removeResourcesHelper(turn, new String[]{"o", "w", "g"});
+            case 'J', 'K' ->  removeResourcesHelper(turn, new String[]{"o", "w", "g"});
             default -> turn;
         };
     }
@@ -268,10 +320,27 @@ public class Board {
         }
     }
 
-    public static String toStringWithScore(Board board) {
-        return board.toString() +
-                "W" + CatanDiceExtra.validateClass.Misc.addZero(Board.calculateScores(board.toString())[0]) +
-                "X" + CatanDiceExtra.validateClass.Misc.addZero(Board.calculateScores(board.toString())[1]);
+    public static String getScoreFromBoardState(String boardState) {
+        return boardState.substring(boardState.indexOf('W', boardState.indexOf('W', 2) + 1));
+    }
+    public static String getTurnFromBoardState(String boardState) {
+        return boardState.substring(0, boardState.indexOf('W', 2));
+    }
+    public static String toStringWithNewScore(Board board) {
+        String wScore = "W" + CatanDiceExtra.validateClass.Misc.addZero(Board.calculateScores(board.toString())[0]);
+        String xScore = "X" + CatanDiceExtra.validateClass.Misc.addZero(Board.calculateScores(board.toString())[1]);
+        HashMap<Character, String[]> playerTitles = Board.getTitleHoldersFromBoardState(board.toString());
+        if (playerTitles != null) {
+            for (String s : playerTitles.get('W')) {
+                wScore += s;
+            }
+            for (String s : playerTitles.get('X')) {
+                xScore += s;
+            }
+        }
+        String newScore = wScore + xScore;
+        return board.toString().replace(board.oldScore, newScore);
+
     }
 
     @Override
@@ -292,7 +361,9 @@ public class Board {
             Object[] roadArr = roadList.toArray();
             Arrays.sort(roadArr);
             List<Settlement> settlementList = Arrays.asList(settlements);
-            settlementList = settlementList.stream().filter(settlement -> filterCondition(settlement, name.charAt(0))).collect(Collectors.toList());
+            settlementList = settlementList.stream().filter(settlement -> filterCondition(settlement, name.charAt(0)) && !settlement.isCity).collect(Collectors.toList());
+            List<Settlement> cityList = Arrays.asList(settlements);
+            cityList = cityList.stream().filter(city -> filterCondition(city, name.charAt(0)) && city.isCity).collect(Collectors.toList());
 
             for (Castle castle : castleList) { // add to each boardstate
                 playerBoardState += castle.toString();
@@ -306,10 +377,13 @@ public class Board {
             for (Settlement settlement : settlementList) {
                 playerBoardState += settlement.toString();
             }
+            for (Settlement city : cityList) {
+                playerBoardState += city.toString();
+            }
             playerBoardStates[index] = playerBoardState;
             index++;
         }
-        return turn + playerBoardStates[0] + playerBoardStates[1];
+        return turn + playerBoardStates[0] + playerBoardStates[1] + oldScore;
     }
     private static boolean filterCondition(GamePiece g, char playerToMatch) {
         if (g.Owner.name != "") {

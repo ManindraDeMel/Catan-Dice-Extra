@@ -134,7 +134,7 @@ public class Prices {
 
         boardState = boardState.replaceFirst(actionSub.substring(0,1), actionSub.substring(1));
 
-        Board board = new Board(boardState.substring(0, boardState.indexOf('W', 2)));
+        Board board = new Board(Board.getTurnFromBoardState(boardState), Board.getScoreFromBoardState(boardState));
         board.applyBoardState(boardState);
         for (int i = 0; i < board.tiles.length; i++) {
             setUsedTrue(actionSub, playerId, convertToTileType, board, i);
@@ -142,7 +142,7 @@ public class Prices {
         for (int i = 9; i < 11; i++) { // check multipurpose knight
             setUsedTrue(actionSub, playerId, convertToTileType, board, i);
         }
-        return Board.toStringWithScore(board);
+        return Board.toStringWithNewScore(board);
     }
 
     private static void setUsedTrue(String actionSub, String playerId, HashMap<String, TileType> convertToTileType, Board board, int i) {
