@@ -18,6 +18,9 @@ public class Board {
             wool, bricks, timber, ore,
             ore, grain, wool
     };
+    public static final ArrayList<Integer> cityLocations = new ArrayList<>(Arrays.asList(
+            1, 7, 10, 17, 18, 19, 34, 35, 36, 43, 46, 52
+    ));
     public Settlement[] settlements;
     public Castle[] castles;
     public ArrayList<Road> roads;
@@ -47,7 +50,7 @@ public class Board {
         this.turn = turn;
         this.oldScore = oldScore;
         for (int i = 0;i<4;i++) {
-            this.castles[i] = new Castle(new Player(""));
+            this.castles[i] = new Castle(new Player(""), i);
         }
         int tilenum=0;
         int settlenum = 0;
@@ -83,7 +86,7 @@ public class Board {
                     this.tiles[tilenum] = new Tile(new Player(""), tilecoords, tilenum, false, tileTypes[tilenum]);
                     tilenum++;
                 }
-                if ( ( (rowlen==6) && (x==3) ) || ( (rowlen==8) && (x==1||x==7) ) || ( (rowlen==10) && (x!=1&&x!=9) ) ) {
+                if (cityLocations.contains(c)){
                     cityable = true;
                 } else {
                     cityable = false;
@@ -168,14 +171,11 @@ public class Board {
             String oldScores = Board.getScoreFromBoardState(boardState);
             char playerIndex = oldScores.charAt(oldScores.indexOf('R') - 3);
             if (playerIndex == 'W' || playerIndex == 'X') {
-                scores.get(boardState.charAt(0))[0] += 2;
-                scores.get(boardState.charAt(0))[1]++;
+                scores.get(playerIndex)[0] += 2;
+                scores.get(playerIndex)[1]++;
                 checkedLongestRoad = true;
             }
         }
-
-
-
         for (Character player : new Character[]{'W', 'X'}) {
             String playerBoardState = CatanDiceExtra.validateClass.Misc.getPlayerBoardState(boardState, player);
 

@@ -131,28 +131,37 @@ public class Prices {
             put("o", TileType.ore);
             put("w", TileType.wool);
         }};
-
-        boardState = boardState.replaceFirst(actionSub.substring(0,1), actionSub.substring(1));
-
+        String resources = Board.getTurnFromBoardState(boardState).substring(3);
+        String newResources = CatanDiceExtra.sortString(resources.replaceFirst(actionSub.substring(0,1), actionSub.substring(1)));
+        boardState = boardState.replaceFirst(resources, newResources);
         Board board = new Board(Board.getTurnFromBoardState(boardState), Board.getScoreFromBoardState(boardState));
         board.applyBoardState(boardState);
+        boolean foundSpecificKnight = false;
         for (int i = 0; i < board.tiles.length; i++) {
-            setUsedTrue(actionSub, playerId, convertToTileType, board, i);
+            if (!(i == 9 || i == 10)) {
+                foundSpecificKnight = setUsedTrue(actionSub, playerId, convertToTileType, board, i);
+            }
         }
-        for (int i = 9; i < 11; i++) { // check multipurpose knight
-            setUsedTrue(actionSub, playerId, convertToTileType, board, i);
+        if (!(foundSpecificKnight)) {
+            for (int i = 9; i < 11; i++) { // check multipurpose knight
+                setUsedTrue(actionSub, playerId, convertToTileType, board, i);
+            }
         }
         return Board.toStringWithNewScore(board);
     }
 
-    private static void setUsedTrue(String actionSub, String playerId, HashMap<String, TileType> convertToTileType, Board board, int i) {
+    private static boolean setUsedTrue(String actionSub, String playerId, HashMap<String, TileType> convertToTileType, Board board, int i) {
         if (board.tiles[i].Owner.name != "") {
             if (board.tiles[i].Owner.name.charAt(0) == playerId.charAt(0)) {
-                if (board.tiles[i].tileType == convertToTileType.get(actionSub.substring(1))) {
-                    board.tiles[i].used = true;
+                if (board.tiles[i].tileType == convertToTileType.get(actionSub.substring(1)) || board.tiles[i].tileType == TileType.desert) {
+                    if (!board.tiles[i].used) {
+                        board.tiles[i].used = true;
+                        return true;
+                    }
                 }
             }
         }
+        return false;
     }
 
     public static String trade(String boardState, String action) {
