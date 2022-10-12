@@ -1475,7 +1475,7 @@ public class CatanDiceExtra {
      * @param actionSequence: array of strings, each representing one action
      * @return string representation of the new board state
      */
-    public static String applyActionSequence(String boardState, String[] actionSequence) {
+    public static String applyActionSequence(String boardState, String[] actionSequence) { // TODO feel free to delete all of this, doesn't seem to be working.
         // Iterating through each action in the array and applying action
         // Returned string is re-stored in boardState
         if (isActionSequenceValid(boardState, actionSequence)) {
