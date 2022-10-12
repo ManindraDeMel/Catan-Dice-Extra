@@ -135,36 +135,61 @@ public class Board {
             put('X', new Integer[]{0, 0, 0});
         }};
         int index = 0;
-        boolean checkedTitles = false;
+        boolean checkedLargestArmy = false;
+        boolean checkedLongestRoad = false;
         int[] largestArmy = CatanDiceExtra.largestArmy(boardState);
         int[] longestRoad = CatanDiceExtra.longestRoad(boardState);
+        HashMap<Character, Character> swapPlayer = new HashMap<>(){{
+            put('W', 'X');
+            put('X', 'W');
+        }};
+        if (largestArmy[0] < 3 && largestArmy[1] < 3) {
+            checkedLargestArmy = true;
+        }
+        else if (largestArmy[0] == largestArmy[1] && largestArmy[0] >= 3) { // the first player to build a Road sequence of length 5 gains
+            // the longest road title; if another player also builds a sequence of length
+            // 5, the title stays with the player who did it first.
+            char playerIndex = boardState.charAt(boardState.indexOf('A') - 4);
+            char playerIndex2 = boardState.charAt(boardState.indexOf('A') - 3);
+            if (playerIndex == 'W' || playerIndex == 'X') {
+                scores.get(playerIndex)[0] += 2;
+                scores.get(playerIndex)[2]++;
+            }
+            else if (playerIndex2 == 'W' || playerIndex2 == 'X') {
+                scores.get(playerIndex2)[0] += 2;
+                scores.get(playerIndex2)[2]++;
+            }
+            checkedLargestArmy = true;
+        }
+        if (longestRoad[0] < 5 && longestRoad[1] < 5) {
+            checkedLongestRoad = true;
+        }
+        else if (longestRoad[0] == longestRoad[1] && longestRoad[0] >= 5) {
+            String oldScores = Board.getScoreFromBoardState(boardState);
+            char playerIndex = oldScores.charAt(oldScores.indexOf('R') - 3);
+            if (playerIndex == 'W' || playerIndex == 'X') {
+                scores.get(boardState.charAt(0))[0] += 2;
+                scores.get(boardState.charAt(0))[1]++;
+                checkedLongestRoad = true;
+            }
+        }
 
-        if (largestArmy[0] == largestArmy[1] && largestArmy[0] >= 3) { // the first player to build a Road sequence of length 5 gains
-                                                // the longest road title; if another player also builds a sequence of length
-                                                // 5, the title stays with the player who did it first.
-            scores.get(boardState.charAt(0))[0] += 2;
-            scores.get(boardState.charAt(0))[2]++;
-            checkedTitles = true;
-        }
-        if (longestRoad[0] == longestRoad[1] && longestRoad[0] >= 5) {
-            scores.get(boardState.charAt(0))[0] += 2;
-            scores.get(boardState.charAt(0))[1]++;
-            checkedTitles = true;
-        }
+
 
         for (Character player : new Character[]{'W', 'X'}) {
-            int score = 0;
             String playerBoardState = CatanDiceExtra.validateClass.Misc.getPlayerBoardState(boardState, player);
 
-            if (!checkedTitles) {
-                if (largestArmy[index] == Arrays.stream(largestArmy).max().getAsInt() && largestArmy[index] >= 3) {
-                    score += 2;
+            if (!checkedLargestArmy) {
+                if (largestArmy[index] == Arrays.stream(largestArmy).max().getAsInt()) {
+                    scores.get(player)[0] += 2;
                     if (scores.get(player)[2] < 1) {
                         scores.get(player)[2]++;
                     }
                 }
-                if (longestRoad[index] == Arrays.stream(longestRoad).max().getAsInt() && longestRoad[index] >= 5) {
-                    score +=2;
+            }
+            if (!checkedLongestRoad) {
+                if (longestRoad[index] == Arrays.stream(longestRoad).max().getAsInt()) {
+                    scores.get(player)[0] +=2;
                     if (scores.get(player)[1] < 1) {
                         scores.get(player)[1]++;
                     }
@@ -172,12 +197,11 @@ public class Board {
             }
             for (Character c : playerBoardState.toCharArray()) {
                 if (c == 'S') {
-                    score++;
+                    scores.get(player)[0]++;
                 }
                 else if (c == 'T' || c == 'C') {
-                    score += 2;
+                    scores.get(player)[0] += 2;
                 }
-                scores.get(player)[0] = score;
             }
             index++;
         }
@@ -337,8 +361,10 @@ public class Board {
 
             List<Castle> castleList = Arrays.asList(castles); // filter by owner
             castleList = castleList.stream().filter(castle -> filterCondition(castle, name.charAt(0))).collect(Collectors.toList());
-            List<Tile> tileList = Arrays.asList(tiles);
-            tileList = tileList.stream().filter(tile -> filterCondition(tile, name.charAt(0))).collect(Collectors.toList());
+            List<Tile> untileList = Arrays.asList(tiles);
+            untileList = untileList.stream().filter(tile -> filterCondition(tile, name.charAt(0)) && !tile.used).collect(Collectors.toList());
+            List<Tile> usedtileList = Arrays.asList(tiles);
+            usedtileList = usedtileList.stream().filter(tile -> filterCondition(tile, name.charAt(0)) && tile.used).collect(Collectors.toList());
             List<Road> roadList = new ArrayList<>();
             roadList.addAll(roads);
             roadList = roadList.stream().filter(road -> filterCondition(road, name.charAt(0))).collect(Collectors.toList());
@@ -352,7 +378,10 @@ public class Board {
             for (Castle castle : castleList) { // add to each boardstate
                 playerBoardState += castle.toString();
             }
-            for (Tile tile : tileList) {
+            for (Tile tile : untileList) {
+                playerBoardState += tile.toString();
+            }
+            for (Tile tile : usedtileList) {
                 playerBoardState += tile.toString();
             }
             for (Object road : roadArr) {
