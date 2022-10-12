@@ -1427,9 +1427,6 @@ public class CatanDiceExtra {
         if (isGameOver(boardState)) {
             return boardState;
         }
-        if (action == "buildS20") { // Catching what I think is a bugged test.
-            return "X63lWK00K01R0003R0004R0104R0307R0408R0712S00S01S07XK02K05K06R0105R0206R0509R0610R0913R0914R1014R1015R1318R1419R1520S09S20T10W03X08RA";
-        }
         String playerId = Character.toString(boardState.charAt(0));
         return switch (action.substring(0, 4)) { // here we match for the type of action we received
             case "keep" -> keep(boardState, action, playerId);

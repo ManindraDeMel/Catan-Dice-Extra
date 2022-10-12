@@ -166,7 +166,7 @@ public class Board {
                     score += 2;
                 }
                 if (longestRoad[index] == Arrays.stream(longestRoad).max().getAsInt() && longestRoad[index] >= 5) {
-                    score++;
+                    score +=2;
                 }
             }
             for (Character c : playerBoardState.toCharArray()) {
