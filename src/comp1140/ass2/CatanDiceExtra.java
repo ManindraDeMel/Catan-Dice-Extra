@@ -1476,16 +1476,51 @@ public class CatanDiceExtra {
      * @return string representation of the new board state
      */
     public static String applyActionSequence(String boardState, String[] actionSequence) {
-        HashMap<Character, String> swapPlayer = new HashMap<>(){{put('W', "X");put('X',"W");}};
         // Iterating through each action in the array and applying action
         // Returned string is re-stored in boardState
         if (isActionSequenceValid(boardState, actionSequence)) {
-            for (int i = 0; i < actionSequence.length; i++) {
-                boardState = applyAction(boardState, actionSequence[i]);
-                boardState = boardState.replaceFirst(Character.toString(boardState.charAt(0)), swapPlayer.get(boardState.charAt(0)));
+            int numDice = Integer.parseInt(boardState.substring(1,2));
+            for (String action : actionSequence) {
+                if (boardState == "W00WXW00X00") { // if start of the game
+                    boardState = applyAction(boardState, action); // apply the action
+                    boardState = swapPlayer(boardState);
+                }
+                else if (boardState.length() == 16) {
+                    boardState = applyAction(boardState, action);
+                    boardState = swapPlayer(boardState);
+                    boardState = boardState.replaceFirst("0", "3"); // make dice 3
+                    boardState = boardState.replaceFirst("0", "1"); // make turn 1
+                    boardState = addNewResources(boardState, 3);
+
+                }
+                else {
+                    boardState = applyAction(boardState, action);
+                    if (numDice < 6) {
+                        boardState = addNewResources(boardState, numDice + 1);
+                    }
+                    else {
+                        boardState = addNewResources(boardState, numDice);
+                    }
+                    if (action.charAt(0) != 'k') {
+                        boardState = swapPlayer(boardState);
+                    }
+                }
             }
         }
         return boardState;
+    }
+
+    private static String swapPlayer(String boardState) {
+        HashMap<Character, String> swapPlayer = new HashMap<>(){{put('W', "X");put('X',"W");}};
+        return boardState.replaceFirst(Character.toString(boardState.charAt(0)), swapPlayer.get(boardState.charAt(0)));
+    }
+
+    private static String addNewResources(String boardState, int numDice) {
+        String resources = rollDice(numDice);
+        if (validateClass.Misc.getResourcesFromBoardState(boardState).size() == 0) {
+            return boardState.substring(0, 3) + resources + boardState.substring(3); // handle base case
+        }
+        return boardState.substring(0, 3) + resources + boardState.substring(resources.length());
     }
 
     /**
