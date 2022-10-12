@@ -260,6 +260,14 @@ public class Board {
         }
     }
 
+    public static String addNewBuild(String boardState, String action, String playerId) {
+        Board board = new Board(Board.getTurnFromBoardState(boardState), Board.getScoreFromBoardState(boardState));
+        board.applyBoardState(boardState);
+        board.buildBuilding(action.substring(5), playerId);
+        return Board.toStringWithNewScore(board);
+    }
+
+
     public void buildBuilding(String actionSub, String playerId) {
         turn = turn.substring(0, 3) + Board.removeResources(turn.substring(3), actionSub.charAt(0));
         switch (actionSub.charAt(0)) {

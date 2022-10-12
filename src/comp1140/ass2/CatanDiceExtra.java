@@ -501,7 +501,6 @@ public class CatanDiceExtra {
         }
         return sortString(resources);
     }
-
     static String sortString(String resources) {
         char[] sortedResource = resources.toCharArray();
         Arrays.sort(sortedResource);
@@ -630,6 +629,7 @@ public class CatanDiceExtra {
                     if (!turnBoardState.contains(c)) {
                         return false;
                     }
+                    turnBoardState.remove(c);
                 }
                 return true;
             }
@@ -702,11 +702,13 @@ public class CatanDiceExtra {
             }
             // ####################
             private static boolean validateKnightBuild(String boardState, String action) {
-                int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
-                if (actionCoord >= 0 && actionCoord < 20) { // validate location
-                    ArrayList<Integer> surroundingCoords = Misc.knightIndexingToRowIndexing.get(actionCoord); // convert to the knight coordinate system
-                    String playerBoardState = Misc.getPlayerBoardState(boardState); // extract coords
-                    return roadConnectedToKnight(playerBoardState, surroundingCoords) || settlementConnectedToKnight(playerBoardState, surroundingCoords); // connected to road || connected to settlement.
+                if (!boardState.contains(action.substring(5))) {
+                    int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
+                    if (actionCoord >= 0 && actionCoord < 20) { // validate location
+                        ArrayList<Integer> surroundingCoords = Misc.knightIndexingToRowIndexing.get(actionCoord); // convert to the knight coordinate system
+                        String playerBoardState = Misc.getPlayerBoardState(boardState); // extract coords
+                        return roadConnectedToKnight(playerBoardState, surroundingCoords) || settlementConnectedToKnight(playerBoardState, surroundingCoords); // connected to road || connected to settlement.
+                    }
                 }
                 return false;
             }
@@ -1125,7 +1127,7 @@ public class CatanDiceExtra {
                 ArrayList<String> roadSequence = new ArrayList<>();
                 roadSequence.add(index);
 
-                getAllConnectedRoads(playerIndexes, playerNeighbours, allRoadSequence, roadSequence, j, notVisited);
+                longestRoadHelper.getAllConnectedRoads(playerIndexes, playerNeighbours, allRoadSequence, roadSequence, j, notVisited);
             }
 
             // Assigning the allRoadSequence Arraylist to the correct player
@@ -1153,39 +1155,6 @@ public class CatanDiceExtra {
 
         return longestRoadArr;
     }
-
-    /**
-     * Finds all the roads sequences for a player
-     *
-     * @param playerIndexes road indexes of a player
-     * @param playerNeighbours connected movable neighbouring road indexes
-     * @param allRoadSequence all the road sequence found so far
-     * @param roadSequence current road sequence found
-     * @param pos current index
-     * @param notVisited indexes of roads where not visited
-     */
-    private static void getAllConnectedRoads(ArrayList<String> playerIndexes, ArrayList<ArrayList<String>> playerNeighbours,
-                                             HashSet<ArrayList<String>> allRoadSequence, ArrayList<String> roadSequence, int pos,
-                                             ArrayList<ArrayList<String>> notVisited) {
-
-        List<String> longestRoadState = new ArrayList<>(roadSequence);
-
-        for (var road : playerNeighbours.get(pos)) {
-            if (!notVisited.get(pos).contains(road)) continue;
-
-            roadSequence = new ArrayList<>(longestRoadState);
-            roadSequence.add(road);
-
-            allRoadSequence.add(roadSequence);
-
-            notVisited.get(pos).remove(road);
-            notVisited.get(playerIndexes.indexOf(road)).remove(playerIndexes.get(pos));
-            getAllConnectedRoads(playerIndexes, playerNeighbours, allRoadSequence, roadSequence, playerIndexes.indexOf(road), notVisited);
-            notVisited.get(pos).add(road);
-            notVisited.get(playerIndexes.indexOf(road)).add(playerIndexes.get(pos));
-        }
-    }
-
     private class longestRoadHelper {
 
         /**
@@ -1367,6 +1336,37 @@ public class CatanDiceExtra {
                 allNeighbourRoads.put(roads[i], neighbours);
             }
         }
+        /**
+         * Finds all the roads sequences for a player
+         *
+         * @param playerIndexes road indexes of a player
+         * @param playerNeighbours connected movable neighbouring road indexes
+         * @param allRoadSequence all the road sequence found so far
+         * @param roadSequence current road sequence found
+         * @param pos current index
+         * @param notVisited indexes of roads where not visited
+         */
+        private static void getAllConnectedRoads(ArrayList<String> playerIndexes, ArrayList<ArrayList<String>> playerNeighbours,
+                                                 HashSet<ArrayList<String>> allRoadSequence, ArrayList<String> roadSequence, int pos,
+                                                 ArrayList<ArrayList<String>> notVisited) {
+
+            List<String> longestRoadState = new ArrayList<>(roadSequence);
+
+            for (var road : playerNeighbours.get(pos)) {
+                if (!notVisited.get(pos).contains(road)) continue;
+
+                roadSequence = new ArrayList<>(longestRoadState);
+                roadSequence.add(road);
+
+                allRoadSequence.add(roadSequence);
+
+                notVisited.get(pos).remove(road);
+                notVisited.get(playerIndexes.indexOf(road)).remove(playerIndexes.get(pos));
+                getAllConnectedRoads(playerIndexes, playerNeighbours, allRoadSequence, roadSequence, playerIndexes.indexOf(road), notVisited);
+                notVisited.get(pos).add(road);
+                notVisited.get(playerIndexes.indexOf(road)).add(playerIndexes.get(pos));
+            }
+        }
     }
 
     /**
@@ -1429,28 +1429,14 @@ public class CatanDiceExtra {
         }
         String playerId = Character.toString(boardState.charAt(0));
         return switch (action.substring(0, 4)) { // here we match for the type of action we received
-            case "keep" -> keep(boardState, action, playerId);
-            case "buil" -> addNewBuild(boardState, action, playerId);
+            case "keep" -> Prices.keep(boardState, action);
+            case "buil" -> Board.addNewBuild(boardState, action, playerId);
             case "trad" -> Prices.trade(boardState, action);
             case "swap" -> Prices.swap(boardState, action.substring(4), playerId);
             default -> boardState;
         };
     }
 
-    private static String addNewBuild(String boardState, String action, String playerId) {
-        Board board = new Board(Board.getTurnFromBoardState(boardState), Board.getScoreFromBoardState(boardState));
-        board.applyBoardState(boardState);
-        board.buildBuilding(action.substring(5), playerId);
-        return Board.toStringWithNewScore(board);
-    }
-    private static String keep(String boardState, String action, String playerId) {
-        boardState = boardState.substring(0, 2) + String.valueOf(Integer.parseInt(boardState.substring(2, 3)) + 1) + boardState.substring(3); // +1 to roll counter
-        int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
-        String oldResources = boardState.substring(3, endOfResourcesIndex);
-        String newResources = Prices.modifyResources(oldResources, action.substring(4), Integer.parseInt(boardState.substring(1, 2)));
-        boardState = boardState.replace(oldResources, newResources);
-        return boardState;
-    }
     /**
      * Given valid board state, this method checks if a sequence of player
      * actions is executable.
@@ -1490,13 +1476,15 @@ public class CatanDiceExtra {
      * @return string representation of the new board state
      */
     public static String applyActionSequence(String boardState, String[] actionSequence) {
+        HashMap<Character, String> swapPlayer = new HashMap<>(){{put('W', "X");put('X',"W");}};
         // Iterating through each action in the array and applying action
         // Returned string is re-stored in boardState
-        for (int i = 0; i < actionSequence.length; i++) {
-            if (isActionValid(boardState, actionSequence[i]))
+        if (isActionSequenceValid(boardState, actionSequence)) {
+            for (int i = 0; i < actionSequence.length; i++) {
                 boardState = applyAction(boardState, actionSequence[i]);
+                boardState = boardState.replaceFirst(Character.toString(boardState.charAt(0)), swapPlayer.get(boardState.charAt(0)));
+            }
         }
-
         return boardState;
     }
 
@@ -1573,5 +1561,9 @@ public class CatanDiceExtra {
 
     public static String GameOver() {
         return "";
+    }
+
+    public static void main(String[] args) {
+        applyActionSequence("X00WR0104XW00X00", new String[]{"buildR1520"});
     }
 }

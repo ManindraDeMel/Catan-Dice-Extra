@@ -150,6 +150,14 @@ public class Prices {
         return Board.toStringWithNewScore(board);
     }
 
+    public static String keep(String boardState, String action) {
+        boardState = boardState.substring(0, 2) + String.valueOf(Integer.parseInt(boardState.substring(2, 3)) + 1) + boardState.substring(3); // +1 to roll counter
+        int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
+        String oldResources = boardState.substring(3, endOfResourcesIndex);
+        String newResources = Prices.modifyResources(oldResources, action.substring(4), Integer.parseInt(boardState.substring(1, 2)));
+        boardState = boardState.replace(oldResources, newResources);
+        return boardState;
+    }
     private static boolean setUsedTrue(String actionSub, String playerId, HashMap<String, TileType> convertToTileType, Board board, int i) {
         if (board.tiles[i].Owner.name != "") {
             if (board.tiles[i].Owner.name.charAt(0) == playerId.charAt(0)) {
