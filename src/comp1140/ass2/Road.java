@@ -38,6 +38,6 @@ public class Road extends GamePiece implements Comparable<Road>{
 
     @Override
     public int compareTo(Road r) {
-        return (coord1 == r.coord1) ? 0 : coord1.index < r.coord1.index ? -1 : 1;
+        return (coord1 == r.coord1) ? (coord2 == r.coord2) ? 0 : coord2.index < r.coord2.index ? -1 : 1 : coord1.index < r.coord1.index ? -1 : 1;
     }
 }
