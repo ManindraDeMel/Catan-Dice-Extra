@@ -131,39 +131,55 @@ public class Prices {
             put("o", TileType.ore);
             put("w", TileType.wool);
         }};
-
-        boardState = boardState.replaceFirst(actionSub.substring(0,1), actionSub.substring(1));
-        String turn = boardState.substring(0, boardState.indexOf('W', 2));
-        String scores = boardState.substring(boardState.indexOf('W', boardState.indexOf('W', 2) + 1));
-
-        Board board = new Board();
+        String resources = Board.getTurnFromBoardState(boardState).substring(3);
+        String newResources = CatanDiceExtra.sortString(resources.replaceFirst(actionSub.substring(0,1), actionSub.substring(1)));
+        boardState = boardState.replaceFirst(resources, newResources);
+        Board board = new Board(Board.getTurnFromBoardState(boardState), Board.getScoreFromBoardState(boardState));
         board.applyBoardState(boardState);
+        boolean foundSpecificKnight = false;
         for (int i = 0; i < board.tiles.length; i++) {
-            if (board.tiles[i].Owner.name != "") { // check material specific knights
-                if (board.tiles[i].Owner.name.charAt(0) == playerId.charAt(0)) {
-                    if (board.tiles[i].tileType == convertToTileType.get(actionSub.substring(1))) {
+            if (!(i == 9 || i == 10)) {
+                foundSpecificKnight = setUsedTrue(actionSub, playerId, convertToTileType, board, i);
+            }
+        }
+        if (!(foundSpecificKnight)) {
+            for (int i = 9; i < 11; i++) { // check multipurpose knight
+                setUsedTrue(actionSub, playerId, convertToTileType, board, i);
+            }
+        }
+        return Board.toStringWithNewScore(board);
+    }
+
+    public static String keep(String boardState, String action) {
+        boardState = boardState.substring(0, 2) + String.valueOf(Integer.parseInt(boardState.substring(2, 3)) + 1) + boardState.substring(3); // +1 to roll counter
+        int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
+        String oldResources = boardState.substring(3, endOfResourcesIndex);
+        String newResources = Prices.modifyResources(oldResources, action.substring(4), Integer.parseInt(boardState.substring(1, 2)));
+        boardState = boardState.replace(oldResources, newResources);
+        return boardState;
+    }
+    private static boolean setUsedTrue(String actionSub, String playerId, HashMap<String, TileType> convertToTileType, Board board, int i) {
+        if (board.tiles[i].Owner.name != "") {
+            if (board.tiles[i].Owner.name.charAt(0) == playerId.charAt(0)) {
+                if (board.tiles[i].tileType == convertToTileType.get(actionSub.substring(1)) || board.tiles[i].tileType == TileType.desert) {
+                    if (!board.tiles[i].used) {
                         board.tiles[i].used = true;
+                        return true;
                     }
                 }
             }
         }
-        for (int i = 9; i < 11; i++) { // check multipurpose knight
-            if (board.tiles[i].Owner.name.charAt(0) == playerId.charAt(0)) {
-                if (board.tiles[i].tileType == convertToTileType.get(actionSub.substring(1))) {
-                    board.tiles[i].used = true;
-                }
-            }
-        }
-        return turn + board + scores;
+        return false;
     }
+
     public static String trade(String boardState, String action) {
         int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
         String oldResources = boardState.substring(3, endOfResourcesIndex);
         String newResources = "";
         newResources = oldResources;
-        for (char c : action.substring(1).toCharArray()) {
+        for (char c : action.substring(5).toCharArray()) {
             newResources = newResources.replaceFirst("m", "");
-            newResources.replaceFirst("m", Character.toString(c));
+            newResources = newResources.replaceFirst("m", Character.toString(c));
         }
         newResources = CatanDiceExtra.sortString(newResources);
         return boardState.replace(oldResources, newResources);

@@ -1,8 +1,6 @@
 package comp1140.ass2;
 
-import java.util.Set;
-
-public class Settlement extends GamePiece{
+public class Settlement extends GamePiece {
     public SettlementState state;
     public Boolean isCityable;
     public Boolean isCity;
@@ -23,7 +21,7 @@ public class Settlement extends GamePiece{
     public Settlement(Player player, Coordinate coord, Boolean cityable, int index) {
         super(player);
         this.coord = coord;
-        this.isCityable=cityable;
+        this.isCityable = cityable;
         this.isBuilt = false;
         this.isCity = false;
         this.intersectionIndex = index;
@@ -31,9 +29,9 @@ public class Settlement extends GamePiece{
 
     @Override
     public String toString() {
-        if (isCityable)
-            return "T" + CatanDiceExtra.validateClass.Misc.addZero(coord.index);
+        if (isCityable && isCity)
+            return "T" + CatanDiceExtra.validateClass.Misc.addZero(intersectionIndex);
         else
-            return "S" + CatanDiceExtra.validateClass.Misc.addZero(coord.index);
+            return "S" + CatanDiceExtra.validateClass.Misc.addZero(intersectionIndex);
     }
 }
