@@ -129,31 +129,26 @@ public class Board {
     }
 
 
-    public static int[] calculateScores(String boardState) { // calculates the points for each player [W,X] of this boardstate.
-        int[] scores = new int[2];
+    public static HashMap<Character, Integer[]> calculateScores(String boardState) { // calculates the points for each player [W,X] of this boardstate.
+        HashMap<Character, Integer[]> scores = new HashMap<>(){{
+            put('W', new Integer[]{0, 0, 0});
+            put('X', new Integer[]{0, 0, 0});
+        }};
         int index = 0;
         boolean checkedTitles = false;
         int[] largestArmy = CatanDiceExtra.largestArmy(boardState);
         int[] longestRoad = CatanDiceExtra.longestRoad(boardState);
 
-        if (largestArmy[0] == largestArmy[1]) { // the first player to build a Road sequence of length 5 gains
+        if (largestArmy[0] == largestArmy[1] && largestArmy[0] >= 3) { // the first player to build a Road sequence of length 5 gains
                                                 // the longest road title; if another player also builds a sequence of length
                                                 // 5, the title stays with the player who did it first.
-            if (boardState.charAt(0) == 'W') {
-                scores[0] += 2;
-            }
-            else {
-                scores[1] += 2;
-            }
+            scores.get(boardState.charAt(0))[0] += 2;
+            scores.get(boardState.charAt(0))[2]++;
             checkedTitles = true;
         }
-        if (longestRoad[0] == longestRoad[1]) {
-            if (boardState.charAt(0) == 'W') {
-                scores[0]+=2;
-            }
-            else {
-                scores[1]+=2;
-            }
+        if (longestRoad[0] == longestRoad[1] && longestRoad[0] >= 5) {
+            scores.get(boardState.charAt(0))[0] += 2;
+            scores.get(boardState.charAt(0))[1]++;
             checkedTitles = true;
         }
 
@@ -164,9 +159,15 @@ public class Board {
             if (!checkedTitles) {
                 if (largestArmy[index] == Arrays.stream(largestArmy).max().getAsInt() && largestArmy[index] >= 3) {
                     score += 2;
+                    if (scores.get(player)[2] < 1) {
+                        scores.get(player)[2]++;
+                    }
                 }
                 if (longestRoad[index] == Arrays.stream(longestRoad).max().getAsInt() && longestRoad[index] >= 5) {
                     score +=2;
+                    if (scores.get(player)[1] < 1) {
+                        scores.get(player)[1]++;
+                    }
                 }
             }
             for (Character c : playerBoardState.toCharArray()) {
@@ -176,37 +177,16 @@ public class Board {
                 else if (c == 'T' || c == 'C') {
                     score += 2;
                 }
-                scores[index] = score;
+                scores.get(player)[0] = score;
             }
             index++;
         }
         return scores;
     }
 
-    public static HashMap<Character, String[]> getTitleHoldersFromBoardState(String boardState) {
-        HashMap<Character, String[]> playerToTitle = new HashMap<>(){{
-            put('W', new String[]{"", ""});
-            put('X', new String[]{"", ""});
-        }};
-        String oldScore = Board.getScoreFromBoardState(boardState);
-        if (!(oldScore.contains("A") || oldScore.contains("R"))) {
-            return null;
-        }
-        String wScore = oldScore.substring(0, oldScore.indexOf('X'));
-        String xScore = oldScore.substring(oldScore.indexOf('X'));
-        String[] titles = new String[]{"R", "A"};
-        for (int i = 0; i < titles.length; i++) {
-            String t = titles[i];
-            if (wScore.contains(t)) {
-                playerToTitle.get('W')[i] = t;
-            }
-            else if (xScore.contains(t)) {
-                playerToTitle.get('X')[i] = t;
-            }
-        }
-
-        return playerToTitle;
-    } // gets TitleHolders. I.e. {'W' : ['R', 'A'], 'X' : []} means player W has both the longest road and largest army.
+    public static int[] extractScoreFromNewScore(HashMap<Character, Integer[]> h) {
+        return new int[]{h.get('W')[0], h.get('X')[0]};
+    }
 
     /**
      * Applies a Player Board State String to an already instantiated board, changeing the states and ownership of various structures.
@@ -327,16 +307,20 @@ public class Board {
         return boardState.substring(0, boardState.indexOf('W', 2));
     }
     public static String toStringWithNewScore(Board board) {
-        String wScore = "W" + CatanDiceExtra.validateClass.Misc.addZero(Board.calculateScores(board.toString())[0]);
-        String xScore = "X" + CatanDiceExtra.validateClass.Misc.addZero(Board.calculateScores(board.toString())[1]);
-        HashMap<Character, String[]> playerTitles = Board.getTitleHoldersFromBoardState(board.toString());
-        if (playerTitles != null) {
-            for (String s : playerTitles.get('W')) {
-                wScore += s;
-            }
-            for (String s : playerTitles.get('X')) {
-                xScore += s;
-            }
+        HashMap<Character, Integer[]> scores = Board.calculateScores(board.toString());
+        String wScore = "W" + CatanDiceExtra.validateClass.Misc.addZero(Board.extractScoreFromNewScore(scores)[0]);
+        String xScore = "X" + CatanDiceExtra.validateClass.Misc.addZero(Board.extractScoreFromNewScore(scores)[1]);
+        if (scores.get('W')[1] == 1) {
+            wScore += "R";
+        }
+        else if (scores.get('X')[1] == 1) {
+            xScore += "R";
+        }
+        if (scores.get('W')[2] == 1) {
+            wScore += "A";
+        }
+        else if (scores.get('X')[2] == 1) {
+            xScore += "A";
         }
         String newScore = wScore + xScore;
         return board.toString().replace(board.oldScore, newScore);
