@@ -484,6 +484,7 @@ public class CatanDiceExtra {
      * @param numOfDice the number of dices to roll
      * @return alphabetically ordered [Resources] with characters
      * 'b', 'l', 'w', 'g', 'o', 'm'.
+     * Authored By Manindra de Mel, u7156805
      */
     public static String rollDice(int numOfDice) {
         HashMap<Integer, String> mapToDiceVal = new HashMap<>() {{
@@ -545,6 +546,7 @@ public class CatanDiceExtra {
      * @param boardState: string representation of the board state.
      * @param action: string representation of the player action.
      * @return true iff the action is executable, false otherwise.
+     * Authored By Manindra de Mel, u7156805
      */
 
     public static boolean isActionValid(String boardState, String action) {
@@ -561,7 +563,19 @@ public class CatanDiceExtra {
             default -> false;
         };
     }
+
+    /**
+     * A helper class which checks for if the actions are valid
+     * Authored By Manindra de Mel, u7156805
+     */
     public class validateClass { // helper class which handles all the different action cases
+        /**
+         * Checks if a build action is valid
+         * @param boardState a string of the boardstate
+         * @param action the action
+         * @return a bool if the build is valid or not
+         * Authored By Manindra de Mel, u7156805
+         */
         public static boolean validateBuild(String boardState, String action) {
             ArrayList<Character> validformat = new ArrayList<>(Arrays.asList( // a filter for all the accepted characters
                     'b',
@@ -585,6 +599,9 @@ public class CatanDiceExtra {
             }
             // ###########
             Character buildType = action.charAt(5);
+            /**
+             * Match case for the type of build.
+             */
             if (ValidateBuildHelperFuncs.sufficentResourcesForBuild(boardState, buildType)) { // check for resources
                 return switch (buildType) {
                     case 'C' -> ValidateBuildHelperFuncs.validateCastleBuild(boardState, action.charAt(action.length() - 1)); // Matching the type of building
@@ -598,6 +615,14 @@ public class CatanDiceExtra {
             return ValidateBuildHelperFuncs.checkBaseCase(boardState, action, buildType); // if there aren't sufficient resources, the game might have just begun.
         }
         // #######################################################################################
+
+        /**
+         * Checks if a trade action is valid
+         * @param boardState the boardstate as a string
+         * @param action the action as a string
+         * @return a bool returning if the action is valid or not
+         * Authored By Manindra de Mel, u7156805
+         */
         public static boolean validateTrade(String boardState, String action) {
             ArrayList<Character> validFormat = new ArrayList<>(Arrays.asList('t', 'r', 'a', 'd', 'e')); // another filter
             validFormat.addAll(Misc.possibleResources); // checks for format
@@ -620,6 +645,13 @@ public class CatanDiceExtra {
             return false;
         }
         // #######################################################################################
+        /**
+         * Checks if a keep action is valid
+         * @param boardState the boardstate as a string
+         * @param action the action as a string
+         * @return a bool returning if the action is valid or not
+         * Authored By Manindra de Mel, u7156805
+         */
         public static boolean validateKeep(String boardState, String action) { // validate keep action
             int numRolls = Integer.parseInt(Character.toString(boardState.toCharArray()[2]));
             if (numRolls < 3) { // check rolls
@@ -636,6 +668,13 @@ public class CatanDiceExtra {
             return false;
         }
         // #######################################################################################
+        /**
+         * Checks if a swap action is valid
+         * @param boardState the boardstate as a string
+         * @param action the action as a string
+         * @return a bool returning if the action is valid or not
+         * Authored By Manindra de Mel, u7156805
+         */
         public static boolean validateSwap(String boardState, String action) {
             ArrayList<Character> resources = Misc.getResourcesFromBoardState(boardState);
             Character resourceIn = action.charAt(4); // get the traded materials
@@ -668,6 +707,11 @@ public class CatanDiceExtra {
             return false;
         }
         // ####################################################################################### Helper functions for validateBuild();
+
+        /**
+         * A class which helps with the validateBuild() method, since the action has further complexity
+         * Authored By Manindra de Mel, u7156805         *
+         */
         private class ValidateBuildHelperFuncs { // a private helper class for the 'build' action since its complex in comparison to the other actions.
             // #######################################################################################
             private static boolean validateCastleBuild(String boardState, Character castlePosition) {
@@ -943,6 +987,10 @@ public class CatanDiceExtra {
             }
         }
         // ####################################################################################### Miscellaneous Helper functions / constants
+
+        /**
+         * Miscellaneous functions used throughout this task and other tasks
+         */
         public class Misc {
             private static final List<Character> possibleResources = new ArrayList<>(Arrays.asList('b', 'g', 'l', 'm', 'o', 'w'));
 
@@ -1099,6 +1147,7 @@ public class CatanDiceExtra {
      * - The method should return {6, 4}
      * @param boardState: string representation of the board state.
      * @return array of contiguous road lengths, one per player.
+     * Authored by Arjun Raj
      */
     public static int[] longestRoad(String boardState) {
         // Defining array to hold length of the longest road
@@ -1422,6 +1471,7 @@ public class CatanDiceExtra {
      * @param boardState: string representation of the board state.
      * @param action: string representation of the player action.
      * @return string representation of the updated board state.
+     * Authored By Manindra de Mel, u7156805
      */
     public static String applyAction(String boardState, String action) {
         if (isGameOver(boardState)) {
@@ -1447,6 +1497,7 @@ public class CatanDiceExtra {
      * @param boardState: string representation of the board state.
      * @param actionSequence: array of strings, each representing one action
      * @return true if the sequence is executable, false otherwise.
+     * Authored By Manindra de Mel, u7156805 & Arjun Raj u7156805
      */
     public static boolean isActionSequenceValid(String boardState, String[] actionSequence) {
         // Iterating through each action in the array and checking if valid
