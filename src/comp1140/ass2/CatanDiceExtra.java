@@ -1,6 +1,7 @@
 package comp1140.ass2;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CatanDiceExtra {
     ArrayList<Player> players = new ArrayList<>();
@@ -1526,52 +1527,135 @@ public class CatanDiceExtra {
      * @param actionSequence: array of strings, each representing one action
      * @return string representation of the new board state
      */
-    public static String applyActionSequence(String boardState, String[] actionSequence) { // TODO feel free to delete all of this, doesn't seem to be working.
+    public static String applyActionSequence(String boardState, String[] actionSequence) {
         // Iterating through each action in the array and applying action
         // Returned string is re-stored in boardState
-        if (isActionSequenceValid(boardState, actionSequence)) {
-            int numDice = Integer.parseInt(boardState.substring(1,2));
-            for (String action : actionSequence) {
-                if (boardState == "W00WXW00X00") { // if start of the game
-                    boardState = applyAction(boardState, action); // apply the action
-                    boardState = swapPlayer(boardState);
-                }
-                else if (boardState.length() == 16) {
+        if (actionSequence.length != 0) { // if player doesnt make any moves and ends their turn
+            if (isActionSequenceValid(boardState, actionSequence)) {
+                for (String action : actionSequence) {
                     boardState = applyAction(boardState, action);
-                    boardState = swapPlayer(boardState);
-                    boardState = boardState.replaceFirst("0", "3"); // make dice 3
-                    boardState = boardState.replaceFirst("0", "1"); // make turn 1
-                    boardState = addNewResources(boardState, 3);
-
-                }
-                else {
-                    boardState = applyAction(boardState, action);
-                    if (numDice < 6) {
-                        boardState = addNewResources(boardState, numDice + 1);
+                    if (action.charAt(0) == 'b') {
+                        boardState = applyActionSequenceHelper.swapPlayer(boardState);
                     }
-                    else {
-                        boardState = addNewResources(boardState, numDice);
-                    }
-                    if (action.charAt(0) != 'k') {
-                        boardState = swapPlayer(boardState);
+                    if (!applyActionSequenceHelper.isStartingPhase(boardState)) {
+                        int numDice = Integer.parseInt(boardState.substring(1,2));
+                        if (applyActionSequenceHelper.isTransitionPhase(boardState)) { // this should always be matched on player 1's second turn.
+                            boardState = boardState.replaceFirst("0", "3"); // Make the dice 3.
+                            boardState = boardState.replaceFirst("0", "1"); // Make the turn 1.
+                            boardState = applyActionSequenceHelper.addNewResources(boardState, 3);
+                        }
+                        else if (numDice < 6) {
+                            boardState.replaceFirst(boardState.substring(1,2), String.valueOf(numDice + 1)); // sequentially add +1 to the dice on each player's turn
+                            boardState = applyActionSequenceHelper.addNewResources(boardState, numDice + 1);
+                            boardState = applyActionSequenceHelper.resetTurnCounter(boardState);
+                        }
+                        else {
+                            boardState = applyActionSequenceHelper.addNewResources(boardState, 6);
+                            boardState = applyActionSequenceHelper.resetTurnCounter(boardState);
+                        }
                     }
                 }
             }
         }
+        else {
+            boardState = applyActionSequenceHelper.swapPlayer(boardState); // swap player
+            boardState = applyActionSequenceHelper.resetTurnCounter(boardState);
+            int numDice = Integer.parseInt(boardState.substring(1,2));
+            if (numDice < 6) { // if the dice is less than 6 then make the next player's dice += 1
+                boardState = boardState.replaceFirst(boardState.substring(1,2), String.valueOf(numDice + 1));
+                numDice++;
+            }
+            boardState = applyActionSequenceHelper.addNewResources(boardState, numDice); // generate new resources
+        }
         return boardState;
     }
+    class applyActionSequenceHelper {
+        /**
+         * Determines if a givenboard state is in it's starting phase (i.e. the players are building their first roads on the coast)
+         * @param boardState
+         * @return true if the boardstate is in the starting phase
+         * Authored By Manindra de Mel, u7156805
+         */
 
-    private static String swapPlayer(String boardState) {
-        HashMap<Character, String> swapPlayer = new HashMap<>(){{put('W', "X");put('X',"W");}};
-        return boardState.replaceFirst(Character.toString(boardState.charAt(0)), swapPlayer.get(boardState.charAt(0)));
-    }
-
-    private static String addNewResources(String boardState, int numDice) {
-        String resources = rollDice(numDice);
-        if (validateClass.Misc.getResourcesFromBoardState(boardState).size() == 0) {
-            return boardState.substring(0, 3) + resources + boardState.substring(3); // handle base case
+        public static boolean isStartingPhase(String boardState) {
+            return Integer.parseInt(boardState.substring(1,2)) == 0 && !playersHaveAtLeastOneRoad(boardState);
         }
-        return boardState.substring(0, 3) + resources + boardState.substring(resources.length());
+
+        /**
+         * The transition phase is a singular phase where the last player who hasn't built a road just built there road and now we're
+         * back to the starting player who receives 3 dice and the game officially 'transitions' out of the starting phase.
+         * @param boardState
+         * @return if the game is in a transition stage
+         * Authored By Manindra de Mel, u7156805
+         */
+        public static boolean isTransitionPhase(String boardState) {
+            return Integer.parseInt(boardState.substring(1,2)) == 0 && playersHaveAtLeastOneRoad(boardState);
+        }
+
+        /**
+         * A helper for 'isStartingPhase()' which determines if a player has at least 1 road
+         * @param boardState
+         * @return if each player has at least one road
+         * Authored By Manindra de Mel, u7156805
+         */
+        public static boolean playersHaveAtLeastOneRoad(String boardState) {
+            Board board = new Board(Board.getTurnFromBoardState(boardState), Board.getScoreFromBoardState(boardState));
+            board.applyBoardState(boardState);
+            int index = 0;
+            String[] players = new String[]{"W", "X"};
+            Boolean[] roadIsOwned = new Boolean[players.length];
+            for (int i = 0; i < players.length; i++) { // a bitmap of each of the players which is updated if a road owned by them is found.
+                roadIsOwned[i] = false;
+            }
+            for (String s : players) {
+                for (Road r : board.roads) {
+                    if (r.Owner.name.charAt(0) == s.charAt(0)) {
+                        roadIsOwned[index] = true;
+                    }
+                }
+                index++;
+            }
+            return Arrays.stream(roadIsOwned).filter(p -> !p).collect(Collectors.toList()).size() == 0; // if there are no 'false' elements it means that all the players have at least 1 road.
+        }
+
+        /**
+         * swaps to next player
+         * @param boardState
+         * @return a new boardState with the next player's turn.
+         * Authored By Manindra de Mel, u7156805
+         */
+        public static String swapPlayer(String boardState) {
+            HashMap<Character, String> swapPlayer = new HashMap<>(){{put('W', "X");put('X',"W");}};
+            return boardState.replaceFirst(Character.toString(boardState.charAt(0)), swapPlayer.get(boardState.charAt(0)));
+        }
+
+        /**
+         * Adds newly rolled resources for a new turn for a given boardState
+         * @param boardState
+         * @param numDice the number of resources/dice rolled to add
+         * @return a new boardstate with new resources.
+         * Authored By Manindra de Mel, u7156805
+         */
+        public static String addNewResources(String boardState, int numDice) {
+            String resources = rollDice(numDice);
+            if (validateClass.Misc.getResourcesFromBoardState(boardState).size() == 0) {
+                return boardState.substring(0, 3) + resources + boardState.substring(3); // handle base case
+            }
+            return boardState.substring(0, 3) + resources + boardState.substring(boardState.indexOf('W', 2));
+        }
+
+        /**
+         * resets the turn counter of a given boardState
+         * @param boardState
+         * @return a new boardstate with a reset turn counter
+         * Authored by Manindra de Mel, u7156805.
+         */
+        public static String resetTurnCounter(String boardState) {
+            char[] boardStateChars = boardState.toCharArray();
+            boardStateChars[2] = String.valueOf(1).charAt(0);
+            return new String(boardStateChars);
+        }
+
     }
 
     /**
@@ -1649,7 +1733,4 @@ public class CatanDiceExtra {
         return "";
     }
 
-    public static void main(String[] args) {
-        applyActionSequence("X00WR0104XW00X00", new String[]{"buildR1520"});
-    }
 }

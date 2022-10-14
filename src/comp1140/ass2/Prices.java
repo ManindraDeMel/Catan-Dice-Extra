@@ -11,7 +11,7 @@ public class Prices {
     public static final HashMap<ArrayList<Resource>, String> builds = new HashMap<>() {{
         put(new ArrayList<Resource>(Arrays.asList(Resource.brick, Resource.wood)), "Road"); // there is implicit ordering in Enums, therefore we can just sort the list and use it as a key for this hashmap
         put(new ArrayList<Resource>(Arrays.asList(Resource.brick, Resource.wood, Resource.sheep, Resource.wheat)), "Settlement");
-        put(new ArrayList<Resource>(Arrays.asList(Resource.sheep, Resource.stone, Resource.wheat)), "Solider");
+        put(new ArrayList<Resource>(Arrays.asList(Resource.sheep, Resource.stone, Resource.wheat)), "Solider"); // Solider = knight sorry.
         put(new ArrayList<Resource>(Arrays.asList(Resource.stone, Resource.stone, Resource.stone, Resource.wheat, Resource.wheat)), "City");
         // castles, (let me know if there is a better way to write this)
         put(new ArrayList<Resource>(Arrays.asList(Resource.brick, Resource.brick, Resource.brick, Resource.brick, Resource.brick)), "Castle");
@@ -24,7 +24,7 @@ public class Prices {
     /**
      * Given a list of resources, find the powerset of that list.
      * @param resources a list of resources owned by a player
-     * @param index a index used for recursion for the index of each set
+     * @param index an index used for recursion for the index of each set
      * @return powerset of that list
      * Authored By Manindra de Mel, u7156805
      */
