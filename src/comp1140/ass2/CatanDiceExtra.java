@@ -1072,7 +1072,7 @@ public class CatanDiceExtra {
                     "04"
             ));
             //
-            private static ArrayList<Character> getResourcesFromBoardState(String boardState) {
+            public static ArrayList<Character> getResourcesFromBoardState(String boardState) {
                 ArrayList<Character> resources = new ArrayList<>();
                 for (Character c : boardState.toCharArray()) {
                     if (possibleResources.contains(c)) { // might be less than 6 resources so we might cut into a players gamestate, this filters that out.
@@ -1530,34 +1530,49 @@ public class CatanDiceExtra {
     public static String applyActionSequence(String boardState, String[] actionSequence) {
         // Iterating through each action in the array and applying action
         // Returned string is re-stored in boardState
-        if (actionSequence.length != 0) { // if player doesnt make any moves and ends their turn
+        if (actionSequence.length != 0) { // if player doesn't make any moves and ends their turn
             if (isActionSequenceValid(boardState, actionSequence)) {
                 for (String action : actionSequence) {
                     boardState = applyAction(boardState, action);
-                    if (action.charAt(0) == 'b') {
-                        boardState = applyActionSequenceHelper.swapPlayer(boardState);
-                    }
-                    if (!applyActionSequenceHelper.isStartingPhase(boardState)) {
-                        int numDice = Integer.parseInt(boardState.substring(1,2));
-                        if (applyActionSequenceHelper.isTransitionPhase(boardState)) { // this should always be matched on player 1's second turn.
-                            boardState = boardState.replaceFirst("0", "3"); // Make the dice 3.
-                            boardState = boardState.replaceFirst("0", "1"); // Make the turn 1.
-                            boardState = applyActionSequenceHelper.addNewResources(boardState, 3);
-                        }
-                        else if (numDice < 6) {
-                            boardState.replaceFirst(boardState.substring(1,2), String.valueOf(numDice + 1)); // sequentially add +1 to the dice on each player's turn
-                            boardState = applyActionSequenceHelper.addNewResources(boardState, numDice + 1);
-                            boardState = applyActionSequenceHelper.resetTurnCounter(boardState);
-                        }
-                        else {
-                            boardState = applyActionSequenceHelper.addNewResources(boardState, 6);
-                            boardState = applyActionSequenceHelper.resetTurnCounter(boardState);
-                        }
+                    if (applyActionSequenceHelper.isTurnOver(action, actionSequence)) {
+                        boardState = applyActionSequenceHelper.endTurn(boardState);
                     }
                 }
             }
         }
-        else {
+        else { // if a player can't make a move or doesn't want to make a move generate new resources
+            boardState = applyActionSequenceHelper.noMoves(boardState);
+        }
+        return boardState;
+    }
+    class applyActionSequenceHelper {
+        /**
+         * if a turn is over, swap the player turn and if the game just started handle some minor additives, such as increase the number of dice etc..
+         * @param boardState
+         * @return a new boardState with the turn ended.
+         * Authored by Manindra de Mel, u7156805
+         */
+        public static String endTurn(String boardState) {
+            return handleTransitionCase(swapPlayer(boardState));
+        }
+        /**
+         * Checks if a turn is over by checking if the action done was the last action in the action sequence.
+         * @param action the action just applied
+         * @param actionSequence the series of actions
+         * @return if the action just applied was the last action in the series of actions
+         * Authored by Manindra de Mel, u7156805
+         */
+        public static boolean isTurnOver(String action, String[] actionSequence) {
+            ArrayList<String> temp = new ArrayList<>(Arrays.asList(actionSequence));
+            return temp.indexOf(action) == temp.size() - 1;
+        }
+        /**
+         * This method is called when the actionSequence = [], otherwise the player makes no moves
+         * @param boardState
+         * @return a new boardstate with reset turns, new resources and a new player turn.
+         * Authored by Manindra de Mel, u7156805
+         */
+        public static String noMoves(String boardState) {
             boardState = applyActionSequenceHelper.swapPlayer(boardState); // swap player
             boardState = applyActionSequenceHelper.resetTurnCounter(boardState);
             int numDice = Integer.parseInt(boardState.substring(1,2));
@@ -1565,11 +1580,34 @@ public class CatanDiceExtra {
                 boardState = boardState.replaceFirst(boardState.substring(1,2), String.valueOf(numDice + 1));
                 numDice++;
             }
-            boardState = applyActionSequenceHelper.addNewResources(boardState, numDice); // generate new resources
+            return applyActionSequenceHelper.addNewResources(boardState, numDice);
         }
-        return boardState;
-    }
-    class applyActionSequenceHelper {
+        /**
+         * Handles the starting stages of the game with the changes to the dices and the introduction of resources.
+         * @param boardState
+         * @return
+         * Authored by Manindra de Mel, u7156805
+         */
+        public static String handleTransitionCase(String boardState) {
+            if (!isStartingPhase(boardState)) {
+                boardState = resetTurnCounter(boardState);
+                int numDice = Integer.parseInt(boardState.substring(1,2));
+                if (isTransitionPhase(boardState)) { // this should always be matched on player 1's second turn.
+                    boardState = boardState.replaceFirst("0", "3"); // Make the dice 3.
+                    return addNewResources(boardState, 3);
+                }
+                else if (numDice < 6) {
+                    boardState = boardState.replaceFirst(boardState.substring(1,2), String.valueOf(numDice + 1)); // sequentially add +1 to the dice on each player's turn
+                    boardState = addNewResources(boardState, numDice + 1);
+                    return boardState;
+                }
+                else { // if we're past the transition phase and the dice is 6, then variables such as the turn and dice
+                    return addNewResources(boardState, 6);
+                }
+            }
+            return boardState;
+        }
+
         /**
          * Determines if a givenboard state is in it's starting phase (i.e. the players are building their first roads on the coast)
          * @param boardState
@@ -1731,6 +1769,11 @@ public class CatanDiceExtra {
 
     public static String GameOver() {
         return "";
+    }
+
+    public static void main(String[] args) {
+        CatanDiceExtra.applyActionSequence("W63ggmmmoWC3K00K01K03K07K08K14R0003R0004R0104R0307R0408R0711R0712R0812R1116R1217R1621R1622R1722R1723R1823R2127R2228R2329R2733R2833R2834R2934R2935S00S01S07S16S17XK02K04K05K06K11K12R0105R0205R0206R0509R0610R0813R0913R0914R1014R1015R1318R1419R1520R1925R2025R2026R2531R2632R3136R3137R3237S02S09S20T10W09RX07A", new String[]{"tradew", "buildK09"});
+        // W09 K00K01K03K07K08K14  R0003R0004R0104R0307R0408R0711R0712R0812R1116R1217R1621R1622R1722R1723R1823R2127R2228R2329R2733R2833R2834R2934R2935S00S01S07S16S17    XK02K04K05K06K11K12   R0105R0205R0206R0509R0610R0813R0913R0914R1014R1015R1318R1419R1520R1925R2025R2026
     }
 
 }

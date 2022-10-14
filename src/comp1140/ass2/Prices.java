@@ -247,8 +247,7 @@ public class Prices {
      * Authored By Manindra de Mel, u7156805
      */
     public static String trade(String boardState, String action) {
-        int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
-        String oldResources = boardState.substring(3, endOfResourcesIndex);
+        String oldResources = boardState.substring(3, boardState.indexOf('W', 2));
         String newResources = "";
         newResources = oldResources;
         for (char c : action.substring(5).toCharArray()) {
