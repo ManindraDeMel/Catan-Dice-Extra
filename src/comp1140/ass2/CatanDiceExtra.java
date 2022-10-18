@@ -1774,6 +1774,12 @@ public class CatanDiceExtra {
         return null;
     }
 
+    /**
+     * A function which checks the score if any of the players scores are above 10, if so the game is over
+     * @param boardState
+     * @return jf the game is over or not
+     * Authored By Manindra de Mel, u7156805
+     */
     public static Boolean isGameOver(String boardState) {
         String scores = Board.getScoreFromBoardState(boardState);
         return Integer.parseInt(scores.substring(1, 3)) >= 10 || Integer.parseInt(scores.substring(scores.indexOf('X') + 1, scores.indexOf('X') + 3)) >= 10;
