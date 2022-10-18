@@ -189,6 +189,9 @@ public class Prices {
         for (int i = 0; i < board.tiles.length; i++) {
             if (!(i == 9 || i == 10)) {
                 foundSpecificKnight = setUsedTrue(actionSub, playerId, convertToTileType, board, i);
+                if (foundSpecificKnight) {
+                    break;
+                }
             }
         }
         if (!(foundSpecificKnight)) {
@@ -198,23 +201,6 @@ public class Prices {
         }
         return Board.toStringWithNewScore(board);
     }
-
-    /**
-     * Applies the 'keep' action for task 9
-     * @param boardState the current boardstate
-     * @param action the action given
-     * @return a new boardstate with the action applied
-     * Authored By Manindra de Mel, u7156805
-     */
-    public static String keep(String boardState, String action) {
-        boardState = boardState.substring(0, 2) + String.valueOf(Integer.parseInt(boardState.substring(2, 3)) + 1) + boardState.substring(3); // +1 to roll counter
-        int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
-        String oldResources = boardState.substring(3, endOfResourcesIndex);
-        String newResources = Prices.modifyResources(oldResources, action.substring(4), Integer.parseInt(boardState.substring(1, 2)));
-        boardState = boardState.replace(oldResources, newResources);
-        return boardState;
-    }
-
     /**
      * A helper function for the 'swap' method. This method sets a knight from unused to used.
      * @param actionSub the action substring for keep. i.e. (keepbb) -> (bb)
@@ -239,6 +225,21 @@ public class Prices {
         return false;
     }
 
+    /**
+     * Applies the 'keep' action for task 9
+     * @param boardState the current boardstate
+     * @param action the action given
+     * @return a new boardstate with the action applied
+     * Authored By Manindra de Mel, u7156805
+     */
+    public static String keep(String boardState, String action) {
+        boardState = boardState.substring(0, 2) + String.valueOf(Integer.parseInt(boardState.substring(2, 3)) + 1) + boardState.substring(3); // +1 to roll counter
+        int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
+        String oldResources = boardState.substring(3, endOfResourcesIndex);
+        String newResources = Prices.modifyResources(oldResources, action.substring(4), Integer.parseInt(boardState.substring(1, 2)));
+        boardState = boardState.replace(oldResources, newResources);
+        return boardState;
+    }
     /**
      * Applies the 'trade' action the the boardstate (for task 9)
      * @param boardState a String representation of the boardState

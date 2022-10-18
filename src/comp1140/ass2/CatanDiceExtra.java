@@ -475,8 +475,6 @@ public class CatanDiceExtra {
         }
         return false;
     }
-
-
     /**
      * Roll the specified number of *random* dice, and return the
      * rolled resources in string form.
@@ -503,6 +501,12 @@ public class CatanDiceExtra {
         }
         return sortString(resources);
     }
+    /**
+     * sortString sorts a string of resources by alphabetical order
+     * @param resources
+     * @return a sorted string of resources
+     * Authored By Manindra de Mel, u7156805
+     */
     static String sortString(String resources) {
         char[] sortedResource = resources.toCharArray();
         Arrays.sort(sortedResource);
@@ -549,7 +553,6 @@ public class CatanDiceExtra {
      * @return true iff the action is executable, false otherwise.
      * Authored By Manindra de Mel, u7156805
      */
-
     public static boolean isActionValid(String boardState, String action) {
         char[] characters = action.toCharArray();
         String actionState = "";
@@ -564,7 +567,6 @@ public class CatanDiceExtra {
             default -> false;
         };
     }
-
     /**
      * A helper class which checks for if the actions are valid
      * Authored By Manindra de Mel, u7156805
@@ -1205,6 +1207,10 @@ public class CatanDiceExtra {
 
         return longestRoadArr;
     }
+
+    /**
+     * A helper class for the longestRoad, this should be moved to LongestRoad.java // todo
+     */
     private class longestRoadHelper {
 
         /**
@@ -1475,9 +1481,6 @@ public class CatanDiceExtra {
      * Authored By Manindra de Mel, u7156805
      */
     public static String applyAction(String boardState, String action) {
-        if (isGameOver(boardState)) {
-            return boardState;
-        }
         String playerId = Character.toString(boardState.charAt(0));
         return switch (action.substring(0, 4)) { // here we match for the type of action we received
             case "keep" -> Prices.keep(boardState, action);
@@ -1526,6 +1529,7 @@ public class CatanDiceExtra {
      * @param boardState: string representation of the board state
      * @param actionSequence: array of strings, each representing one action
      * @return string representation of the new board state
+     * Authored By Manindra de Mel, u7156805
      */
     public static String applyActionSequence(String boardState, String[] actionSequence) {
         // Iterating through each action in the array and applying action
@@ -1534,7 +1538,10 @@ public class CatanDiceExtra {
             if (isActionSequenceValid(boardState, actionSequence)) {
                 for (String action : actionSequence) {
                     boardState = applyAction(boardState, action);
-                    if (applyActionSequenceHelper.isTurnOver(action, actionSequence)) {
+                    if (isGameOver(boardState)) {
+                        return boardState;
+                    }
+                    else if (applyActionSequenceHelper.isTurnOver(action, actionSequence)) {
                         boardState = applyActionSequenceHelper.endTurn(boardState);
                     }
                 }
@@ -1545,6 +1552,11 @@ public class CatanDiceExtra {
         }
         return boardState;
     }
+
+    /**
+     * Helper classes for the apply action sequence
+     * Authored by Manindra de Mel
+     */
     class applyActionSequenceHelper {
         /**
          * if a turn is over, swap the player turn and if the game just started handle some minor additives, such as increase the number of dice etc..
@@ -1764,16 +1776,6 @@ public class CatanDiceExtra {
 
     public static Boolean isGameOver(String boardState) {
         String scores = Board.getScoreFromBoardState(boardState);
-        return Integer.parseInt(scores.substring(1, 3)) == 10 || Integer.parseInt(scores.substring(scores.indexOf('X') + 1, scores.indexOf('X') + 2)) == 10;
+        return Integer.parseInt(scores.substring(1, 3)) >= 10 || Integer.parseInt(scores.substring(scores.indexOf('X') + 1, scores.indexOf('X') + 3)) >= 10;
     }
-
-    public static String GameOver() {
-        return "";
-    }
-
-    public static void main(String[] args) {
-        CatanDiceExtra.applyActionSequence("W63ggmmmoWC3K00K01K03K07K08K14R0003R0004R0104R0307R0408R0711R0712R0812R1116R1217R1621R1622R1722R1723R1823R2127R2228R2329R2733R2833R2834R2934R2935S00S01S07S16S17XK02K04K05K06K11K12R0105R0205R0206R0509R0610R0813R0913R0914R1014R1015R1318R1419R1520R1925R2025R2026R2531R2632R3136R3137R3237S02S09S20T10W09RX07A", new String[]{"tradew", "buildK09"});
-        // W09 K00K01K03K07K08K14  R0003R0004R0104R0307R0408R0711R0712R0812R1116R1217R1621R1622R1722R1723R1823R2127R2228R2329R2733R2833R2834R2934R2935S00S01S07S16S17    XK02K04K05K06K11K12   R0105R0205R0206R0509R0610R0813R0913R0914R1014R1015R1318R1419R1520R1925R2025R2026
-    }
-
 }
