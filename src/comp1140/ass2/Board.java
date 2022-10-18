@@ -42,7 +42,7 @@ public class Board {
      */
     public Board(String turn, String oldScore) {
         coords = new Coordinate[54];
-        roads = new ArrayList<>();
+        this.roads = new ArrayList<>();
         this.tiles = new Tile[20];
         this.settlements = new Settlement[24]; // isn't there only 24 settlements?
         this.castles = new Castle[4];
