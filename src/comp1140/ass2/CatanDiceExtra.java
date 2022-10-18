@@ -2,6 +2,10 @@ package comp1140.ass2;
 
 import java.util.*;
 
+import static comp1140.ass2.Board.getScoreFromBoardState;
+import static comp1140.ass2.Board.getTurnFromBoardState;
+import static comp1140.ass2.CatanDiceExtra.validateClass.Misc.getPlayerBoardState;
+
 public class CatanDiceExtra {
     ArrayList<Player> players = new ArrayList<>();
     ArrayList<String> playersNames = new ArrayList<>(Arrays.asList("Manindra", "Stephen", "Arjun")); // changes when we add GUI stuff (max of 6 players?)
@@ -682,7 +686,7 @@ public class CatanDiceExtra {
             if (!resources.contains(resourceIn)) {
                 return false; // Player doesn't have resource to trade.
             }
-            String playerBoardState = Misc.getPlayerBoardState(boardState);
+            String playerBoardState = getPlayerBoardState(boardState);
             if (playerBoardState == "[]") {
                 return false; // Player has no builds
             }
@@ -736,7 +740,7 @@ public class CatanDiceExtra {
                         46,
                         52
                 ));
-                String playerBoardState = Misc.getPlayerBoardState(boardState);
+                String playerBoardState = getPlayerBoardState(boardState);
                 String settlement = "S" + Character.toString(action.charAt(6)) + Character.toString(action.charAt(7)); // extract location
                 int location = Integer.parseInt(Character.toString(action.charAt(6)) + Character.toString(action.charAt(7)));
                 if (playerBoardState.contains(settlement) && validCityBuildLocations.contains(location)) { // settlement already built check && location is in a cityable location.
@@ -750,7 +754,7 @@ public class CatanDiceExtra {
                     int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
                     if (actionCoord >= 0 && actionCoord < 20) { // validate location
                         ArrayList<Integer> surroundingCoords = Misc.knightIndexingToRowIndexing.get(actionCoord); // convert to the knight coordinate system
-                        String playerBoardState = Misc.getPlayerBoardState(boardState); // extract coords
+                        String playerBoardState = getPlayerBoardState(boardState); // extract coords
                         return roadConnectedToKnight(playerBoardState, surroundingCoords) || settlementConnectedToKnight(playerBoardState, surroundingCoords); // connected to road || connected to settlement.
                     }
                 }
@@ -851,7 +855,7 @@ public class CatanDiceExtra {
                 return false;
             }
             private static boolean checkIfConnected(String boardState, String action) {
-                String playerBoardState = Misc.getPlayerBoardState(boardState);
+                String playerBoardState = getPlayerBoardState(boardState);
                 int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
                 int currentIndex = 0;
                 while (playerBoardState.indexOf("R", currentIndex) != -1) { // get road from player board state
@@ -906,7 +910,7 @@ public class CatanDiceExtra {
                 }
                 // ###
                 String[] coords = Misc.getRoadCoordsFromAction(action);
-                String playerBoardState = Misc.getPlayerBoardState(boardState);
+                String playerBoardState = getPlayerBoardState(boardState);
                 // ##
                 int currentIndex = 0;
                 ArrayList<String> firstCoordsInPlayerState = new ArrayList<>();
@@ -1617,7 +1621,13 @@ public class CatanDiceExtra {
      * @return array of possible action sequences.
      */
     public static String[][] generateAllPossibleActionSequences(String boardState) {
-        // FIXME: Task 12
+        String turn = getTurnFromBoardState(boardState);
+        Character playerId = turn.charAt(0);
+        String playerBoardState = getPlayerBoardState(boardState, playerId);
+        Board board = new Board(turn, getScoreFromBoardState(boardState));
+        Board playerBuilds = board;
+        board.applyBoardState(boardState);
+        playerBuilds.applyPlayerBoardState(playerBoardState, Character.toString(playerId));
         return null;
     }
 
@@ -1641,7 +1651,7 @@ public class CatanDiceExtra {
     }
 
     public static Boolean isGameOver(String boardState) {
-        String scores = Board.getScoreFromBoardState(boardState);
+        String scores = getScoreFromBoardState(boardState);
         return Integer.parseInt(scores.substring(1, 3)) == 10 || Integer.parseInt(scores.substring(scores.indexOf('X') + 1, scores.indexOf('X') + 2)) == 10;
     }
 
