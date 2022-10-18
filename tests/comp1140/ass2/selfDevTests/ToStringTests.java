@@ -27,10 +27,10 @@ public class ToStringTests {
         }
 
         // Adding Castles
-        structuresTest.get(0).add(new Castle(0 ));
+        structuresTest.get(0).add(new Castle(new Player(""), 0 ));
         expString.get(0).add("C0");
 
-        structuresTest.get(0).add(new Castle(3 ));
+        structuresTest.get(0).add(new Castle(new Player(""), 3 ));
         expString.get(0).add("C3");
 
 

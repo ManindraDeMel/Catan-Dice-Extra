@@ -7,7 +7,7 @@ public class Player {
     ArrayList<ArrayList<GamePiece>> structures = new ArrayList<ArrayList<GamePiece>>(); // Stores the structures built
     String name;
     Resource[] resources;
-    Player(String name) {
+    public Player(String name) {
         this.name = name;
     }
 

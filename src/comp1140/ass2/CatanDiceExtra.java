@@ -1,15 +1,16 @@
 package comp1140.ass2;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static comp1140.ass2.Board.getScoreFromBoardState;
+import static comp1140.ass2.Board.getTurnFromBoardState;
+import static comp1140.ass2.CatanDiceExtra.validateClass.Misc.getPlayerBoardState;
 
 public class CatanDiceExtra {
     ArrayList<Player> players = new ArrayList<>();
     ArrayList<String> playersNames = new ArrayList<>(Arrays.asList("Manindra", "Stephen", "Arjun")); // changes when we add GUI stuff (max of 6 players?)
     public void startGame() {
-        Board board = new Board();
-        for (String name : playersNames) {
-            players.add(new Player(name));
-        }
     }
 
     public void newTurn(Player player) {
@@ -478,8 +479,6 @@ public class CatanDiceExtra {
         }
         return false;
     }
-
-
     /**
      * Roll the specified number of *random* dice, and return the
      * rolled resources in string form.
@@ -488,6 +487,7 @@ public class CatanDiceExtra {
      * @param numOfDice the number of dices to roll
      * @return alphabetically ordered [Resources] with characters
      * 'b', 'l', 'w', 'g', 'o', 'm'.
+     * Authored By Manindra de Mel, u7156805
      */
     public static String rollDice(int numOfDice) {
         HashMap<Integer, String> mapToDiceVal = new HashMap<>() {{
@@ -505,7 +505,12 @@ public class CatanDiceExtra {
         }
         return sortString(resources);
     }
-
+    /**
+     * sortString sorts a string of resources by alphabetical order
+     * @param resources
+     * @return a sorted string of resources
+     * Authored By Manindra de Mel, u7156805
+     */
     static String sortString(String resources) {
         char[] sortedResource = resources.toCharArray();
         Arrays.sort(sortedResource);
@@ -550,8 +555,8 @@ public class CatanDiceExtra {
      * @param boardState: string representation of the board state.
      * @param action: string representation of the player action.
      * @return true iff the action is executable, false otherwise.
+     * Authored By Manindra de Mel, u7156805
      */
-
     public static boolean isActionValid(String boardState, String action) {
         char[] characters = action.toCharArray();
         String actionState = "";
@@ -566,7 +571,18 @@ public class CatanDiceExtra {
             default -> false;
         };
     }
+    /**
+     * A helper class which checks for if the actions are valid
+     * Authored By Manindra de Mel, u7156805
+     */
     public class validateClass { // helper class which handles all the different action cases
+        /**
+         * Checks if a build action is valid
+         * @param boardState a string of the boardstate
+         * @param action the action
+         * @return a bool if the build is valid or not
+         * Authored By Manindra de Mel, u7156805
+         */
         public static boolean validateBuild(String boardState, String action) {
             ArrayList<Character> validformat = new ArrayList<>(Arrays.asList( // a filter for all the accepted characters
                     'b',
@@ -590,6 +606,9 @@ public class CatanDiceExtra {
             }
             // ###########
             Character buildType = action.charAt(5);
+            /**
+             * Match case for the type of build.
+             */
             if (ValidateBuildHelperFuncs.sufficentResourcesForBuild(boardState, buildType)) { // check for resources
                 return switch (buildType) {
                     case 'C' -> ValidateBuildHelperFuncs.validateCastleBuild(boardState, action.charAt(action.length() - 1)); // Matching the type of building
@@ -603,6 +622,14 @@ public class CatanDiceExtra {
             return ValidateBuildHelperFuncs.checkBaseCase(boardState, action, buildType); // if there aren't sufficient resources, the game might have just begun.
         }
         // #######################################################################################
+
+        /**
+         * Checks if a trade action is valid
+         * @param boardState the boardstate as a string
+         * @param action the action as a string
+         * @return a bool returning if the action is valid or not
+         * Authored By Manindra de Mel, u7156805
+         */
         public static boolean validateTrade(String boardState, String action) {
             ArrayList<Character> validFormat = new ArrayList<>(Arrays.asList('t', 'r', 'a', 'd', 'e')); // another filter
             validFormat.addAll(Misc.possibleResources); // checks for format
@@ -625,6 +652,13 @@ public class CatanDiceExtra {
             return false;
         }
         // #######################################################################################
+        /**
+         * Checks if a keep action is valid
+         * @param boardState the boardstate as a string
+         * @param action the action as a string
+         * @return a bool returning if the action is valid or not
+         * Authored By Manindra de Mel, u7156805
+         */
         public static boolean validateKeep(String boardState, String action) { // validate keep action
             int numRolls = Integer.parseInt(Character.toString(boardState.toCharArray()[2]));
             if (numRolls < 3) { // check rolls
@@ -634,12 +668,20 @@ public class CatanDiceExtra {
                     if (!turnBoardState.contains(c)) {
                         return false;
                     }
+                    turnBoardState.remove(c);
                 }
                 return true;
             }
             return false;
         }
         // #######################################################################################
+        /**
+         * Checks if a swap action is valid
+         * @param boardState the boardstate as a string
+         * @param action the action as a string
+         * @return a bool returning if the action is valid or not
+         * Authored By Manindra de Mel, u7156805
+         */
         public static boolean validateSwap(String boardState, String action) {
             ArrayList<Character> resources = Misc.getResourcesFromBoardState(boardState);
             Character resourceIn = action.charAt(4); // get the traded materials
@@ -647,7 +689,7 @@ public class CatanDiceExtra {
             if (!resources.contains(resourceIn)) {
                 return false; // Player doesn't have resource to trade.
             }
-            String playerBoardState = Misc.getPlayerBoardState(boardState);
+            String playerBoardState = getPlayerBoardState(boardState);
             if (playerBoardState == "[]") {
                 return false; // Player has no builds
             }
@@ -672,6 +714,11 @@ public class CatanDiceExtra {
             return false;
         }
         // ####################################################################################### Helper functions for validateBuild();
+
+        /**
+         * A class which helps with the validateBuild() method, since the action has further complexity
+         * Authored By Manindra de Mel, u7156805         *
+         */
         private class ValidateBuildHelperFuncs { // a private helper class for the 'build' action since its complex in comparison to the other actions.
             // #######################################################################################
             private static boolean validateCastleBuild(String boardState, Character castlePosition) {
@@ -696,7 +743,7 @@ public class CatanDiceExtra {
                         46,
                         52
                 ));
-                String playerBoardState = Misc.getPlayerBoardState(boardState);
+                String playerBoardState = getPlayerBoardState(boardState);
                 String settlement = "S" + Character.toString(action.charAt(6)) + Character.toString(action.charAt(7)); // extract location
                 int location = Integer.parseInt(Character.toString(action.charAt(6)) + Character.toString(action.charAt(7)));
                 if (playerBoardState.contains(settlement) && validCityBuildLocations.contains(location)) { // settlement already built check && location is in a cityable location.
@@ -706,11 +753,13 @@ public class CatanDiceExtra {
             }
             // ####################
             private static boolean validateKnightBuild(String boardState, String action) {
-                int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
-                if (actionCoord >= 0 && actionCoord < 20) { // validate location
-                    ArrayList<Integer> surroundingCoords = Misc.knightIndexingToRowIndexing.get(actionCoord); // convert to the knight coordinate system
-                    String playerBoardState = Misc.getPlayerBoardState(boardState); // extract coords
-                    return roadConnectedToKnight(playerBoardState, surroundingCoords) || settlementConnectedToKnight(playerBoardState, surroundingCoords); // connected to road || connected to settlement.
+                if (!boardState.contains(action.substring(5))) {
+                    int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
+                    if (actionCoord >= 0 && actionCoord < 20) { // validate location
+                        ArrayList<Integer> surroundingCoords = Misc.knightIndexingToRowIndexing.get(actionCoord); // convert to the knight coordinate system
+                        String playerBoardState = getPlayerBoardState(boardState); // extract coords
+                        return roadConnectedToKnight(playerBoardState, surroundingCoords) || settlementConnectedToKnight(playerBoardState, surroundingCoords); // connected to road || connected to settlement.
+                    }
                 }
                 return false;
             }
@@ -809,7 +858,7 @@ public class CatanDiceExtra {
                 return false;
             }
             private static boolean checkIfConnected(String boardState, String action) {
-                String playerBoardState = Misc.getPlayerBoardState(boardState);
+                String playerBoardState = getPlayerBoardState(boardState);
                 int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
                 int currentIndex = 0;
                 while (playerBoardState.indexOf("R", currentIndex) != -1) { // get road from player board state
@@ -864,7 +913,7 @@ public class CatanDiceExtra {
                 }
                 // ###
                 String[] coords = Misc.getRoadCoordsFromAction(action);
-                String playerBoardState = Misc.getPlayerBoardState(boardState);
+                String playerBoardState = getPlayerBoardState(boardState);
                 // ##
                 int currentIndex = 0;
                 ArrayList<String> firstCoordsInPlayerState = new ArrayList<>();
@@ -945,6 +994,10 @@ public class CatanDiceExtra {
             }
         }
         // ####################################################################################### Miscellaneous Helper functions / constants
+
+        /**
+         * Miscellaneous functions used throughout this task and other tasks
+         */
         public class Misc {
             private static final List<Character> possibleResources = new ArrayList<>(Arrays.asList('b', 'g', 'l', 'm', 'o', 'w'));
 
@@ -1025,7 +1078,7 @@ public class CatanDiceExtra {
                     "04"
             ));
             //
-            private static ArrayList<Character> getResourcesFromBoardState(String boardState) {
+            public static ArrayList<Character> getResourcesFromBoardState(String boardState) {
                 ArrayList<Character> resources = new ArrayList<>();
                 for (Character c : boardState.toCharArray()) {
                     if (possibleResources.contains(c)) { // might be less than 6 resources so we might cut into a players gamestate, this filters that out.
@@ -1101,10 +1154,9 @@ public class CatanDiceExtra {
      * - The method should return {6, 4}
      * @param boardState: string representation of the board state.
      * @return array of contiguous road lengths, one per player.
+     * Authored by Arjun Raj
      */
     public static int[] longestRoad(String boardState) {
-        // FIXME complete this method
-
         // Defining array to hold length of the longest road
         int[] longestRoadArr = new int[2];
 
@@ -1131,7 +1183,7 @@ public class CatanDiceExtra {
                 ArrayList<String> roadSequence = new ArrayList<>();
                 roadSequence.add(index);
 
-                getAllConnectedRoads(playerIndexes, playerNeighbours, allRoadSequence, roadSequence, j, notVisited);
+                longestRoadHelper.getAllConnectedRoads(playerIndexes, playerNeighbours, allRoadSequence, roadSequence, j, notVisited);
             }
 
             // Assigning the allRoadSequence Arraylist to the correct player
@@ -1161,37 +1213,8 @@ public class CatanDiceExtra {
     }
 
     /**
-     * Finds all the roads sequences for a player
-     *
-     * @param playerIndexes road indexes of a player
-     * @param playerNeighbours connected movable neighbouring road indexes
-     * @param allRoadSequence all the road sequence found so far
-     * @param roadSequence current road sequence found
-     * @param pos current index
-     * @param notVisited indexes of roads where not visited
+     * A helper class for the longestRoad, this should be moved to LongestRoad.java // todo
      */
-    private static void getAllConnectedRoads(ArrayList<String> playerIndexes, ArrayList<ArrayList<String>> playerNeighbours,
-                                             HashSet<ArrayList<String>> allRoadSequence, ArrayList<String> roadSequence, int pos,
-                                             ArrayList<ArrayList<String>> notVisited) {
-
-        List<String> longestRoadState = new ArrayList<>(roadSequence);
-
-        for (var road : playerNeighbours.get(pos)) {
-            if (!notVisited.get(pos).contains(road)) continue;
-
-            roadSequence = new ArrayList<>(longestRoadState);
-            roadSequence.add(road);
-
-            allRoadSequence.add(roadSequence);
-
-            notVisited.get(pos).remove(road);
-            notVisited.get(playerIndexes.indexOf(road)).remove(playerIndexes.get(pos));
-            getAllConnectedRoads(playerIndexes, playerNeighbours, allRoadSequence, roadSequence, playerIndexes.indexOf(road), notVisited);
-            notVisited.get(pos).add(road);
-            notVisited.get(playerIndexes.indexOf(road)).add(playerIndexes.get(pos));
-        }
-    }
-
     private class longestRoadHelper {
 
         /**
@@ -1373,6 +1396,37 @@ public class CatanDiceExtra {
                 allNeighbourRoads.put(roads[i], neighbours);
             }
         }
+        /**
+         * Finds all the roads sequences for a player
+         *
+         * @param playerIndexes road indexes of a player
+         * @param playerNeighbours connected movable neighbouring road indexes
+         * @param allRoadSequence all the road sequence found so far
+         * @param roadSequence current road sequence found
+         * @param pos current index
+         * @param notVisited indexes of roads where not visited
+         */
+        private static void getAllConnectedRoads(ArrayList<String> playerIndexes, ArrayList<ArrayList<String>> playerNeighbours,
+                                                 HashSet<ArrayList<String>> allRoadSequence, ArrayList<String> roadSequence, int pos,
+                                                 ArrayList<ArrayList<String>> notVisited) {
+
+            List<String> longestRoadState = new ArrayList<>(roadSequence);
+
+            for (var road : playerNeighbours.get(pos)) {
+                if (!notVisited.get(pos).contains(road)) continue;
+
+                roadSequence = new ArrayList<>(longestRoadState);
+                roadSequence.add(road);
+
+                allRoadSequence.add(roadSequence);
+
+                notVisited.get(pos).remove(road);
+                notVisited.get(playerIndexes.indexOf(road)).remove(playerIndexes.get(pos));
+                getAllConnectedRoads(playerIndexes, playerNeighbours, allRoadSequence, roadSequence, playerIndexes.indexOf(road), notVisited);
+                notVisited.get(pos).add(road);
+                notVisited.get(playerIndexes.indexOf(road)).add(playerIndexes.get(pos));
+            }
+        }
     }
 
     /**
@@ -1428,48 +1482,19 @@ public class CatanDiceExtra {
      * @param boardState: string representation of the board state.
      * @param action: string representation of the player action.
      * @return string representation of the updated board state.
+     * Authored By Manindra de Mel, u7156805
      */
     public static String applyAction(String boardState, String action) {
-        if (isGameOver(boardState)) {
-            return GameOver();
-        }
         String playerId = Character.toString(boardState.charAt(0));
         return switch (action.substring(0, 4)) { // here we match for the type of action we received
-            case "keep" -> keep(boardState, action, playerId); //DONE
-            case "buil" -> addNewBuild(boardState, action, playerId); // DONE
-            case "trad" -> Prices.trade(boardState, action); //DONE
+            case "keep" -> Prices.keep(boardState, action);
+            case "buil" -> Board.addNewBuild(boardState, action, playerId);
+            case "trad" -> Prices.trade(boardState, action);
             case "swap" -> Prices.swap(boardState, action.substring(4), playerId);
             default -> boardState;
         };
     }
 
-    private static String addNewBuild(String boardState, String action, String playerId) {
-        Board board = new Board();
-        board.applyBoardState(boardState);
-        board.buildBuilding(action.substring(5), playerId);
-        String turn = boardState.substring(0, boardState.indexOf('W', 2));
-
-//        if (turn.charAt(0) == 'W') {
-//            turn = turn.replaceFirst("W", "X");
-//        }
-//        else {
-//            turn = turn.replaceFirst("X", "W");
-//        }
-        turn = turn.substring(0, 3) + Board.removeResources(turn.substring(3), action.charAt(5));
-//        String oldScores = boardState.substring(boardState.indexOf('W', boardState.indexOf('W', 2) + 1));
-        int[] newScores = Board.calculateScores(boardState);
-        String newScoreStr = "W" + validateClass.Misc.addZero(newScores[0]) + "X" + validateClass.Misc.addZero(newScores[1]);
-        return turn + board + newScoreStr;
-    }
-
-    private static String keep(String boardState, String action, String playerId) {
-        boardState = boardState.substring(0, 2) + String.valueOf(Integer.parseInt(boardState.substring(2, 3)) + 1) + boardState.substring(3); // +1 to roll counter
-        int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
-        String oldResources = boardState.substring(3, endOfResourcesIndex);
-        String newResources = Prices.modifyResources(oldResources, action.substring(4), Integer.parseInt(boardState.substring(1, 2)));
-        boardState = boardState.replace(oldResources, newResources);
-        return boardState;
-    }
     /**
      * Given valid board state, this method checks if a sequence of player
      * actions is executable.
@@ -1480,6 +1505,7 @@ public class CatanDiceExtra {
      * @param boardState: string representation of the board state.
      * @param actionSequence: array of strings, each representing one action
      * @return true if the sequence is executable, false otherwise.
+     * Authored By Manindra de Mel, u7156805 & Arjun Raj u7156805
      */
     public static boolean isActionSequenceValid(String boardState, String[] actionSequence) {
         // Iterating through each action in the array and checking if valid
@@ -1507,16 +1533,183 @@ public class CatanDiceExtra {
      * @param boardState: string representation of the board state
      * @param actionSequence: array of strings, each representing one action
      * @return string representation of the new board state
+     * Authored By Manindra de Mel, u7156805
      */
     public static String applyActionSequence(String boardState, String[] actionSequence) {
         // Iterating through each action in the array and applying action
         // Returned string is re-stored in boardState
-        for (int i = 0; i < actionSequence.length; i++) {
-            if (isActionValid(boardState, actionSequence[i]))
-                boardState = applyAction(boardState, actionSequence[i]);
+        if (actionSequence.length != 0) { // if player doesn't make any moves and ends their turn
+            if (isActionSequenceValid(boardState, actionSequence)) {
+                for (String action : actionSequence) {
+                    boardState = applyAction(boardState, action);
+                    if (isGameOver(boardState)) {
+                        return boardState;
+                    }
+                    else if (applyActionSequenceHelper.isTurnOver(action, actionSequence)) {
+                        boardState = applyActionSequenceHelper.endTurn(boardState);
+                    }
+                }
+            }
+        }
+        else { // if a player can't make a move or doesn't want to make a move generate new resources
+            boardState = applyActionSequenceHelper.noMoves(boardState);
+        }
+        return boardState;
+    }
+
+    /**
+     * Helper classes for the apply action sequence
+     * Authored by Manindra de Mel
+     */
+    class applyActionSequenceHelper {
+        /**
+         * if a turn is over, swap the player turn and if the game just started handle some minor additives, such as increase the number of dice etc..
+         * @param boardState
+         * @return a new boardState with the turn ended.
+         * Authored by Manindra de Mel, u7156805
+         */
+        public static String endTurn(String boardState) {
+            return handleTransitionCase(swapPlayer(boardState));
+        }
+        /**
+         * Checks if a turn is over by checking if the action done was the last action in the action sequence.
+         * @param action the action just applied
+         * @param actionSequence the series of actions
+         * @return if the action just applied was the last action in the series of actions
+         * Authored by Manindra de Mel, u7156805
+         */
+        public static boolean isTurnOver(String action, String[] actionSequence) {
+            ArrayList<String> temp = new ArrayList<>(Arrays.asList(actionSequence));
+            return temp.indexOf(action) == temp.size() - 1;
+        }
+        /**
+         * This method is called when the actionSequence = [], otherwise the player makes no moves
+         * @param boardState
+         * @return a new boardstate with reset turns, new resources and a new player turn.
+         * Authored by Manindra de Mel, u7156805
+         */
+        public static String noMoves(String boardState) {
+            boardState = applyActionSequenceHelper.swapPlayer(boardState); // swap player
+            boardState = applyActionSequenceHelper.resetTurnCounter(boardState);
+            int numDice = Integer.parseInt(boardState.substring(1,2));
+            if (numDice < 6) { // if the dice is less than 6 then make the next player's dice += 1
+                boardState = boardState.replaceFirst(boardState.substring(1,2), String.valueOf(numDice + 1));
+                numDice++;
+            }
+            return applyActionSequenceHelper.addNewResources(boardState, numDice);
+        }
+        /**
+         * Handles the starting stages of the game with the changes to the dices and the introduction of resources.
+         * @param boardState
+         * @return
+         * Authored by Manindra de Mel, u7156805
+         */
+        public static String handleTransitionCase(String boardState) {
+            if (!isStartingPhase(boardState)) {
+                boardState = resetTurnCounter(boardState);
+                int numDice = Integer.parseInt(boardState.substring(1,2));
+                if (isTransitionPhase(boardState)) { // this should always be matched on player 1's second turn.
+                    boardState = boardState.replaceFirst("0", "3"); // Make the dice 3.
+                    return addNewResources(boardState, 3);
+                }
+                else if (numDice < 6) {
+                    boardState = boardState.replaceFirst(boardState.substring(1,2), String.valueOf(numDice + 1)); // sequentially add +1 to the dice on each player's turn
+                    boardState = addNewResources(boardState, numDice + 1);
+                    return boardState;
+                }
+                else { // if we're past the transition phase and the dice is 6, then variables such as the turn and dice
+                    return addNewResources(boardState, 6);
+                }
+            }
+            return boardState;
         }
 
-        return boardState;
+        /**
+         * Determines if a givenboard state is in it's starting phase (i.e. the players are building their first roads on the coast)
+         * @param boardState
+         * @return true if the boardstate is in the starting phase
+         * Authored By Manindra de Mel, u7156805
+         */
+
+        public static boolean isStartingPhase(String boardState) {
+            return Integer.parseInt(boardState.substring(1,2)) == 0 && !playersHaveAtLeastOneRoad(boardState);
+        }
+
+        /**
+         * The transition phase is a singular phase where the last player who hasn't built a road just built there road and now we're
+         * back to the starting player who receives 3 dice and the game officially 'transitions' out of the starting phase.
+         * @param boardState
+         * @return if the game is in a transition stage
+         * Authored By Manindra de Mel, u7156805
+         */
+        public static boolean isTransitionPhase(String boardState) {
+            return Integer.parseInt(boardState.substring(1,2)) == 0 && playersHaveAtLeastOneRoad(boardState);
+        }
+
+        /**
+         * A helper for 'isStartingPhase()' which determines if a player has at least 1 road
+         * @param boardState
+         * @return if each player has at least one road
+         * Authored By Manindra de Mel, u7156805
+         */
+        public static boolean playersHaveAtLeastOneRoad(String boardState) {
+            Board board = new Board(Board.getTurnFromBoardState(boardState), Board.getScoreFromBoardState(boardState));
+            board.applyBoardState(boardState);
+            int index = 0;
+            String[] players = new String[]{"W", "X"};
+            Boolean[] roadIsOwned = new Boolean[players.length];
+            for (int i = 0; i < players.length; i++) { // a bitmap of each of the players which is updated if a road owned by them is found.
+                roadIsOwned[i] = false;
+            }
+            for (String s : players) {
+                for (Road r : board.roads) {
+                    if (r.Owner.name.charAt(0) == s.charAt(0)) {
+                        roadIsOwned[index] = true;
+                    }
+                }
+                index++;
+            }
+            return Arrays.stream(roadIsOwned).filter(p -> !p).collect(Collectors.toList()).size() == 0; // if there are no 'false' elements it means that all the players have at least 1 road.
+        }
+
+        /**
+         * swaps to next player
+         * @param boardState
+         * @return a new boardState with the next player's turn.
+         * Authored By Manindra de Mel, u7156805
+         */
+        public static String swapPlayer(String boardState) {
+            HashMap<Character, String> swapPlayer = new HashMap<>(){{put('W', "X");put('X',"W");}};
+            return boardState.replaceFirst(Character.toString(boardState.charAt(0)), swapPlayer.get(boardState.charAt(0)));
+        }
+
+        /**
+         * Adds newly rolled resources for a new turn for a given boardState
+         * @param boardState
+         * @param numDice the number of resources/dice rolled to add
+         * @return a new boardstate with new resources.
+         * Authored By Manindra de Mel, u7156805
+         */
+        public static String addNewResources(String boardState, int numDice) {
+            String resources = rollDice(numDice);
+            if (validateClass.Misc.getResourcesFromBoardState(boardState).size() == 0) {
+                return boardState.substring(0, 3) + resources + boardState.substring(3); // handle base case
+            }
+            return boardState.substring(0, 3) + resources + boardState.substring(boardState.indexOf('W', 2));
+        }
+
+        /**
+         * resets the turn counter of a given boardState
+         * @param boardState
+         * @return a new boardstate with a reset turn counter
+         * Authored by Manindra de Mel, u7156805.
+         */
+        public static String resetTurnCounter(String boardState) {
+            char[] boardStateChars = boardState.toCharArray();
+            boardStateChars[2] = String.valueOf(1).charAt(0);
+            return new String(boardStateChars);
+        }
+
     }
 
     /**
@@ -1562,8 +1755,32 @@ public class CatanDiceExtra {
      * @return array of possible action sequences.
      */
     public static String[][] generateAllPossibleActionSequences(String boardState) {
-        // FIXME: Task 12
-        return null;
+        ArrayList<String[]> acc = new ArrayList<String[]>();
+        String turn = getTurnFromBoardState(boardState);
+        String resources = turn.substring(2);
+        if (turn.charAt(1)=='1'||turn.charAt(1)=='2') {
+            for (int x=0; x<(2^(resources.length())); x++) {
+                String binary = Integer.toBinaryString(x);
+                String keep = "keep";
+                for (int i=0; i<binary.length(); i++) {
+                    if (binary.charAt(binary.length()-i)=='1') {
+                        keep+=resources.charAt(i);
+                    }
+                }
+                String[] keepArray = new String[1];
+                keepArray[0]= keep;
+                acc.add(keepArray);
+            }
+        }
+        Character playerId = turn.charAt(0);
+        String playerBoardState = getPlayerBoardState(boardState, playerId);
+        Board board = new Board(turn, getScoreFromBoardState(boardState));
+        Board playerBuilds = board;
+        board.applyBoardState(boardState);
+        playerBuilds.applyPlayerBoardState(playerBoardState, Character.toString(playerId));
+        String[][] accArray = new String[acc.size()][];
+        accArray = acc.toArray(accArray);
+        return accArray;
     }
 
     /**
@@ -1585,12 +1802,14 @@ public class CatanDiceExtra {
         return null;
     }
 
+    /**
+     * A function which checks the score if any of the players scores are above 10, if so the game is over
+     * @param boardState
+     * @return jf the game is over or not
+     * Authored By Manindra de Mel, u7156805
+     */
     public static Boolean isGameOver(String boardState) {
-        return false;
+        String scores = Board.getScoreFromBoardState(boardState);
+        return Integer.parseInt(scores.substring(1, 3)) >= 10 || Integer.parseInt(scores.substring(scores.indexOf('X') + 1, scores.indexOf('X') + 3)) >= 10;
     }
-
-    public static String GameOver() {
-        return "";
-    }
-
 }
