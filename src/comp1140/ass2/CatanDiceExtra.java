@@ -1,5 +1,6 @@
 package comp1140.ass2;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1810,6 +1811,29 @@ public class CatanDiceExtra {
 
                 }
             }
+        } else if (turn.charAt(2)=='3') {
+            ArrayList<Resource> resourceArrayList= new ArrayList<Resource>();
+            for (int x=0; x<resources.length(); x++) {
+                if (resources.charAt(x)=='b') {
+                    resourceArrayList.add(Resource.brick);
+                }
+                if (resources.charAt(x)=='g') {
+                    resourceArrayList.add(Resource.wheat);
+                }
+                if (resources.charAt(x)=='l') {
+                    resourceArrayList.add(Resource.wood);
+                }
+                if (resources.charAt(x)=='m') {
+                    resourceArrayList.add(Resource.gold);
+                }
+                if (resources.charAt(x)=='o') {
+                    resourceArrayList.add(Resource.stone);
+                }
+                if (resources.charAt(x)=='w') {
+                    resourceArrayList.add(Resource.sheep);
+                }
+            }
+            acc = buildPhase(board, playerBuilds, resourceArrayList, new ArrayList<Resource>(), playerId, new String[0]);
         }
         String[][] accArray = new String[acc.size()][];
         accArray = acc.toArray(accArray);
@@ -1826,6 +1850,28 @@ public class CatanDiceExtra {
         }
         return acc;
 
+    }
+    public static ArrayList<String[]> buildPhase(Board board, Board playerBuilds, ArrayList<Resource> resources, ArrayList<Resource> fixedResources, Character playerId, String[] actionsSoFar) {
+        int goldnum = 0;
+        for (Resource r : resources) {
+            if (r == Resource.gold) {
+                goldnum+=1;
+            }
+        }
+        if (goldnum>=2) {
+            ArrayList<Resource> tradeFor = new ArrayList<Resource>();
+            String tradeAction = "trade";
+            for (int x = 2; x<=goldnum; x+=2) {
+                for (int y = 0; y<6; x++) {
+                    tradeFor.add(boardResources[y]);
+                    tradeAction+=resourceChars[y];
+                }
+            }
+        }
+        ArrayList<Resource> totalResources = resources;
+        totalResources.addAll(fixedResources);
+        ArrayList<String[]> acc = new ArrayList<String[]>();
+        return acc;
     }
 
     /**
