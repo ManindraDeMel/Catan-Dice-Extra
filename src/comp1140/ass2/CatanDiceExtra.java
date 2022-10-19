@@ -1798,7 +1798,7 @@ public class CatanDiceExtra {
      */
     public static String[] generateAction(String boardState) {
         Minimax m = new Minimax();
-        m.run(boardState, 3, true);
+        m.run(boardState, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
         return m.bestMove;
     }
     /**
@@ -1819,7 +1819,7 @@ public class CatanDiceExtra {
          * @return the max/min child score depending on who's turn it is and other factors
          * Authored by Manindra de Mel, u7156805.
          */
-        private int run(String boardState, int depth, boolean AIturn) {
+        private int run(String boardState, int depth, int alpha, int beta, boolean AIturn) {
             if (isGameOver(boardState)) {
                 if (AIturn) {
                     return 10000;
@@ -1834,10 +1834,14 @@ public class CatanDiceExtra {
                 int max = -1;
                 for (String[] actionSequence : actionsSequences) {
                     String newBoardState = applyActionSequence(boardState, actionSequence);
-                    int childScore = run(newBoardState, depth - 1, false);
+                    int childScore = run(newBoardState, depth - 1, alpha, beta, false); // Will have to be changed when we have more than 2 players
                     if (childScore > max) {
                         max = childScore;
                         bestMove = actionSequence;
+                    }
+                    alpha = Math.max(alpha, childScore);
+                    if (beta <= alpha) {
+                        break;
                     }
                 }
                 return max;
@@ -1846,10 +1850,14 @@ public class CatanDiceExtra {
                 int min = 1000;
                 for (String[] actionSequence : actionsSequences) {
                     String newBoardState = applyActionSequence(boardState, actionSequence);
-                    int childScore = run(newBoardState, depth - 1, true);
+                    int childScore = run(newBoardState, depth - 1, alpha, beta, true);
                     if (childScore < min) {
                         min = childScore;
                         bestMove = actionSequence;
+                    }
+                    beta = Math.min(beta, childScore);
+                    if (beta <= alpha) {
+                        break;
                     }
                 }
                 return min;
