@@ -1798,10 +1798,9 @@ public class CatanDiceExtra {
      */
     public static String[] generateAction(String boardState) {
         Minimax m = new Minimax();
-        m.run(boardState, 7, true);
+        m.run(boardState, 3, true);
         return m.bestMove;
     }
-
     /**
      * The AI written for this assignment uses the minimax algorithm to compete against the opponent.
      * Authored by Manindra de Mel, u7156805.
@@ -1847,7 +1846,7 @@ public class CatanDiceExtra {
                 int min = 1000;
                 for (String[] actionSequence : actionsSequences) {
                     String newBoardState = applyActionSequence(boardState, actionSequence);
-                    int childScore = run(newBoardState, depth - 1, false);
+                    int childScore = run(newBoardState, depth - 1, true);
                     if (childScore < min) {
                         min = childScore;
                         bestMove = actionSequence;
@@ -1869,6 +1868,7 @@ public class CatanDiceExtra {
             return Integer.parseInt(score.substring(score.indexOf(playerID) + 1, score.indexOf(playerID) + 3));
         }
     }
+
     /**
      * A function which checks the score if any of the players scores are above 10, if so the game is over
      * @param boardState
