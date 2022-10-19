@@ -3,8 +3,7 @@ package comp1140.ass2;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static comp1140.ass2.Board.getScoreFromBoardState;
-import static comp1140.ass2.Board.getTurnFromBoardState;
+import static comp1140.ass2.Board.*;
 import static comp1140.ass2.CatanDiceExtra.validateClass.Misc.getPlayerBoardState;
 
 public class CatanDiceExtra {
@@ -1758,7 +1757,13 @@ public class CatanDiceExtra {
         ArrayList<String[]> acc = new ArrayList<String[]>();
         String turn = getTurnFromBoardState(boardState);
         String resources = turn.substring(2);
-        if (turn.charAt(1)=='1'||turn.charAt(1)=='2') {
+        Character playerId = turn.charAt(0);
+        String playerBoardState = getPlayerBoardState(boardState, playerId);
+        Board board = new Board(turn, getScoreFromBoardState(boardState));
+        Board playerBuilds = board;
+        board.applyBoardState(boardState);
+        playerBuilds.applyPlayerBoardState(playerBoardState, Character.toString(playerId));
+        if (turn.charAt(2)=='1'||turn.charAt(2)=='2') {
             for (int x=0; x<(2^(resources.length())); x++) {
                 String binary = Integer.toBinaryString(x);
                 String keep = "keep";
@@ -1771,16 +1776,56 @@ public class CatanDiceExtra {
                 keepArray[0]= keep;
                 acc.add(keepArray);
             }
+        } else if (turn.charAt(2)=='0') {
+            Set<Coordinate> bannedCoords = Set.of();
+            if (board.roads.size()>0) {
+                Road startRoad = board.roads.get(0);
+                Coordinate c1 = startRoad.coord1;
+                Coordinate c2 = startRoad.coord2;
+                bannedCoords.addAll(findCoordsInDistance(c1, 5));
+                bannedCoords.addAll(findCoordsInDistance(c2, 5));
+            }
+            for (Coordinate coord : coords) {
+                ArrayList<Coordinate> coastalNeighbours = neighbours.get(coord);
+                if (coastalNeighbours.size()==2) {
+                    if (bannedCoords.contains(coord)) {
+                        continue;
+                    }
+                    Coordinate neighbour1 = coastalNeighbours.get(0);
+                    Coordinate neighbour2 = coastalNeighbours.get(1);
+                    Road r1 = (new Road(new Player(""), coord, neighbour1));
+                    r1.roadOrder();
+                    Road r2 = (new Road(new Player(""), coord, neighbour2));
+                    r2.roadOrder();
+                    String [] r1Array = new String [1];
+                    String [] r2Array = new String [1];
+                    r1Array[0] = r1.toString();
+                    r2Array[0] = r2.toString();
+                    if ((!acc.contains(r1Array))&&!bannedCoords.contains(neighbour1)) {
+                        acc.add(r1Array);
+                    }
+                    if ((!acc.contains(r2Array))&&!bannedCoords.contains(neighbour2)) {
+                        acc.add(r2Array);
+                    }
+
+                }
+            }
         }
-        Character playerId = turn.charAt(0);
-        String playerBoardState = getPlayerBoardState(boardState, playerId);
-        Board board = new Board(turn, getScoreFromBoardState(boardState));
-        Board playerBuilds = board;
-        board.applyBoardState(boardState);
-        playerBuilds.applyPlayerBoardState(playerBoardState, Character.toString(playerId));
         String[][] accArray = new String[acc.size()][];
         accArray = acc.toArray(accArray);
         return accArray;
+    }
+
+    public static Set<Coordinate> findCoordsInDistance(Coordinate coord, int distance) {
+        Set<Coordinate> acc = Set.of();
+        acc.addAll(neighbours.get(coord));
+        if (distance > 1) {
+            for (Coordinate c : neighbours.get(coord)) {
+                acc.addAll(findCoordsInDistance(c, distance-1));
+            }
+        }
+        return acc;
+
     }
 
     /**

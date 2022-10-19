@@ -18,7 +18,15 @@ public class Road extends GamePiece implements Comparable<Road>{
         this.coord2 = coord2;
     }
 
-
+    public void roadOrder() {
+        Coordinate coord1 = this.coord1;
+        Coordinate coord2 = this.coord2;
+        if (coord1.index>coord2.index) {
+            this.coord1 = coord2;
+            this.coord2 = coord1;
+        }
+        return;
+    }
     @Override
     public String toString() {
         String ind = "";
