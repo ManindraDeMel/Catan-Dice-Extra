@@ -52,7 +52,7 @@ public class Prices {
     /**
      * Given a list of resources, return a list of all the possible buildings that can be created from that list of resources
      * @param resources
-     * @return a list of resources that can be created from the list of resources
+     * @return a list of buildings that can be created from the list of resources
      * Authored By Manindra de Mel, u7156805
      */
     public static ArrayList<ArrayList<String>> findBuilds(ArrayList<Resource> resources) { // need to account for the case of two gold

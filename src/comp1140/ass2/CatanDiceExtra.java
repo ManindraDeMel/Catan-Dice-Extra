@@ -1797,11 +1797,78 @@ public class CatanDiceExtra {
      * @return array of strings representing the actions the AI will take.
      */
     public static String[] generateAction(String boardState) {
-        // FIXME: Task 13
-        // FIXME: Task 14 Implement a "smart" generateAction()
-        return null;
+        Minimax m = new Minimax();
+        m.run(boardState, 7, true);
+        return m.bestMove;
     }
 
+    /**
+     * The AI written for this assignment uses the minimax algorithm to compete against the opponent.
+     * Authored by Manindra de Mel, u7156805.
+     */
+    private static class Minimax {
+        /**
+         * bestMove is used to keep track of the bestMove throughout the minimax recursive calls.
+         */
+        private String[] bestMove;
+
+        /**
+         * The minimax algorithm
+         * @param boardState takes a boardstate
+         * @param depth how many future boardstates to look into
+         * @param AIturn if it's the AI's turn
+         * @return the max/min child score depending on who's turn it is and other factors
+         * Authored by Manindra de Mel, u7156805.
+         */
+        private int run(String boardState, int depth, boolean AIturn) {
+            if (isGameOver(boardState)) {
+                if (AIturn) {
+                    return 10000;
+                }
+                return -10000;
+            }
+            else if (depth == 0 ) {
+                return heuristic(boardState);
+            }
+            String[][] actionsSequences = generateAllPossibleActionSequences(boardState);
+            if (AIturn) {
+                int max = -1;
+                for (String[] actionSequence : actionsSequences) {
+                    String newBoardState = applyActionSequence(boardState, actionSequence);
+                    int childScore = run(newBoardState, depth - 1, false);
+                    if (childScore > max) {
+                        max = childScore;
+                        bestMove = actionSequence;
+                    }
+                }
+                return max;
+            }
+            else {
+                int min = 1000;
+                for (String[] actionSequence : actionsSequences) {
+                    String newBoardState = applyActionSequence(boardState, actionSequence);
+                    int childScore = run(newBoardState, depth - 1, false);
+                    if (childScore < min) {
+                        min = childScore;
+                        bestMove = actionSequence;
+                    }
+                }
+                return min;
+            }
+        }
+
+        /**
+         * A way to evaluate a boardState is to simply look at the score of the AI.
+         * @param boardState
+         * @return the score of the AI/player's turn
+         * Authored by Manindra de Mel, u7156805.
+         */
+        private static int heuristic(String boardState) {
+            String score = Board.getScoreFromBoardState(boardState);
+            char playerID = boardState.charAt(0);
+            return Integer.parseInt(score.substring(score.indexOf(playerID) + 1, score.indexOf(playerID) + 3));
+        }
+    }
     /**
      * A function which checks the score if any of the players scores are above 10, if so the game is over
      * @param boardState
