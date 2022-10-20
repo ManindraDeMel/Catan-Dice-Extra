@@ -1,11 +1,13 @@
 package comp1140.ass2;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static comp1140.ass2.Board.getScoreFromBoardState;
-import static comp1140.ass2.Board.getTurnFromBoardState;
+import static comp1140.ass2.Board.*;
 import static comp1140.ass2.CatanDiceExtra.validateClass.Misc.getPlayerBoardState;
+import static comp1140.ass2.Resource.*;
+import static comp1140.ass2.TileType.*;
 
 public class CatanDiceExtra {
     ArrayList<Player> players = new ArrayList<>();
@@ -779,7 +781,7 @@ public class CatanDiceExtra {
                     put('g', Resource.wheat);
                     put('l', Resource.wood);
                     put('m', Resource.gold);
-                    put('o', Resource.stone);
+                    put('o', stone);
                     put('w', Resource.sheep); // convert to our system
                 }};
                 final HashMap<String, Character> nameToBuildID = new HashMap<>() {{
@@ -1758,7 +1760,14 @@ public class CatanDiceExtra {
         ArrayList<String[]> acc = new ArrayList<String[]>();
         String turn = getTurnFromBoardState(boardState);
         String resources = turn.substring(2);
-        if (turn.charAt(1)=='1'||turn.charAt(1)=='2') {
+        char playerId = turn.charAt(0);
+        String playerBoardState = getPlayerBoardState(boardState, playerId);
+        Board board = new Board(turn, getScoreFromBoardState(boardState));
+        Board playerBuilds = board;
+        board.applyBoardState(boardState);
+        playerBuilds.applyPlayerBoardState(playerBoardState, Character.toString(playerId));
+        ArrayList<Road> playerRoads = playerBuilds.roads;
+        if (turn.charAt(2)=='1'||turn.charAt(2)=='2') {
             for (int x=0; x<(2^(resources.length())); x++) {
                 String binary = Integer.toBinaryString(x);
                 String keep = "keep";
@@ -1771,18 +1780,303 @@ public class CatanDiceExtra {
                 keepArray[0]= keep;
                 acc.add(keepArray);
             }
+        } else if (turn.charAt(2)=='0') {
+            Set<Coordinate> bannedCoords = Set.of();
+            if (board.roads.size()>0) {
+                Road startRoad = board.roads.get(0);
+                Coordinate c1 = startRoad.coord1;
+                Coordinate c2 = startRoad.coord2;
+                bannedCoords.addAll(findCoordsInDistance(c1, 5));
+                bannedCoords.addAll(findCoordsInDistance(c2, 5));
+            }
+            for (Coordinate coord : coords) {
+                ArrayList<Coordinate> coastalNeighbours = neighbours.get(coord);
+                if (coastalNeighbours.size()==2) {
+                    if (bannedCoords.contains(coord)) {
+                        continue;
+                    }
+                    Coordinate neighbour1 = coastalNeighbours.get(0);
+                    Coordinate neighbour2 = coastalNeighbours.get(1);
+                    Road r1 = (new Road(new Player(""), coord, neighbour1));
+                    r1.roadOrder();
+                    Road r2 = (new Road(new Player(""), coord, neighbour2));
+                    r2.roadOrder();
+                    String [] r1Array = new String [1];
+                    String [] r2Array = new String [1];
+                    r1Array[0] = r1.toString();
+                    r2Array[0] = r2.toString();
+                    if ((!acc.contains(r1Array))&&!bannedCoords.contains(neighbour1)) {
+                        acc.add(r1Array);
+                    }
+                    if ((!acc.contains(r2Array))&&!bannedCoords.contains(neighbour2)) {
+                        acc.add(r2Array);
+                    }
+
+                }
+            }
+        } else if (turn.charAt(2)=='3') {
+            ArrayList<Resource> resourceArrayList= new ArrayList<Resource>();
+            for (int x=0; x<resources.length(); x++) {
+                if (resources.charAt(x)=='b') {
+                    resourceArrayList.add(Resource.brick);
+                }
+                if (resources.charAt(x)=='g') {
+                    resourceArrayList.add(Resource.wheat);
+                }
+                if (resources.charAt(x)=='l') {
+                    resourceArrayList.add(Resource.wood);
+                }
+                if (resources.charAt(x)=='m') {
+                    resourceArrayList.add(Resource.gold);
+                }
+                if (resources.charAt(x)=='o') {
+                    resourceArrayList.add(stone);
+                }
+                if (resources.charAt(x)=='w') {
+                    resourceArrayList.add(Resource.sheep);
+                }
+            }
+            acc = buildPhase(board, playerRoads, resourceArrayList, new ArrayList<Resource>(), playerId, new String[0]);
         }
-        Character playerId = turn.charAt(0);
-        String playerBoardState = getPlayerBoardState(boardState, playerId);
-        Board board = new Board(turn, getScoreFromBoardState(boardState));
-        Board playerBuilds = board;
-        board.applyBoardState(boardState);
-        playerBuilds.applyPlayerBoardState(playerBoardState, Character.toString(playerId));
         String[][] accArray = new String[acc.size()][];
         accArray = acc.toArray(accArray);
         return accArray;
     }
 
+    public static Set<Coordinate> findCoordsInDistance(Coordinate coord, int distance) {
+        Set<Coordinate> acc = Set.of();
+        acc.addAll(neighbours.get(coord));
+        if (distance > 1) {
+            for (Coordinate c : neighbours.get(coord)) {
+                acc.addAll(findCoordsInDistance(c, distance-1));
+            }
+        }
+        return acc;
+
+    }
+    public static ArrayList<String[]> buildPhase(Board board, ArrayList<Road> playerRoads, ArrayList<Resource> resources, ArrayList<Resource> fixedResources, char playerId, String[] actionsSoFar) {
+        ArrayList<String[]> acc = new ArrayList<String[]>();
+        if (fixedResources.size()==0) {
+            acc.add(actionsSoFar);
+        }
+        String[] newActionsSoFar = new String[actionsSoFar.length+1];
+        for (int x=0;x<actionsSoFar.length; x++) {
+            newActionsSoFar[x]=actionsSoFar[x];
+        }
+        ArrayList<Resource> newResources = new ArrayList<Resource>();
+        ArrayList<Resource> newFixedResources = new ArrayList<Resource>();
+        Board newBoard = board;
+        ArrayList<Road> newPlayerRoads = playerRoads;
+        int goldnum = 0;
+        for (Resource r : resources) {
+            if (r == Resource.gold) {
+                goldnum += 1;
+            }
+        }
+        if (goldnum>=2) {
+            newResources = new ArrayList<>();
+            newResources.addAll(resources);
+            newResources.remove(Resource.gold);
+            newResources.remove(Resource.gold);
+            for (int x = 0; x<5;x++) {
+                newFixedResources = new ArrayList<>();
+                newFixedResources.addAll(fixedResources);
+                newFixedResources.add(boardResources[x]);
+                String tradeAction = "trade"+resourceChars[x];
+                newActionsSoFar[actionsSoFar.length] = tradeAction;
+                acc.addAll(buildPhase(board, playerRoads, newResources, newFixedResources, playerId, newActionsSoFar));
+            }
+        }
+        if (goldnum>=4) {
+            newResources = new ArrayList<>();
+            newResources.addAll(resources);
+            newResources.remove(Resource.gold);
+            newResources.remove(Resource.gold);
+            newResources.remove(Resource.gold);
+            newResources.remove(Resource.gold);
+            for (int y = 0; y<5;y++) {
+                for (int x=0; x<=y;x++) {
+                    newFixedResources = new ArrayList<>();
+                    newFixedResources.addAll(fixedResources);
+                    newFixedResources.add(boardResources[x]);
+                    newFixedResources.add(boardResources[y]);
+                    String tradeAction = "trade"+resourceChars[x]+resourceChars[y];
+                    newActionsSoFar[actionsSoFar.length] = tradeAction;
+                    acc.addAll(buildPhase(board, playerRoads, newResources, newFixedResources, playerId, newActionsSoFar));
+                }
+            }
+        }
+        if (goldnum>=6) {
+            newResources = new ArrayList<>();
+            newResources.addAll(resources);
+            newResources.remove(Resource.gold);
+            newResources.remove(Resource.gold);
+            newResources.remove(Resource.gold);
+            newResources.remove(Resource.gold);
+            newResources.remove(Resource.gold);
+            newResources.remove(Resource.gold);
+            for (int z = 0; z<5;z++) {
+                for (int y=0; y<=z;y++) {
+                    for (int x=0; x<=y; x++) {
+                        newFixedResources = new ArrayList<>();
+                        newFixedResources.addAll(fixedResources);
+                        newFixedResources.add(boardResources[x]);
+                        newFixedResources.add(boardResources[y]);
+                        newFixedResources.add(boardResources[z]);
+                        String tradeAction = "trade"+resourceChars[x]+resourceChars[y]+resourceChars[z];
+                        newActionsSoFar[actionsSoFar.length] = tradeAction;
+                        acc.addAll(buildPhase(board, playerRoads, newResources, newFixedResources, playerId, newActionsSoFar));
+                    }
+                }
+            }
+        }
+        int desertcount = 0;
+        for (Tile tile : board.tiles) {
+            if ((tile.Owner.name.equals(String.valueOf(playerId)))&&!tile.used) {
+                if (tile.tileType==desert) {
+                    desertcount+=1;
+                } else {
+                    newFixedResources = new ArrayList<>();
+                    newFixedResources.addAll(fixedResources);
+                    newFixedResources.add(tileTypeToResource(tile.tileType));
+                    newBoard=board;
+                    (board.tiles[tile.tileIndex]).used=true;
+                    for (int x = 0; x<resources.size(); x++) {
+                        newResources = new ArrayList<>();
+                        newResources.addAll(resources);
+                        newResources.remove(resources.get(x));
+                        String swapAction = "swap" + resourceToChar(resources.get(x))+tileTypeToChar(tile.tileType);
+                        newActionsSoFar[actionsSoFar.length] = swapAction;
+                        acc.addAll(buildPhase(  newBoard, playerRoads, newResources, newFixedResources, playerId, newActionsSoFar));
+                    }
+                }
+            }
+        }
+        if (desertcount==2) {
+            newBoard=board;
+            (board.tiles[9]).used=true;
+            (board.tiles[10]).used=true;
+            for (Resource resource:boardResources) {
+                newFixedResources = new ArrayList<>();
+                newFixedResources.addAll(fixedResources);
+                newFixedResources.add(resource);
+                for (int x = 0; x<resources.size(); x++) {
+                    newResources = new ArrayList<>();
+                    newResources.addAll(resources);
+                    newResources.remove(resources.get(x));
+                    String swapAction = "swap" + resourceToChar(resources.get(x))+resourceToChar(resource);
+                    newActionsSoFar[actionsSoFar.length] = swapAction;
+                    acc.addAll(buildPhase(newBoard, playerRoads, newResources, newFixedResources, playerId, newActionsSoFar));
+                }
+            }
+
+        }
+        ArrayList<Resource> totalResources = resources;
+        totalResources.addAll(fixedResources);
+        int[] resourceAmounts = {0, 0, 0, 0, 0, 0};
+        for (Resource r : totalResources) {
+            if (r == Resource.brick) {
+                resourceAmounts[0]+=1;
+            } else if (r == Resource.wheat) {
+                resourceAmounts[1]+=1;
+            } else if (r == Resource.wood) {
+                resourceAmounts[2]+=1;
+            } else if (r == Resource.stone) {
+                resourceAmounts[3]+=1;
+            } else if (r == Resource.sheep) {
+                resourceAmounts[4]+=1;
+            } else if (r == Resource.gold) {
+                resourceAmounts[5]+=1;
+            }
+        }
+        boolean affordRoad = false;
+        if (resourceAmounts[0]>=1&&resourceAmounts[2]>=1) {
+            affordRoad=true;
+        }
+        boolean affordSettlement = false;
+        if (resourceAmounts[1]>=1&&resourceAmounts[4]>=1&&affordRoad) {
+            affordSettlement=true;
+        }
+        boolean affordCity = false;
+        if (resourceAmounts[1]>=2&&resourceAmounts[3]>=3) {
+            affordSettlement=true;
+        }
+        boolean affordKnight = false;
+        if (resourceAmounts[1]>=1&&resourceAmounts[3]>=1&&resourceAmounts[4]>=1) {
+            affordKnight=true;
+        }
+        for (int x = 0; x<6; x++) {
+            if (resourceAmounts[x]>=5) {
+                newResources = new ArrayList<>();
+                newResources.addAll(resources);
+                newFixedResources = new ArrayList<>();
+                newFixedResources.addAll(fixedResources);
+                for (int y = 0; y<5; y++) {
+                    if (newResources.contains(boardResources[x])) {
+                        newResources.remove(boardResources[x]);
+                    } else {
+                        newFixedResources.remove(boardResources[x]);
+                    }
+                }
+                for (int z = 0; z<board.castles.length; z++) {
+                    if (board.castles[x].Owner.name=="") {
+                        newBoard=board;
+                        String buildAction = "build" + board.castles[x].toString();
+                        newBoard.castles[x].Owner.name = String.valueOf(playerId);
+                        newBoard.castles[x].Owner.ID = playerId;
+                        newActionsSoFar[actionsSoFar.length] = buildAction;
+                        acc.addAll(buildPhase(newBoard, playerRoads, newResources, newFixedResources, playerId, newActionsSoFar));
+                    }
+                }
+            }
+        }
+        return acc;
+    }
+    public static Character tileTypeToChar(TileType t) {
+        if (t==ore) {
+            return 'o';
+        } else if (t==grain) {
+            return 'g';
+        } else if (t==wool) {
+            return 'w';
+        } else if (t==timber) {
+            return 'l';
+        } else if (t==bricks) {
+            return 'b';
+        } else {
+            return null;
+        }
+    }
+    public static Resource tileTypeToResource(TileType t) {
+        if (t==ore) {
+            return stone;
+        } else if (t==grain) {
+            return wheat;
+        } else if (t==wool) {
+            return sheep;
+        } else if (t==timber) {
+            return wood;
+        } else if (t==bricks) {
+            return brick;
+        } else {
+            return null;
+        }
+    }
+    public static Character resourceToChar(Resource r) {
+        if (r==stone) {
+            return 'o';
+        } else if (r==wheat) {
+            return 'g';
+        } else if (r==sheep) {
+            return 'w';
+        } else if (r==wood) {
+            return 'l';
+        } else if (r==brick) {
+            return 'b';
+        } else {
+            return null;
+        }
+    }
     /**
      * Given a valid board state, return a valid action sequence.
      *
@@ -1797,9 +2091,84 @@ public class CatanDiceExtra {
      * @return array of strings representing the actions the AI will take.
      */
     public static String[] generateAction(String boardState) {
-        // FIXME: Task 13
-        // FIXME: Task 14 Implement a "smart" generateAction()
-        return null;
+        Minimax m = new Minimax();
+        m.run(boardState, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+        return m.bestMove;
+    }
+    /**
+     * The AI written for this assignment uses the minimax algorithm to compete against the opponent.
+     * Authored by Manindra de Mel, u7156805.
+     */
+    private static class Minimax {
+        /**
+         * bestMove is used to keep track of the bestMove throughout the minimax recursive calls.
+         */
+        private String[] bestMove;
+
+        /**
+         * The minimax algorithm
+         * @param boardState takes a boardstate
+         * @param depth how many future boardstates to look into
+         * @param AIturn if it's the AI's turn
+         * @return the max/min child score depending on who's turn it is and other factors
+         * Authored by Manindra de Mel, u7156805.
+         */
+        private int run(String boardState, int depth, int alpha, int beta, boolean AIturn) {
+            if (isGameOver(boardState)) {
+                if (AIturn) {
+                    return 10000;
+                }
+                return -10000;
+            }
+            else if (depth == 0 ) {
+                return heuristic(boardState);
+            }
+            String[][] actionsSequences = generateAllPossibleActionSequences(boardState);
+            if (AIturn) {
+                int max = -1;
+                for (String[] actionSequence : actionsSequences) {
+                    String newBoardState = applyActionSequence(boardState, actionSequence);
+                    int childScore = run(newBoardState, depth - 1, alpha, beta, false); // Will have to be changed when we have more than 2 players
+                    if (childScore > max) {
+                        max = childScore;
+                        bestMove = actionSequence;
+                    }
+                    alpha = Math.max(alpha, childScore);
+                    if (beta <= alpha) {
+                        break;
+                    }
+                }
+                return max;
+            }
+            else {
+                int min = 1000;
+                for (String[] actionSequence : actionsSequences) {
+                    String newBoardState = applyActionSequence(boardState, actionSequence);
+                    int childScore = run(newBoardState, depth - 1, alpha, beta, true);
+                    if (childScore < min) {
+                        min = childScore;
+                        bestMove = actionSequence;
+                    }
+                    beta = Math.min(beta, childScore);
+                    if (beta <= alpha) {
+                        break;
+                    }
+                }
+                return min;
+            }
+        }
+
+        /**
+         * A way to evaluate a boardState is to simply look at the score of the AI.
+         * @param boardState
+         * @return the score of the AI/player's turn
+         * Authored by Manindra de Mel, u7156805.
+         */
+        private static int heuristic(String boardState) {
+            String score = Board.getScoreFromBoardState(boardState);
+            char playerID = boardState.charAt(0);
+            return Integer.parseInt(score.substring(score.indexOf(playerID) + 1, score.indexOf(playerID) + 3));
+        }
     }
 
     /**
