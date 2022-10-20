@@ -1,5 +1,6 @@
 package comp1140.ass2.gui;
 
+import comp1140.ass2.Board;
 import comp1140.ass2.gui.backend.*;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -9,19 +10,25 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import javax.swing.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static comp1140.ass2.CatanDiceExtra.validateClass.Misc.getResourcesFromBoardState;
 import static comp1140.ass2.gui.backend.Constants.*;
 
 public class Game extends Application {
@@ -34,7 +41,9 @@ public class Game extends Application {
     private static GameMode GAME_MODE = GameMode.NOTCHOSEN;
     private final Group board = new Group();
     private final Group structures = new Group();
+    private final Group information = new Group();
     private static int players;
+    static String BOARD_STATE = "W00WXW00X00";
 
     // CONSTANTS
     static final double HEX_WIDTH = 140;
@@ -44,6 +53,25 @@ public class Game extends Application {
     static final int MARGIN_Y = (int) (HEX_HEIGHT * 0.5);
     static final int BOARD_Y = MARGIN_Y;
     static final Color[] playersColour = new Color[]{Color.ORANGE, Color.RED};
+
+    private final static String INSTRUCTIONS = """
+           Welcome to Catan Dice Extra!
+                                                                                                                                                                               
+           You're a new venturer seeking to dominante control over an island constented between you and other venturers!
+           Once you've built your initial road, you test your luck and roll for resources on your turn! If you're unhappy with some of the resources you've rolled, you can try your luck again and roll again! But be careful, you only have 3 rolls. If you get lucky and roll 2 money resources you can trade it for any resource you desire! and if you've built a knight on a resource tile you can even swap another resource for the resource the knight is on! Talk about sneaky strategy.. Ultimately you must use swaps, trades and keep (reroll) actions to outplay your opponents and build as many structures as to can to dominante your control over the island, build long roads and many knights (you get bonus points). This first to 10 points wins! Good luck venturers!
+           
+           Controls:
+           On your turn you have three different phases
+           - the Roll Phase
+             - In the roll phase you can use the 'keep' button and name the resources you want to keep, the other resources will be rerolled (at a max of 3 rerolls)
+           - The Build Phase
+             - build action
+               - Here you can build several structures: Roads, settlements, citites, castles and knights all of which need a certain amount of resources to build and need to be connected to a road network owned by yourself
+             - trade action
+               - If you've attained 2 money resources in a roll, you can trade those 2 money resources for any resource you desire. The ratio is always 2 : 1
+             - swap action
+               - If you've built a knight and it hasn't been used yet, you can use that knight to 'swap' one of the resources you've rolled for the resource the knight is on
+           """;
 
 
     private void chooseGameMode() {
@@ -129,6 +157,16 @@ public class Game extends Application {
         this.controls.getChildren().add(gameModeButtons);
     }
 
+    public void endGame(char winner){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText("GAME OVER");
+        alert.setContentText("WINNER IS: Player " + winner);
+        alert.showAndWait().ifPresent(e ->
+        {
+            Platform.exit();
+        });
+    }
+
     /**
      *  makeBoard() creates tiles (hexagon shaped) on the window
      */
@@ -155,6 +193,12 @@ public class Game extends Application {
                 this.board.getChildren().add(hexagon);
             }
         }
+
+        Line line = new Line(HEX_WIDTH * 5.5, -WINDOW_HEIGHT, HEX_WIDTH * 5.5, WINDOW_HEIGHT);
+        line.setFill(Color.WHITESMOKE);
+        line.setStrokeType(StrokeType.CENTERED);
+        this.board.getChildren().add(line);
+
         this.board.toBack();
     }
 
@@ -537,6 +581,7 @@ public class Game extends Application {
             this.structures.getChildren().add(toAdd.cityLeft);
         }
 
+        makeScoreBoard(boardState);
 
         // Outputting text for debugging
 //        System.out.println(this.structures.getChildren());
@@ -544,6 +589,32 @@ public class Game extends Application {
 
 
         /////////////////////////////////////////////
+    }
+
+    private void makeScoreBoard(String boardState){
+        String scores = Board.getScoreFromBoardState(boardState);
+        int scoreX = Integer.parseInt(scores.substring(1, 3));
+        int scoreY = Integer.parseInt(scores.substring(scores.indexOf('X') + 1, scores.indexOf('X') + 3));
+        Font font = Font.font("Courier New", FontWeight.BOLD, 22);
+        double centerX = WINDOW_WIDTH - 350;
+
+
+        Text scoreStrX = new Text("Player X Score: " + scoreX);
+        scoreStrX.setY(HEX_HEIGHT * 0.5);
+        scoreStrX.setX(centerX);
+        scoreStrX.setFill(playersColour[0]);
+        scoreStrX.setFont(font);
+        scoreStrX.setStrokeType(StrokeType.OUTSIDE);
+
+        Text scoreStrY = new Text("Player Y Score: " + scoreY);
+        scoreStrY.setY(HEX_WIDTH * 0.75);
+        scoreStrY.setX(centerX);
+        scoreStrY.setFill(playersColour[1]);
+        scoreStrY.setFont(font);
+        scoreStrY.setStrokeType(StrokeType.OUTSIDE);
+
+
+        this.information.getChildren().addAll(scoreStrX, scoreStrY);
     }
 
     private void newGame() {
@@ -558,39 +629,67 @@ public class Game extends Application {
 
     private void makeControls() {
         Button button = new Button("Restart");
-        button.setLayoutX(MARGIN_X + 90);
+        button.setLayoutX(WINDOW_WIDTH - 100);
         button.setLayoutY(WINDOW_HEIGHT - 45);
         button.setOnAction(e -> this.newGame());
         this.controls.getChildren().add(button);
 
         Button instructions = new Button("Instructions");
-        instructions.setLayoutX(MARGIN_X + 180);
+        instructions.setLayoutX(WINDOW_WIDTH - 200);
         instructions.setLayoutY(WINDOW_HEIGHT - 45);
         instructions.setOnAction(e -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setHeaderText("Instructions and Controls");
             alert.setContentText(INSTRUCTIONS);
             alert.show();
+//            try {TimeUnit.SECONDS.sleep(2);}
+//            catch(InterruptedException ex) {Thread.currentThread().interrupt();}
+//            alert.close();
         });
         this.controls.getChildren().add(instructions);
+    }
 
-        this.difficulty.setMin(0);
-        this.difficulty.setMax(3);
-        this.difficulty.setValue(0);
-        this.difficulty.setShowTickLabels(true);
-        this.difficulty.setShowTickMarks(true);
-        this.difficulty.setMajorTickUnit(1);
-        this.difficulty.setSnapToTicks(true);
+    private void makeTurnInfo() throws FileNotFoundException {
+        Group resourceGroup = new Group();
+        String turn = Board.getTurnFromBoardState(BOARD_STATE);
+        String player = turn.substring(0, 1);
+        ArrayList<Character> resources = getResourcesFromBoardState(BOARD_STATE);
+        ArrayList<ImageView> resourcesImage = new ArrayList<ImageView>();
+        Font font = Font.font("Courier New", FontWeight.BOLD, 22);
+        double centerX = WINDOW_WIDTH - 350;
 
-        this.difficulty.setLayoutX(MARGIN_X + 60);
-        this.difficulty.setLayoutY(WINDOW_HEIGHT - 85);
-        this.controls.getChildren().add(this.difficulty);
 
-        final Label difficultyCaption = new Label("Difficulty:");
-        difficultyCaption.setTextFill(Color.GRAY);
-        difficultyCaption.setLayoutX(MARGIN_X);
-        difficultyCaption.setLayoutY(WINDOW_HEIGHT - 85);
-        this.controls.getChildren().add(difficultyCaption);
+        Text currTurn = new Text("Current Turn: " + player);
+        currTurn.setY(HEX_HEIGHT * 1.5);
+        currTurn.setX(centerX);
+        currTurn.setFill(Color.LIGHTBLUE);
+        currTurn.setFont(font);
+        currTurn.setStrokeType(StrokeType.OUTSIDE);
+
+
+        for (int i = 0; i < resources.size(); i++) {
+            System.out.println(i);
+            InputStream stream = new FileInputStream("assets/resources/" + resources.get(i) + ".png");
+            Image image = new Image(stream);
+            ImageView resource = new ImageView(image);
+
+            resource.setScaleX(0.75);
+            resource.setScaleY(0.75);
+
+            resource.setTranslateX(centerX + 50*i);
+            resource.setTranslateY(HEX_HEIGHT * 1.65);
+
+            this.information.getChildren().add(resource);
+
+            resourcesImage.add(resource);
+        }
+
+        resourceGroup.getChildren().addAll(resourcesImage);
+        this.information.getChildren().addAll(currTurn, resourceGroup);
+    }
+    private void makePlayControls(){
+
+        Button keep = new Button();
     }
 
 
@@ -602,13 +701,35 @@ public class Game extends Application {
 
 //        this.chooseGameMode();
 
+        BOARD_STATE = "X61bblmoowWK02R0105R0205R0509S02XR3237W01X00";
+
         this.root.getChildren().add(controls);
+        makeControls();
+        makeTurnInfo();
+
+        scene.setFill(Color.valueOf("0E56B0"));
+//        scene.setFill(Color.valueOf("2159A8"));
+//                scene.setFill(Color.BLUE);
 
         this.makeBoard();
         this.root.getChildren().add(this.board);
         this.root.getChildren().add(this.structures);
+        this.root.getChildren().add(this.information);
 
-        this.displayState("XWXW0X0");
+        InputStream stream = new FileInputStream("assets/board.png");
+        Image image = new Image(stream);
+        ImageView board = new ImageView(image);
+        board.setTranslateX(-170);
+        board.setTranslateY(-170);
+        board.setScaleX(0.94);
+        board.setScaleY(0.95);
+
+        board.toBack();
+        this.board.getChildren().add(board);
+
+
+        this.displayState(BOARD_STATE);
+//        endGame('X');
 
         stage.show();
     }
