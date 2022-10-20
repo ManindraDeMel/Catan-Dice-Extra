@@ -122,7 +122,6 @@ public class Prices {
         }
         return findBuilds(resources);
     }
-    // Create one which finds the most efficient gold trade automatically (for the AI)
 
     /**
      * check if there is sufficient amount of gold for the gold trade

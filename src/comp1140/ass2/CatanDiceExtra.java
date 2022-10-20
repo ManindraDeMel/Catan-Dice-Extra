@@ -606,7 +606,6 @@ public class CatanDiceExtra {
                     return false; // Check the format (filter out if its not properly formed)
                 }
             }
-            // ###########
             Character buildType = action.charAt(5);
             /**
              * Match case for the type of build.
@@ -623,7 +622,6 @@ public class CatanDiceExtra {
             }
             return ValidateBuildHelperFuncs.checkBaseCase(boardState, action, buildType); // if there aren't sufficient resources, the game might have just begun.
         }
-        // #######################################################################################
 
         /**
          * Checks if a trade action is valid
@@ -653,7 +651,6 @@ public class CatanDiceExtra {
             }
             return false;
         }
-        // #######################################################################################
         /**
          * Checks if a keep action is valid
          * @param boardState the boardstate as a string
@@ -676,7 +673,6 @@ public class CatanDiceExtra {
             }
             return false;
         }
-        // #######################################################################################
         /**
          * Checks if a swap action is valid
          * @param boardState the boardstate as a string
@@ -715,21 +711,33 @@ public class CatanDiceExtra {
             }
             return false;
         }
-        // ####################################################################################### Helper functions for validateBuild();
+        // Helper functions for validateBuild();
 
         /**
          * A class which helps with the validateBuild() method, since the action has further complexity
-         * Authored By Manindra de Mel, u7156805         *
+         * Authored By Manindra de Mel, u7156805
          */
         private class ValidateBuildHelperFuncs { // a private helper class for the 'build' action since its complex in comparison to the other actions.
-            // #######################################################################################
+            /**
+             * Validates a specific castle build, in which case we only need to check if the castle is unOwned.
+             * @param boardState
+             * @param castlePosition
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static boolean validateCastleBuild(String boardState, Character castlePosition) {
                 if (boardState.contains("C" + castlePosition)) {
                     return false; // check existence
                 }
                 return true;
             }
-            // ####################
+            /**
+             * Validates a city build, in which case we need to check that there was a settlement already in that location
+             * @param boardState
+             * @param action
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static boolean validateCityBuild(String boardState, String action) {
                 final ArrayList<Integer> validCityBuildLocations = new ArrayList<>(Arrays.asList( // hard coded list of all the locations cityable locations on the board.
                         1,
@@ -753,7 +761,14 @@ public class CatanDiceExtra {
                 }
                 return false;
             }
-            // ####################
+
+            /**
+             * Validates a knight build, in this case we have to check its connected to a road, not already build, or connected to a settlement
+             * @param boardState
+             * @param action
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static boolean validateKnightBuild(String boardState, String action) {
                 if (!boardState.contains(action.substring(5))) {
                     int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
@@ -765,16 +780,37 @@ public class CatanDiceExtra {
                 }
                 return false;
             }
-            // ####################
+
+            /**
+             * For a road to be built we just need to check if it doesn't already exist, or if its connected to the player through either a road or a settlement.
+             * @param boardState
+             * @param action
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static boolean validateRoadBuild(String boardState, String action) {
                 return !checkIfExists(boardState, action) && checkIfConnectedR(boardState, action) && checkForSettlement(boardState, action); // check if a road doesnt already exist &&
                                                                                                                     // check if its connected to another road && check theres a settlement between the roads
             }
-            // ####################
+
+            /**
+             * For a settlement we just need to check if its connected to the road network
+             * @param boardState
+             * @param action
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static boolean validateSettlementBuild(String boardState, String action) {
                 return !checkIfExists(boardState, action) && checkIfConnected(boardState, action); // check if a settlement doesn't already exist and is connected to a road.
             }
-            // #################### sub-helper functions below
+
+            /**
+             * Uses Prices.findBuilds to check if a build is valid (price wise)
+             * @param boardState
+             * @param buildType
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static boolean sufficentResourcesForBuild(String boardState, Character buildType) {
                 final HashMap<Character, Resource> charToResource = new HashMap<>() {{ // maps to convert between our program and the assignment requirements.
                     put('b', Resource.brick);
@@ -806,6 +842,15 @@ public class CatanDiceExtra {
                 }
                 return false;
             }
+
+            /**
+             * Here we check the initial few states of a new game, such as checking the distance between initial roads and if the roads are on the coast.
+             * @param boardState
+             * @param action
+             * @param buildType
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static boolean checkBaseCase(String boardState, String action, Character buildType) { // checking for when a game just starts and players are just choosing their first roads.
                 if (buildType == 'R' && validateRoadLength(action)) {
                     if (boardState == "W00WXW00X00" || boardState == "X00WXW00X00") { // in this case, its the first turn so we have to check if the road is just on the coast
@@ -834,6 +879,13 @@ public class CatanDiceExtra {
                 }
                 return false;
             }
+
+            /**
+             * Checks if a road is on the coast (has two costal nodes)
+             * @param action
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static boolean roadOnCoast(String action) {
                 for (String s : Misc.getRoadCoordsFromAction(action)) {
                     if (Misc.coastalRoadNodes.contains(s)) { // just checks the list if a road is on the coast
@@ -842,6 +894,14 @@ public class CatanDiceExtra {
                 }
                 return false;
             }
+
+            /**
+             * Check if a building already exists in a given boardState and an action
+             * @param boardState
+             * @param action in the form "buildC4" or "buildR0402" (idk if thats a valid road)
+             * @return true or false if a building exists
+             * Authored By Manindra de Mel, u7156805
+             */
             private static boolean checkIfExists(String boardState, String action) { // checking if some build already exists
                 String build = "";
                 if (action.charAt(5) == 'R') {
@@ -859,6 +919,14 @@ public class CatanDiceExtra {
                 }
                 return false;
             }
+
+            /**
+             * Checks if an action (build) will be connected to the road network
+             * @param boardState
+             * @param action
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static boolean checkIfConnected(String boardState, String action) {
                 String playerBoardState = getPlayerBoardState(boardState);
                 int actionCoord = Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1)));
@@ -874,6 +942,14 @@ public class CatanDiceExtra {
                 }
                 return false;
             }
+
+            /**
+             * Because a road has two coords we recursivley check if either of the coords are connected
+             * @param boardState
+             * @param action
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static boolean checkIfConnectedR(String boardState, String action) { // because roads have two coordinates we can check them both recursively.
                 String[] coords = Misc.getRoadCoordsFromAction(action);
                 if (validateRoadLength(action)) { // coordinates for the road can't be unreasonably far away.
@@ -881,6 +957,13 @@ public class CatanDiceExtra {
                 }
                 return false;
             }
+
+            /**
+             * Checks if the integers / the coordinates of a road is valid. I.e. the road is an actual road on the board.
+             * @param action
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static boolean validateRoadLength(String action) {
                 String[] coords = Misc.getRoadCoordsFromAction(action);
                 ArrayList<ArrayList<Integer>> roads = Misc.knightIndexingToRowIndexing;
@@ -906,6 +989,14 @@ public class CatanDiceExtra {
                 }
                 return false;
             }
+
+            /**
+             * checks if a settlement exists at a given action coordinate. (Used for upgrading to a city)
+             * @param boardState
+             * @param action
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static boolean checkForSettlement(String boardState, String action) {
                 ArrayList<Integer> coordsWithoutSettlements = new ArrayList<>(Arrays.asList(
                         3, 4, 5, 6, 11, 12, 13, 14, 15, 38, 39, 40, 41, 42, 47, 48, 49, 50
@@ -941,6 +1032,14 @@ public class CatanDiceExtra {
                 }
                 return false; // no common roads to connect to.
             }
+
+            /**
+             * checks all the roads around a knight and if a road owned by the player exists, they the knight build at that location is valid
+             * @param playerBoardState
+             * @param surroundingCoords
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static boolean roadConnectedToKnight(String playerBoardState, ArrayList<Integer> surroundingCoords) {
                 int currentIndex = 0;
                 while (playerBoardState.indexOf("R", currentIndex) != -1) {
@@ -977,9 +1076,26 @@ public class CatanDiceExtra {
                 }
                 return false;
             }
+
+            /**
+             * Similar method to roadConneectedToKnight but here we only check for 1 coord, the settlementCoord.
+             * @param playerBoardState
+             * @param surroundingCoords
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static boolean settlementConnectedToKnight(String playerBoardState, ArrayList<Integer> surroundingCoords) {
                 return settlementConnectedToKnightHelper(playerBoardState, surroundingCoords, "S") || settlementConnectedToKnightHelper(playerBoardState, surroundingCoords, "T");
             }
+
+            /**
+             * a helper method for settlementConnectedToKnight
+             * @param playerBoardState
+             * @param surroundingCoords
+             * @param buildtype
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static boolean settlementConnectedToKnightHelper (String playerBoardState, ArrayList<Integer> surroundingCoords, String buildtype) {
                 int currentIndex = 0;
                 while (playerBoardState.indexOf(buildtype, currentIndex) != -1) {
@@ -995,14 +1111,15 @@ public class CatanDiceExtra {
                 return false;
             }
         }
-        // ####################################################################################### Miscellaneous Helper functions / constants
-
         /**
          * Miscellaneous functions used throughout this task and other tasks
          */
         public class Misc {
-            private static final List<Character> possibleResources = new ArrayList<>(Arrays.asList('b', 'g', 'l', 'm', 'o', 'w'));
-
+            private static final List<Character> possibleResources = new ArrayList<>(Arrays.asList('b', 'g', 'l', 'm', 'o', 'w')); // all possible resource characters
+            /**
+             * all the roads around a knightIndexing tile
+             * Authored By Manindra de Mel, u7156805
+             */
             private static final ArrayList<ArrayList<Integer>> knightIndexingToRowIndexing = new ArrayList<>(Arrays.asList(
                     // # Row 1
                     new ArrayList<>(Arrays.asList(0, 4, 8, 12, 7, 3)),
@@ -1059,6 +1176,10 @@ public class CatanDiceExtra {
                     'g',
                     'w'
             };
+            /**
+             * All the coastal nodes
+             * Authored By Manindra de Mel, u7156805
+             */
             final static ArrayList<String> coastalRoadNodes = new ArrayList<>(Arrays.asList(
                     "03",
                     "07",
@@ -1079,7 +1200,13 @@ public class CatanDiceExtra {
                     "05",
                     "04"
             ));
-            //
+
+            /**
+             * Gets the resources from a boardState string
+             * @param boardState
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             public static ArrayList<Character> getResourcesFromBoardState(String boardState) {
                 ArrayList<Character> resources = new ArrayList<>();
                 for (Character c : boardState.toCharArray()) {
@@ -1090,6 +1217,12 @@ public class CatanDiceExtra {
                 return resources;
             }
 
+            /**
+             * Gets the playerBoardState of the current player
+             * @param boardState
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             public static String getPlayerBoardState(String boardState) { // get the board-state of the current player's turn
                 HashMap<Character, String> switchPlayers = new HashMap<>() {{
                     put('W', "X");
@@ -1098,6 +1231,14 @@ public class CatanDiceExtra {
                 Character playerTurn = boardState.charAt(0);
                 return getString(boardState, playerTurn, switchPlayers);
             }
+
+            /**
+             * Gets the playerBoardState given a player char
+             * @param boardState
+             * @param playerTurn
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             public static String getPlayerBoardState(String boardState, Character playerTurn) { // get the board-state given a player
                 HashMap<Character, String> switchPlayers = new HashMap<>() {{
                     put('W', "X");
@@ -1105,6 +1246,15 @@ public class CatanDiceExtra {
                 }};
                 return getString(boardState, playerTurn, switchPlayers);
             }
+
+            /**
+             * A helper method which preserves the main functionality of both getPlayerBoardState's
+             * @param boardState
+             * @param playerTurn
+             * @param switchPlayers
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static String getString(String boardState, Character playerTurn, HashMap<Character, String> switchPlayers) { // common method for both getPlayerBoardState()'s
                 int startOfPlayerBoardState = boardState.indexOf(Character.toString(playerTurn), 1);
                 int endOfPlayerBoardState = boardState.indexOf(switchPlayers.get(playerTurn), startOfPlayerBoardState);
@@ -1119,6 +1269,12 @@ public class CatanDiceExtra {
                 return result;
             }
 
+            /**
+             * Converts a coordinate to our x,y system.
+             * @param boardCoord
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static Coordinate convertToCoordinate(int boardCoord) { // convert to our coordinate system
                 int yCoord = 0, xCoord = 0;
                 for (int hexIndex = 0; hexIndex < Misc.knightIndexingToRowIndexing.size(); hexIndex++) {
@@ -1129,14 +1285,38 @@ public class CatanDiceExtra {
                 }
                 return new Coordinate(xCoord, yCoord);
             }
+
+            /**
+             * Get the coords of a road
+             * @param action
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static String[] getRoadCoordsFromAction(String action) {
                 String firstCoord = Character.toString(action.charAt(action.length() - 4)) + Character.toString(action.charAt(action.length() - 3));
                 String secondCoord = Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1));
                 return new String[]{firstCoord, secondCoord};
             }
+
+            /**
+             * Distance formula (used to check if roads are 5 roads apart),
+             * then we divide by two since a road length takes up
+             * two coords
+             * @param a
+             * @param b
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             private static double getDistance(Coordinate a, Coordinate b) {
-                return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+                return Math.floor(Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))/2);
             }
+
+            /**
+             * Mainly used for the toString() methods when converting back into a string
+             * @param n
+             * @return
+             * Authored By Manindra de Mel, u7156805
+             */
             public static String addZero(int n) {
                 if (n < 10) {
                     return "0" + n;
@@ -1842,7 +2022,6 @@ public class CatanDiceExtra {
         accArray = acc.toArray(accArray);
         return accArray;
     }
-
     public static Set<Coordinate> findCoordsInDistance(Coordinate coord, int distance) {
         Set<Coordinate> acc = Set.of();
         acc.addAll(neighbours.get(coord));
@@ -1930,7 +2109,7 @@ public class CatanDiceExtra {
                 }
             }
         }
-        int desertcount = 0;
+        int desertcount = 0; // I assume this is where swaps begin? (mani)
         for (Tile tile : board.tiles) {
             if ((tile.Owner.name.equals(String.valueOf(playerId)))&&!tile.used) {
                 if (tile.tileType==desert) {
@@ -1969,7 +2148,6 @@ public class CatanDiceExtra {
                     acc.addAll(buildPhase(newBoard, playerRoads, newResources, newFixedResources, playerId, newActionsSoFar));
                 }
             }
-
         }
         ArrayList<Resource> totalResources = resources;
         totalResources.addAll(fixedResources);
@@ -2004,7 +2182,7 @@ public class CatanDiceExtra {
         boolean affordKnight = false;
         if (resourceAmounts[1]>=1&&resourceAmounts[3]>=1&&resourceAmounts[4]>=1) {
             affordKnight=true;
-        }
+        } // where does the 'swap' code end??
         for (int x = 0; x<6; x++) {
             if (resourceAmounts[x]>=5) {
                 newResources = new ArrayList<>();
@@ -2048,8 +2226,8 @@ public class CatanDiceExtra {
         }
     }
     public static Resource tileTypeToResource(TileType t) {
-        if (t==ore) {
-            return stone;
+        if (t==ore) { // this miscommunication is really funny, imagine we actually talked with each other then
+            return stone; // we wouldn't need this, also why not use a hashmap<TileType, Resource> instead of a function lmfao
         } else if (t==grain) {
             return wheat;
         } else if (t==wool) {
