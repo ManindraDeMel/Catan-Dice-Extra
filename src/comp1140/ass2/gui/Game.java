@@ -14,6 +14,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -198,6 +199,14 @@ public class Game extends Application {
         line.setFill(Color.WHITESMOKE);
         line.setStrokeType(StrokeType.CENTERED);
         this.board.getChildren().add(line);
+
+        Rectangle background = new Rectangle();
+        background.setWidth(HEX_WIDTH * 5.5 + MARGIN_X);
+        background.setHeight(WINDOW_HEIGHT+100);
+        background.setTranslateX(-MARGIN_X);
+        background.setTranslateY(-MARGIN_Y-100);
+        background.setFill(Color.valueOf("0E56B0"));
+        this.board.getChildren().add(background);
 
         this.board.toBack();
     }
@@ -701,13 +710,13 @@ public class Game extends Application {
 
 //        this.chooseGameMode();
 
-        BOARD_STATE = "X61bblmoowWK02R0105R0205R0509S02XR3237W01X00";
+        BOARD_STATE = "X61bglmowWK02R0105R0205R0509S02XR3237W01X00";
 
         this.root.getChildren().add(controls);
         makeControls();
         makeTurnInfo();
 
-        scene.setFill(Color.valueOf("0E56B0"));
+//        scene.setFill(Color.valueOf("0E56B0"));
 //        scene.setFill(Color.valueOf("2159A8"));
 //                scene.setFill(Color.BLUE);
 

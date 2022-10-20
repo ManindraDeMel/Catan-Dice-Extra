@@ -13,7 +13,7 @@ public class KnightShape {
         this.id = id;
         this.knightHead = new KnightHead(startX, startY, isBuilt, player);
         this.knightBody = new KnightBody(startX, startY, isBuilt, player);
-        this.resourceCircle = new ResourceCircle(startX, startY, true);
+        this.resourceCircle = new ResourceCircle(startX, startY, true, id);
         this.isUsed = true;
     }
 
@@ -21,7 +21,7 @@ public class KnightShape {
         this.id = id;
         this.knightHead = new KnightHead(startX, startY, isBuilt, player);
         this.knightBody = new KnightBody(startX, startY, isBuilt, player);
-        this.resourceCircle = new ResourceCircle(startX, startY, isUsed);
+        this.resourceCircle = new ResourceCircle(startX, startY, isUsed, id);
         this.isUsed = isUsed;
     }
 
