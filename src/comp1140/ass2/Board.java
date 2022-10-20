@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static comp1140.ass2.Coordinate.*;
+import static comp1140.ass2.Resource.*;
 import static comp1140.ass2.TileType.*;
 
 
@@ -27,6 +28,8 @@ public class Board {
     public static HashMap<Coordinate, ArrayList<Coordinate>> neighbours;
 
     public String turn = "";
+    public static final Resource[] boardResources = {brick, wheat, wood, stone, sheep, gold};
+    public static final Character[] resourceChars = {'b', 'g', 'l', 'o', 'w', 'm'};
 
     public String oldScore = "";
     /**
