@@ -1989,6 +1989,22 @@ public class CatanDiceExtra {
                 resourceAmounts[5]+=1;
             }
         }
+        boolean affordRoad = false;
+        if (resourceAmounts[0]>=1&&resourceAmounts[2]>=1) {
+            affordRoad=true;
+        }
+        boolean affordSettlement = false;
+        if (resourceAmounts[1]>=1&&resourceAmounts[4]>=1&&affordRoad) {
+            affordSettlement=true;
+        }
+        boolean affordCity = false;
+        if (resourceAmounts[1]>=2&&resourceAmounts[3]>=3) {
+            affordSettlement=true;
+        }
+        boolean affordKnight = false;
+        if (resourceAmounts[1]>=1&&resourceAmounts[3]>=1&&resourceAmounts[4]>=1) {
+            affordKnight=true;
+        }
         for (int x = 0; x<6; x++) {
             if (resourceAmounts[x]>=5) {
                 newResources = new ArrayList<>();
