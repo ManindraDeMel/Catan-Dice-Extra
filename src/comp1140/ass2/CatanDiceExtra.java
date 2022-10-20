@@ -1149,11 +1149,7 @@ public class CatanDiceExtra {
                     new ArrayList<>(Arrays.asList(40, 45, 49, 52, 48, 44)),
                     new ArrayList<>(Arrays.asList(41, 46, 50, 53, 49, 45))
             ));
-            /**
-             * the tile resources in the form of a char
-             * Authored By Manindra de Mel, u7156805
-             */
-            final static Character[] coordinateToResource = new Character[]{
+            public final static Character[] coordinateToResource = new Character[]{
                     // # Row 1
                     'w',
                     'g',
