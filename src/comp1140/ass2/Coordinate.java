@@ -1,6 +1,9 @@
 package comp1140.ass2;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Coordinate {
     public int x;
@@ -80,4 +83,25 @@ public class Coordinate {
         return false;
     }
 
+    private static int distance(Coordinate coord1, Coordinate coord2, Coordinate previousCoord, int acc) {
+        List<Coordinate> neighbours = Board.neighbours.get(coord1);
+        if (neighbours.stream().filter(coord -> CheckEquals(coord1, coord)).collect(Collectors.toList()).size() == 0) { // coord2 not found in this neighbourhood
+            for (Coordinate coord : neighbours) {
+                if (!CheckEquals(previousCoord, coord)) {
+                    distance(coord,coord2, coord, acc + 1);
+                }
+            }
+        }
+        return acc;
+    }
+
+    public static int distance(Coordinate coord1, Coordinate coord2) {
+        List<Coordinate> neighbours = Board.neighbours.get(coord1);
+        if (neighbours.stream().filter(coord -> CheckEquals(coord1, coord)).collect(Collectors.toList()).size() == 0) { // coord2 not found in this neighbourhood
+            for (Coordinate coord : neighbours) {
+                distance(coord, coord2, coord1, 2);
+            }
+        }
+        return 1;
+    }
 }
