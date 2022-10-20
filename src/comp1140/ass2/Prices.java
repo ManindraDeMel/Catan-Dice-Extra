@@ -4,10 +4,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 public class Prices {
+    /**
+     * a set of resources which points to each build
+     * Authored By Manindra de Mel, u7156805
+     */
     public static final HashMap<ArrayList<Resource>, String> builds = new HashMap<>() {{
         put(new ArrayList<Resource>(Arrays.asList(Resource.brick, Resource.wood)), "Road"); // there is implicit ordering in Enums, therefore we can just sort the list and use it as a key for this hashmap
         put(new ArrayList<Resource>(Arrays.asList(Resource.brick, Resource.wood, Resource.sheep, Resource.wheat)), "Settlement");
-        put(new ArrayList<Resource>(Arrays.asList(Resource.sheep, Resource.stone, Resource.wheat)), "Solider");
+        put(new ArrayList<Resource>(Arrays.asList(Resource.sheep, Resource.stone, Resource.wheat)), "Solider"); // Solider = knight sorry.
         put(new ArrayList<Resource>(Arrays.asList(Resource.stone, Resource.stone, Resource.stone, Resource.wheat, Resource.wheat)), "City");
         // castles, (let me know if there is a better way to write this)
         put(new ArrayList<Resource>(Arrays.asList(Resource.brick, Resource.brick, Resource.brick, Resource.brick, Resource.brick)), "Castle");
@@ -17,6 +21,13 @@ public class Prices {
         put(new ArrayList<Resource>(Arrays.asList(Resource.wheat, Resource.wheat, Resource.wheat, Resource.wheat, Resource.wheat)), "Castle");
     }};
 
+    /**
+     * Given a list of resources, find the powerset of that list.
+     * @param resources a list of resources owned by a player
+     * @param index an index used for recursion for the index of each set
+     * @return powerset of that list
+     * Authored By Manindra de Mel, u7156805
+     */
     private static ArrayList<ArrayList<Resource>> powerset(ArrayList<Resource> resources, int index) {
         ArrayList<ArrayList<Resource>> subsets;
         if (index < 0) {
@@ -37,6 +48,13 @@ public class Prices {
         }
         return subsets;
     }
+
+    /**
+     * Given a list of resources, return a list of all the possible buildings that can be created from that list of resources
+     * @param resources
+     * @return a list of resources that can be created from the list of resources
+     * Authored By Manindra de Mel, u7156805
+     */
     public static ArrayList<ArrayList<String>> findBuilds(ArrayList<Resource> resources) { // need to account for the case of two gold
         ArrayList<ArrayList<Resource>> possibleBuildsR = new ArrayList<>();
         ArrayList<ArrayList<String>> validBuilds = new ArrayList<>();
@@ -89,6 +107,30 @@ public class Prices {
         return validBuilds;
     }
 
+    /**
+     * Similarly to findbuilds, this finds all the possible builds given a list of resources, but all takes a gold trade decided by the player and finds all
+     * the new builds possible.
+     * @param resources a list of resources
+     * @param resourcesAttainedFromGold resources gained from the trade
+     * @return a list of builds
+     * Authored By Manindra de Mel, u7156805
+     */
+    public static ArrayList<ArrayList<String>> findBuildsWithManualGoldTrade(ArrayList<Resource> resources, ArrayList<Resource> resourcesAttainedFromGold) { // resourcesAttainedFromGold is what the player decides when they want to exchange gold for materials
+        if (validateGoldTrade(resources, resourcesAttainedFromGold)) {
+            resources = removeGold(resources, (resourcesAttainedFromGold.size() * 2));
+            resources.addAll(resourcesAttainedFromGold);
+        }
+        return findBuilds(resources);
+    }
+    // Create one which finds the most efficient gold trade automatically (for the AI)
+
+    /**
+     * check if there is sufficient amount of gold for the gold trade
+     * @param resources list of current resources
+     * @param resourcesAttainedFromGold resources to be exchanged for gold
+     * @return a bool based on if the trade is valid or not (Task 7)
+     * Authored By Manindra de Mel, u7156805
+     */
     private static Boolean validateGoldTrade(ArrayList<Resource> resources, ArrayList<Resource> resourcesAttainedFromGold) {
         int numGold = 0;
         for (Resource resource : resources) {
@@ -102,6 +144,13 @@ public class Prices {
         return false;
     }
 
+    /**
+     * Remove a certain amount of gold from a list of resources
+     * @param resources list of resources
+     * @param goldToBeRemoved number of gold to be removed
+     * @return a new list with the removed gold
+     * Authored By Manindra de Mel, u7156805
+     */
     private static ArrayList<Resource> removeGold(ArrayList<Resource> resources, int goldToBeRemoved) {
         for (int i = 0; i < resources.size(); i++) {
             if (goldToBeRemoved == 0) {
@@ -113,15 +162,15 @@ public class Prices {
         }
         return resources;
     }
-    public static ArrayList<ArrayList<String>> findBuildsWithManualGoldTrade(ArrayList<Resource> resources, ArrayList<Resource> resourcesAttainedFromGold) { // resourcesAttainedFromGold is what the player decides when they want to exchange gold for materials
-        if (validateGoldTrade(resources, resourcesAttainedFromGold)) {
-            resources = removeGold(resources, (resourcesAttainedFromGold.size() * 2));
-            resources.addAll(resourcesAttainedFromGold);
-        }
-        return findBuilds(resources);
-    }
-    // Create one which finds the most efficient gold trade automatically (for the AI)
 
+    /**
+     * Applies the 'swap' action for task 9.
+     * @param boardState the current boardstate
+     * @param actionSub the action substring. i.e. (swapbg) -> (bg). where bg is the substring
+     * @param playerId the current player's turn
+     * @return a new boardState with the swap applied
+     * Authored By Manindra de Mel, u7156805
+     */
     public static String swap(String boardState, String actionSub, String playerId) {
 
         HashMap<String, TileType> convertToTileType = new HashMap<>(){{
@@ -140,6 +189,9 @@ public class Prices {
         for (int i = 0; i < board.tiles.length; i++) {
             if (!(i == 9 || i == 10)) {
                 foundSpecificKnight = setUsedTrue(actionSub, playerId, convertToTileType, board, i);
+                if (foundSpecificKnight) {
+                    break;
+                }
             }
         }
         if (!(foundSpecificKnight)) {
@@ -149,15 +201,16 @@ public class Prices {
         }
         return Board.toStringWithNewScore(board);
     }
-
-    public static String keep(String boardState, String action) {
-        boardState = boardState.substring(0, 2) + String.valueOf(Integer.parseInt(boardState.substring(2, 3)) + 1) + boardState.substring(3); // +1 to roll counter
-        int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
-        String oldResources = boardState.substring(3, endOfResourcesIndex);
-        String newResources = Prices.modifyResources(oldResources, action.substring(4), Integer.parseInt(boardState.substring(1, 2)));
-        boardState = boardState.replace(oldResources, newResources);
-        return boardState;
-    }
+    /**
+     * A helper function for the 'swap' method. This method sets a knight from unused to used.
+     * @param actionSub the action substring for keep. i.e. (keepbb) -> (bb)
+     * @param playerId the current player's turn
+     * @param convertToTileType the hashmap which converts to a tile type
+     * @param board A Board representation of the string boardstate
+     * @param i the index
+     * @return a boolean which returns true if a knight has been set to used.
+     * Authored By Manindra de Mel, u7156805
+     */
     private static boolean setUsedTrue(String actionSub, String playerId, HashMap<String, TileType> convertToTileType, Board board, int i) {
         if (board.tiles[i].Owner.name != "") {
             if (board.tiles[i].Owner.name.charAt(0) == playerId.charAt(0)) {
@@ -172,9 +225,30 @@ public class Prices {
         return false;
     }
 
-    public static String trade(String boardState, String action) {
+    /**
+     * Applies the 'keep' action for task 9
+     * @param boardState the current boardstate
+     * @param action the action given
+     * @return a new boardstate with the action applied
+     * Authored By Manindra de Mel, u7156805
+     */
+    public static String keep(String boardState, String action) {
+        boardState = boardState.substring(0, 2) + String.valueOf(Integer.parseInt(boardState.substring(2, 3)) + 1) + boardState.substring(3); // +1 to roll counter
         int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
         String oldResources = boardState.substring(3, endOfResourcesIndex);
+        String newResources = Prices.modifyResources(oldResources, action.substring(4), Integer.parseInt(boardState.substring(1, 2)));
+        boardState = boardState.replace(oldResources, newResources);
+        return boardState;
+    }
+    /**
+     * Applies the 'trade' action the the boardstate (for task 9)
+     * @param boardState a String representation of the boardState
+     * @param action the action
+     * @return a new boardstate with the action applied
+     * Authored By Manindra de Mel, u7156805
+     */
+    public static String trade(String boardState, String action) {
+        String oldResources = boardState.substring(3, boardState.indexOf('W', 2));
         String newResources = "";
         newResources = oldResources;
         for (char c : action.substring(5).toCharArray()) {
@@ -185,6 +259,14 @@ public class Prices {
         return boardState.replace(oldResources, newResources);
     }
 
+    /**
+     * A helper function for the 'keep' action, which rolls new resources that the player didn't keep.
+     * @param resources string of the resources from the board
+     * @param actionSub the resources that were kept from the keep action
+     * @param numDice the number of dice/new resources to roll/attain
+     * @return a new resources string
+     * Authored By Manindra de Mel, u7156805
+     */
     public static String modifyResources(String resources, String actionSub, int numDice) {
         ArrayList<Character> actionSubList = new ArrayList<>();
         for (Character c : actionSub.toCharArray()) {
