@@ -62,7 +62,7 @@ assets:
     licence: free
   
 collaboration: Idea for task 12
-  - name:Lachlan Braithwaite
+  - name: Lachlan Braithwaite
     comment: Got the idea to keep track of two seperate pools of resources in the buildphase to prevent redundant trades from him.
 
 # Sign *your* name and uids here. (Remove entries if you have fewer
