@@ -84,7 +84,7 @@ public class AI {
      * Authored By Manindra de Mel, u7156805
      */
     public static String[] basicAI(String boardState) {
-        return AI(boardState, 1);
+        return runAI(boardState, 1);
     }
 
     /**
@@ -94,7 +94,7 @@ public class AI {
      * Authored By Manindra de Mel, u7156805
      */
     public static String[] advancedAI(String boardState) {
-        return AI(boardState, 7);
+        return runAI(boardState, 7);
     }
 
     /**
@@ -104,7 +104,7 @@ public class AI {
      * @return
      * Authored By Manindra de Mel, u7156805
      */
-    private static String[] AI(String boardState, int depth) {
+    private static String[] runAI(String boardState, int depth) {
         Minimax m = new Minimax();
         m.run(boardState, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
         return m.bestMove;

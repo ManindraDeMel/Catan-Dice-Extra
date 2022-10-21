@@ -995,7 +995,7 @@ public class Game extends Application {
         this.displayState(BOARD_STATE);
 
         if (END_GAME){
-//            endGame(CatanDiceExtra.whoWon(BOARD_STATE));
+            endGame(CatanDiceExtra.whoWon(BOARD_STATE));
         }
     }
 
