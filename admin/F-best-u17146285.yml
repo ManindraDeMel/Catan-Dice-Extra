@@ -18,9 +18,9 @@ declaration: >-
 #
 # Add as many "name+comment" entries as necessary
 # (or remove it altogether if you haven't collaborated with anyone)
-collaboration:
-  - name:
-    comment: >-
+collaboration: Idea for task 12
+  - name: Lachlan Braithwaite
+    comment: Got the idea to keep track of two seperate pools of resources in the buildphase to prevent redundant trades from him.
 
 # Use this to list any code that you used that you did not write,
 # aside from code provided by the lecturer.  Provide a comment
@@ -37,15 +37,15 @@ code:
 # I wish to submit the following classes as entirely my own (remove this if
 # you want to just submit methods):
 class:
-   - 
-   - 
+   - Board (the constructors, helper functions added by everyone)
+   - Coordinate
 
 # I wish to submit the following methods as entirely my own (remove this if
 # you want to just submit classes):
 method:
-   - 
+   - generateAllPossibleActionSequences (and helper function buildPhase. works bar reading the wrong players roads AFAIK)
    - 
 
 # sign *your* name and uid here
-name:
-uid:
+name: Stephen Burg
+uid: u7146285
