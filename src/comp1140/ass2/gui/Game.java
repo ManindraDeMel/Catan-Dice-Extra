@@ -995,12 +995,16 @@ public class Game extends Application {
         this.displayState(BOARD_STATE);
 
         if (END_GAME){
-            endGame(CatanDiceExtra.whoWon(BOARD_STATE));
+//            endGame(CatanDiceExtra.whoWon(BOARD_STATE));
         }
     }
 
     private void startNewGame(){
 
+
+        UNCHANGED_BOARD_STATE = "W00WXW00X00";
+        BOARD_STATE = UNCHANGED_BOARD_STATE;
+        updateBoardUI(BOARD_STATE);
     }
 
 
@@ -1010,10 +1014,9 @@ public class Game extends Application {
         Scene scene = new Scene(this.root, WINDOW_WIDTH, WINDOW_HEIGHT);
         stage.setScene(scene);
 
-//        this.chooseGameMode();
 
-        BOARD_STATE = "X61bglmowWK02R0105R0205R0509S02XR3237W01X00";
-//        UNCHANGED_BOARD_STATE = BOARD_STATE;
+
+//        this.chooseGameMode();
 
         this.root.getChildren().add(controls);
         makeControls();
@@ -1041,11 +1044,11 @@ public class Game extends Application {
         this.board.getChildren().add(board);
 
 
-
-
         this.displayState(BOARD_STATE);
 //        endGame('X');
 
         stage.show();
+
+        startNewGame();
     }
 }
