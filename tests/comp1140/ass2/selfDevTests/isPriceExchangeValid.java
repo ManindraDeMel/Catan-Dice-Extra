@@ -1,4 +1,6 @@
-package comp1140.ass2;
+package comp1140.ass2.selfDevTests;
+import comp1140.ass2.Prices;
+import comp1140.ass2.Resource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;

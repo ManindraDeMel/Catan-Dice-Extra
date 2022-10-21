@@ -11,6 +11,8 @@ import static comp1140.ass2.gui.backend.Constants.playersColour;
 
 /**
  * Used to create a Knight's Head shape
+ *
+ * Authored by Arjun Raj, u7526852
  */
 class KnightHead extends Circle {
     double startX, startY;

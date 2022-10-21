@@ -1,5 +1,6 @@
 package comp1140.ass2.gui.backend;
 
+import comp1140.ass2.gui.Game;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -10,11 +11,14 @@ import static comp1140.ass2.gui.backend.Constants.*;
 
 /**
  * Used to create Settlement shape
+ *
+ * Authored by Arjun Raj, u7526852
  */
 public class SettlementShape extends Polygon {
     public String id;
     double centerX;
     double centerY;
+    boolean clicked = false;
 
     public SettlementShape(double startX, double startY, boolean isBuilt, String id, int bottom, char player){
         this.id = id;
@@ -68,7 +72,16 @@ public class SettlementShape extends Polygon {
         this.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                //TODO
+                // TODO EXTRA
+                if (!clicked) {
+//                    setFill(Color.BROWN);
+                    Game.BUILD = "build" + "S" + id;
+                    clicked = true;
+                }
+                else{
+//                    Game.updateBuild();
+                    clicked = false;
+                }
             }
         });
 

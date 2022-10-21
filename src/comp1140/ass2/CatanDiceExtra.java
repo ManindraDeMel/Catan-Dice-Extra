@@ -1,5 +1,7 @@
 package comp1140.ass2;
 
+import comp1140.ass2.gui.Game;
+
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -2059,10 +2061,11 @@ public class CatanDiceExtra {
      * A function which checks the score if any of the players scores are above 10, if so the game is over
      * @param boardState
      * @return jf the game is over or not
-     * Authored By Manindra de Mel, u7156805
+     * Authored By Manindra de Mel, u7156805 and Arjun Raj, u7526852
      */
     public static Boolean isGameOver(String boardState) {
         String scores = Board.getScoreFromBoardState(boardState);
+        Game.END_GAME = true;
         return Integer.parseInt(scores.substring(1, 3)) >= 10 || Integer.parseInt(scores.substring(scores.indexOf('X') + 1, scores.indexOf('X') + 3)) >= 10;
     }
 }

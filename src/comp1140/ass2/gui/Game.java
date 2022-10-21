@@ -1,17 +1,24 @@
 package comp1140.ass2.gui;
 
 import comp1140.ass2.Board;
+import comp1140.ass2.CatanDiceExtra;
 import comp1140.ass2.gui.backend.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
@@ -20,7 +27,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -32,19 +41,32 @@ import java.util.concurrent.TimeUnit;
 import static comp1140.ass2.CatanDiceExtra.validateClass.Misc.getResourcesFromBoardState;
 import static comp1140.ass2.gui.backend.Constants.*;
 
+/**
+ * Authored by Arjun Raj, u7526852
+ */
 public class Game extends Application {
     // FIXME Task 11: implement a playable game
 
-    private final Group root = new Group();
-    private final Group controls = new Group();
+    private Group root = new Group();
+    private Group controls = new Group();
     private static final int WINDOW_WIDTH = 1200;
     private static final int WINDOW_HEIGHT = 700;
     private static GameMode GAME_MODE = GameMode.NOTCHOSEN;
-    private final Group board = new Group();
-    private final Group structures = new Group();
-    private final Group information = new Group();
+    private Group board = new Group();
+    private Group structures = new Group();
+    private Group information = new Group();
     private static int players;
     static String BOARD_STATE = "W00WXW00X00";
+    static String UNCHANGED_BOARD_STATE = "W00WXW00X00";
+    public static String BUILD = "";
+    public static Object BUILD_STRUCTURE = null;
+    public static ResourceCircle RESOURCE_IN = null;
+    private boolean ROLL_STATE;
+    public static boolean END_GAME = false;
+
+
+    private static ArrayList<CurrentResource> currentResources = new ArrayList<>();
+    private static ArrayList<String> playedActionSequences = new ArrayList<>();
 
     // CONSTANTS
     static final double HEX_WIDTH = 140;
@@ -157,6 +179,10 @@ public class Game extends Application {
 
         this.controls.getChildren().add(gameModeButtons);
     }
+    public void updateBuild(Object struct){
+//        if (struct ins)
+        //TODO
+    }
 
     public void endGame(char winner){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -207,6 +233,17 @@ public class Game extends Application {
         background.setTranslateY(-MARGIN_Y-100);
         background.setFill(Color.valueOf("0E56B0"));
         this.board.getChildren().add(background);
+
+        InputStream stream = null;
+        try{stream = new FileInputStream("assets/board.png");}
+        catch (Exception e) {}
+        Image image = new Image(stream);
+        ImageView board = new ImageView(image);
+        board.setTranslateX(-170);
+        board.setTranslateY(-170);
+        board.setScaleX(0.94);
+        board.setScaleY(0.95);
+        this.board.getChildren().add(board);
 
         this.board.toBack();
     }
@@ -590,7 +627,11 @@ public class Game extends Application {
             this.structures.getChildren().add(toAdd.cityLeft);
         }
 
+
         makeScoreBoard(boardState);
+//        try{
+//        makeTurnInfo();}catch (Exception e){}
+//        makeControls();
 
         // Outputting text for debugging
 //        System.out.println(this.structures.getChildren());
@@ -677,28 +718,289 @@ public class Game extends Application {
 
 
         for (int i = 0; i < resources.size(); i++) {
-            System.out.println(i);
-            InputStream stream = new FileInputStream("assets/resources/" + resources.get(i) + ".png");
-            Image image = new Image(stream);
-            ImageView resource = new ImageView(image);
+            CurrentResource resource = new CurrentResource(resources.get(i));
+            ImageView resourceImage = resource.imageView;
+            resourceImage.setTranslateX(centerX + 50*i);
+            resourceImage.setTranslateY(HEX_HEIGHT * 1.65);
 
-            resource.setScaleX(0.75);
-            resource.setScaleY(0.75);
+            this.information.getChildren().add(resourceImage);
 
-            resource.setTranslateX(centerX + 50*i);
-            resource.setTranslateY(HEX_HEIGHT * 1.65);
-
-            this.information.getChildren().add(resource);
-
-            resourcesImage.add(resource);
+            resourcesImage.add(resourceImage);
+            currentResources.add(resource);
         }
 
         resourceGroup.getChildren().addAll(resourcesImage);
         this.information.getChildren().addAll(currTurn, resourceGroup);
     }
+    private String reRoll(){
+        String action = "keep";
+        for (var resource: currentResources){
+            if (resource.selected)
+                action +=  resource.resourceChar;
+        }
+
+        return action;
+    }
+
+    private boolean checkRollState(){
+        for (var action : playedActionSequences) {
+            if (action.charAt(0) != 'k')
+                return false;
+        }
+
+        return BOARD_STATE.charAt(2)=='1'|| BOARD_STATE.charAt(2)=='2';
+    }
+
     private void makePlayControls(){
+        Font font = Font.font("Courier New", FontWeight.BOLD, 22);
+        ROLL_STATE = checkRollState();
+
+        //TODO
+        double height = 50;
+        double width = 100;
+        double gapScale = 1.5;
+        double centerX = WINDOW_WIDTH - 350;
+        double centerY = WINDOW_HEIGHT - 350;
+
+        Button endTurn = new Button();
+        endTurn.setText("End Turn");
+        endTurn.setFont(font);
+        endTurn.setPrefSize(width*2.5, height);
+        endTurn.setTranslateX(centerX);
+        endTurn.setTranslateY(centerY+ height * 2.75);
+        this.controls.getChildren().add(endTurn);
 
         Button keep = new Button();
+        keep.setText("ROLL");
+        keep.setFont(font);
+        keep.setPrefSize(width, height);
+        keep.setTranslateX(centerX);
+        keep.setTranslateY(centerY);
+        this.controls.getChildren().add(keep);
+
+        Button buildButton = new Button();
+        buildButton.setText("BUILD");
+        buildButton.setFont(font);
+        buildButton.setPrefSize(width, height);
+        buildButton.setTranslateX(centerX + width*gapScale);
+        buildButton.setTranslateY(centerY);
+        this.controls.getChildren().add(buildButton);
+
+        Button swapButton = new Button();
+        swapButton.setText("SWAP");
+        swapButton.setFont(font);
+        swapButton.setPrefSize(width, height);
+        swapButton.setTranslateX(centerX + width*gapScale);
+        swapButton.setTranslateY(centerY + height*1.5);
+        this.controls.getChildren().add(swapButton);
+
+        Button tradeButton = new Button();
+        tradeButton.setText("TRADE");
+        tradeButton.setFont(font);
+        tradeButton.setPrefSize(width, height);
+        tradeButton.setTranslateX(centerX);
+        tradeButton.setTranslateY(centerY + height*1.5);
+        this.controls.getChildren().add(tradeButton);
+
+        //EVENTS
+        endTurn.setOnMouseClicked(mouseEvent -> {
+            System.out.println("PREVIOUS: " + BOARD_STATE);
+            String[] actionsPlayed;
+            if (playedActionSequences.size() == 0)
+                actionsPlayed = new String[0];
+            else{
+                actionsPlayed = new String[playedActionSequences.size()];
+
+                for (int i = 0; i < actionsPlayed.length; i++) {
+                    actionsPlayed[i] = playedActionSequences.get(i);
+                }
+            }
+
+            UNCHANGED_BOARD_STATE = CatanDiceExtra.applyActionSequence(UNCHANGED_BOARD_STATE, actionsPlayed);
+            BOARD_STATE = UNCHANGED_BOARD_STATE;
+
+            playedActionSequences = new ArrayList<>();
+            updateBoardUI(BOARD_STATE);
+
+            System.out.println("AFTER: " + BOARD_STATE);
+
+        });
+
+
+        keep.setOnMouseClicked(mouseEvent -> {
+            if (ROLL_STATE){
+                String action = reRoll();
+
+                if (CatanDiceExtra.isActionValid(BOARD_STATE, action)) {
+                    BOARD_STATE = CatanDiceExtra.applyAction(BOARD_STATE, action);
+                    currentResources = new ArrayList<>();
+                    playedActionSequences.add(action);
+                    updateBoardUI(BOARD_STATE);
+                }else {
+                    actionNotAllowed(action);
+                }
+            }else {
+                actionNotAllowed("ROLL PHASE OVER");
+            }
+        });
+
+        buildButton.setOnMouseClicked(mouseEvent -> {
+            String action = BUILD;
+//            System.out.println("-----");
+//            System.out.println(action);
+//            System.out.println(CatanDiceExtra.isActionValid(BOARD_STATE, action));
+//            System.out.println(BOARD_STATE);
+//            System.out.println("-------");
+
+            if (CatanDiceExtra.isActionValid(BOARD_STATE, action)) {
+                BOARD_STATE = CatanDiceExtra.applyAction(BOARD_STATE, action);
+                currentResources = new ArrayList<>();
+                playedActionSequences.add(action);
+                updateBoardUI(BOARD_STATE);
+            }else {
+                actionNotAllowed(action);
+            }
+        });
+
+        // DONE
+        swapButton.setOnMouseClicked(mouseEvent -> {
+            if ((RESOURCE_IN == null || selectedOutResource().size() != 1)){
+                actionNotAllowed("NOT SELECTED PROPERLY");
+            }
+            else{
+                String action = "swap" + CatanDiceExtra.validateClass.Misc.coordinateToResource[RESOURCE_IN.id] + selectedOutResource().get(0).resourceChar;
+
+                if (CatanDiceExtra.isActionValid(BOARD_STATE, action)) {
+                    BOARD_STATE = CatanDiceExtra.applyAction(BOARD_STATE, action);
+                    currentResources = new ArrayList<>();
+                    playedActionSequences.add(action);
+                    updateBoardUI(BOARD_STATE);
+                }else {
+                    actionNotAllowed(action);
+            }}
+        });
+
+        tradeButton.setOnAction(new EventHandler<ActionEvent>() {
+            String[] tradeResources = {""};
+            public void handle(ActionEvent event) {
+                
+                Label secondLabel = new Label("Enter trade resources\nExample:" +
+                        "\nb: brick" +
+                        "\n" +
+                        "g: grain" +
+                        "\n" +
+                        "l: lumber" +
+                        "\n" +
+                        "o: ore" +
+                        "\n" +
+                        "w: wool");
+
+                StackPane secondaryLayout = new StackPane();
+                secondaryLayout.getChildren().add(secondLabel);
+
+                Scene secondScene = new Scene(secondaryLayout, 500, 500);
+
+                // New window (Stage)
+                Stage newWindow = new Stage();
+                newWindow.setTitle("Second Stage");
+                newWindow.setScene(secondScene);
+
+                // Specifies the modality for new window.
+                newWindow.initModality(Modality.APPLICATION_MODAL);
+
+                // Specifies the owner Window (parent) for new window
+//                Window primaryStage = ;
+//                newWindow.initOwner(primaryStage);
+//
+//                // Set position of second window, related to primary window.
+                newWindow.setMinHeight(100);
+                newWindow.setMinWidth(500);
+//                newWindow.setX(primaryStage.getX() + 200);
+//                newWindow.setY(primaryStage.getY() + 100);
+
+                newWindow.show();
+
+                ////
+                Label boardLabel = new Label("Enter Trade Resources:");
+                TextField boardTextField = new TextField();
+                boardTextField.setPrefWidth(200);
+                Button button = new Button("Continue");
+                button.setPrefSize(100, 50);
+                System.out.println(123456);
+                button.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent e) {
+                        tradeResources[0] = boardTextField.getText();
+
+                        String action = "trade" + tradeResources[0];
+
+
+                        // ACTUAL CODE
+                        if (CatanDiceExtra.isActionValid(BOARD_STATE, action)) {
+                            System.out.println("HELLOO TRADE");
+                            BOARD_STATE = CatanDiceExtra.applyAction(BOARD_STATE, action);
+                            currentResources = new ArrayList<>();
+                            playedActionSequences.add(action);
+                            updateBoardUI(BOARD_STATE);
+                        }
+                        else {
+                            actionNotAllowed(action);
+                        }
+
+                        newWindow.close();
+                    }
+                });
+                HBox hb = new HBox();
+                hb.getChildren().addAll(boardLabel, boardTextField, button);
+                hb.setSpacing(10);
+                secondaryLayout.getChildren().add(hb);
+            }
+        });
+    }
+
+    private ArrayList<CurrentResource> selectedOutResource(){
+        ArrayList<CurrentResource> selected = new ArrayList<>();
+        for (var resource: currentResources){
+            if (!resource.selected)
+                selected.add(resource);
+        }
+        return selected;
+    }
+
+    private void actionNotAllowed(String action){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText("NOT ALLOWED");
+        alert.setContentText("Action: " + action + " not allowed on Board State: " + BOARD_STATE);
+        alert.showAndWait();
+    }
+
+    private void updateBoardUI(String boardState){
+        System.out.println("------------");
+        this.root.getChildren().clear();
+        this.board.getChildren().clear();
+        this.structures.getChildren().clear();
+        this.information.getChildren().clear();
+        this.controls.getChildren().clear();
+
+        this.makeBoard();
+        this.makeControls();
+        try{makeTurnInfo();} catch (Exception e){}
+        makePlayControls();
+
+
+        this.root.getChildren().add(this.board);
+        this.root.getChildren().add(this.structures);
+        this.root.getChildren().add(this.information);
+        this.root.getChildren().add(this.controls);
+        this.displayState(BOARD_STATE);
+
+        if (END_GAME){
+//            endGame(CatanDiceExtra.whoWon(BOARD_STATE));
+        }
+    }
+
+    private void startNewGame(){
+
     }
 
 
@@ -711,10 +1013,12 @@ public class Game extends Application {
 //        this.chooseGameMode();
 
         BOARD_STATE = "X61bglmowWK02R0105R0205R0509S02XR3237W01X00";
+//        UNCHANGED_BOARD_STATE = BOARD_STATE;
 
         this.root.getChildren().add(controls);
         makeControls();
         makeTurnInfo();
+        makePlayControls();
 
 //        scene.setFill(Color.valueOf("0E56B0"));
 //        scene.setFill(Color.valueOf("2159A8"));
@@ -735,6 +1039,8 @@ public class Game extends Application {
 
         board.toBack();
         this.board.getChildren().add(board);
+
+
 
 
         this.displayState(BOARD_STATE);
