@@ -61,9 +61,9 @@ assets:
     url: https://www.pixilart.com/art/brick-sprite-4d9fce8e33f17a0
     licence: free
   
-collaboration: Idea for task 12
+collaboration:
   - name: Lachlan Braithwaite
-    comment: Got the idea to keep track of two seperate pools of resources in the buildphase to prevent redundant trades from him.
+    comment:  Idea for task 12 - Got the idea to keep track of two seperate pools of resources in the buildphase to prevent redundant trades from him
 
 # Sign *your* name and uids here. (Remove entries if you have fewer
 # than three members.)
