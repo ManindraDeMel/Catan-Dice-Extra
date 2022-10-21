@@ -121,7 +121,6 @@ public class Board {
                     x+=2;
                 }
             }
-
         }
         for (Coordinate coord : coords) {
             ArrayList<Coordinate> acc = new ArrayList<>();

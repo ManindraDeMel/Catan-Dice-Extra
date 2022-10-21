@@ -649,14 +649,14 @@ public class Game extends Application {
         double centerX = WINDOW_WIDTH - 350;
 
 
-        Text scoreStrX = new Text("Player X Score: " + scoreX);
+        Text scoreStrX = new Text("Player W Score: " + scoreX);
         scoreStrX.setY(HEX_HEIGHT * 0.5);
         scoreStrX.setX(centerX);
         scoreStrX.setFill(playersColour[0]);
         scoreStrX.setFont(font);
         scoreStrX.setStrokeType(StrokeType.OUTSIDE);
 
-        Text scoreStrY = new Text("Player Y Score: " + scoreY);
+        Text scoreStrY = new Text("Player X Score: " + scoreY);
         scoreStrY.setY(HEX_WIDTH * 0.75);
         scoreStrY.setX(centerX);
         scoreStrY.setFill(playersColour[1]);
