@@ -681,7 +681,7 @@ public class Game extends Application {
         Button button = new Button("Restart");
         button.setLayoutX(WINDOW_WIDTH - 100);
         button.setLayoutY(WINDOW_HEIGHT - 45);
-        button.setOnAction(e -> this.newGame());
+        button.setOnAction(e -> startNewGame());
         this.controls.getChildren().add(button);
 
         Button instructions = new Button("Instructions");
