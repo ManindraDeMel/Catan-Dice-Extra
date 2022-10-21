@@ -6,6 +6,8 @@ import static comp1140.ass2.gui.backend.Constants.hmKnight;
  *
  * Used to get the tile center coordinate in which the road is in
  * Also used to get the orientation of the road in the tile
+ *
+ * Authored by Arjun Raj, u7526852
  */
 public class RoadStartID {
     int orientation;

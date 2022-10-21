@@ -10,7 +10,7 @@ public class CityShape {
 
     public CityShape(double startX, double startY, boolean isBuilt, String id, int bottom, char player){
         this.id = id;
-        cityLeft = new CityLeft(startX, startY, isBuilt, bottom, player);
-        cityRight = new CityRight(startX, startY, isBuilt, bottom, player);
+        cityLeft = new CityLeft(startX, startY, isBuilt, bottom, player, this);
+        cityRight = new CityRight(startX, startY, isBuilt, bottom, player, this);
     }
 }

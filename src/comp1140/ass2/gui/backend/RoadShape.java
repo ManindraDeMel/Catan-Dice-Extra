@@ -1,5 +1,6 @@
 package comp1140.ass2.gui.backend;
 
+import comp1140.ass2.gui.Game;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -12,11 +13,14 @@ import static comp1140.ass2.gui.backend.Constants.playersColour;
 
 /**
  * Used to create road shape
+ *
+ * Authored by Arjun Raj, u7526852
  */
 public class RoadShape extends Rectangle {
     double height, width, startX, startY;
     int orientation;
     public String id;
+    public boolean clicked = false;
 
     public RoadShape(double startX, double startY, boolean isBuilt, String id, int orientation, char player){
         this.startX = startX;
@@ -66,7 +70,16 @@ public class RoadShape extends Rectangle {
         this.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                //TODO
+                // TODO EXTRA
+                if (!clicked) {
+//                    setFill(Color.BROWN);
+                    Game.BUILD = "build" + "R" + id;
+                    clicked = true;
+                }
+                else{
+//                    Game.updateBuild();
+                    clicked = false;
+                }
             }
         });
 

@@ -8,6 +8,8 @@ import static comp1140.ass2.gui.backend.Constants.HEX_WIDTH;
 
 /**
  * Used to create a tile shape
+ *
+ * Authored by Arjun Raj, u7526852
  */
 public class TileShape extends Polygon {
     double startX, startY;

@@ -1,5 +1,6 @@
 package comp1140.ass2.gui.backend;
 
+import comp1140.ass2.gui.Game;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -12,7 +13,13 @@ import static comp1140.ass2.gui.backend.Constants.*;
  * Used to create the right half of a City shape
  */
 class CityRight extends Polygon {
-    CityRight (double startX, double startY, boolean isBuilt, int bottom, char player){
+
+    CityShape cityShape;
+    boolean clicked = false;
+
+    CityRight (double startX, double startY, boolean isBuilt, int bottom, char player, CityShape cityShape){
+
+        this.cityShape = cityShape;
 
         double sideLength = HEX_WIDTH * 3 / 5;
         int scale = 7;
@@ -64,7 +71,15 @@ class CityRight extends Polygon {
         this.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                //TODO
+                if (!clicked) {
+//                    setFill(Color.BROWN)
+                    Game.BUILD = "build" + "T" + cityShape.id;
+                    clicked = true;
+                }
+                else{
+//                    Game.updateBuild();
+                    clicked = false;
+                }
             }
         });
 
