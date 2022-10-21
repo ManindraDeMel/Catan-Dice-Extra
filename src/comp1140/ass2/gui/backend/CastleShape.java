@@ -1,5 +1,6 @@
 package comp1140.ass2.gui.backend;
 
+import comp1140.ass2.gui.Game;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -15,6 +16,7 @@ public class CastleShape extends Polygon {
     public int id;
     double centerX;
     double centerY;
+    boolean clicked = false;
 
     public CastleShape(boolean isBuilt, int id, char player){
         double scale = 3.0;
@@ -86,8 +88,15 @@ public class CastleShape extends Polygon {
         this.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                System.out.println(id);
-                //TODO
+                if (!clicked) {
+//                    setFill(Color.BROWN)
+                    Game.BUILD = "build" + "C" + id;
+                    clicked = true;
+                }
+                else{
+//                    Game.updateBuild();
+                    clicked = false;
+                }
             }
         });
 

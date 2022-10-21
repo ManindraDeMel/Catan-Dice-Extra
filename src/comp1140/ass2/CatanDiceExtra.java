@@ -10,6 +10,11 @@ import static comp1140.ass2.CatanDiceExtra.validateClass.Misc.getPlayerBoardStat
 public class CatanDiceExtra {
     ArrayList<Player> players = new ArrayList<>();
     ArrayList<String> playersNames = new ArrayList<>(Arrays.asList("Manindra", "Stephen", "Arjun")); // changes when we add GUI stuff (max of 6 players?)
+
+    public static char whoWon(String boardState) {
+        return boardState.charAt(0);
+    }
+
     public void startGame() {
     }
 
@@ -1797,9 +1802,7 @@ public class CatanDiceExtra {
      * @return array of strings representing the actions the AI will take.
      */
     public static String[] generateAction(String boardState) {
-        // FIXME: Task 13
-        // FIXME: Task 14 Implement a "smart" generateAction()
-        return null;
+        return AI.advancedAI(boardState);
     }
 
     /**
