@@ -819,11 +819,11 @@ public class Game extends Application {
             UNCHANGED_BOARD_STATE = CatanDiceExtra.applyActionSequence(UNCHANGED_BOARD_STATE, actionsPlayed);
             BOARD_STATE = UNCHANGED_BOARD_STATE;
 
+            currentResources = new ArrayList<>();
             playedActionSequences = new ArrayList<>();
             updateBoardUI(BOARD_STATE);
 
             System.out.println("AFTER: " + BOARD_STATE);
-
         });
 
 
