@@ -1030,7 +1030,7 @@ public class CatanDiceExtra {
                     new ArrayList<>(Arrays.asList(40, 45, 49, 52, 48, 44)),
                     new ArrayList<>(Arrays.asList(41, 46, 50, 53, 49, 45))
             ));
-            final static Character[] coordinateToResource = new Character[]{
+            public final static Character[] coordinateToResource = new Character[]{
                     // # Row 1
                     'w',
                     'g',
