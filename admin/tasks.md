@@ -67,7 +67,7 @@ Stephen: Task 12 & General classes
 
 Arjun: Task 11 GUI
 
-Mani: Help others
+Mani: Tasks 13 & 14
 
 Stephen: Task 12 & General classes
 
