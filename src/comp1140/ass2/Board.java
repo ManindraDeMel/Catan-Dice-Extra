@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static comp1140.ass2.Coordinate.*;
+import static comp1140.ass2.Resource.*;
 import static comp1140.ass2.TileType.*;
 
 
@@ -27,6 +28,8 @@ public class Board {
     public static HashMap<Coordinate, ArrayList<Coordinate>> neighbours;
 
     public String turn = "";
+    public static final Resource[] boardResources = {brick, wheat, wood, stone, sheep, gold};
+    public static final Character[] resourceChars = {'b', 'g', 'l', 'o', 'w', 'm'};
 
     public String oldScore = "";
     /**
@@ -37,12 +40,12 @@ public class Board {
      * Designed to be modular, allowing for simple changes to things like tiltypes,
      * but larger changes to the dimension of the board would require a complete rewrite.
      * Creates everything with an empty player name "", so should only every be executed once.
-     * Authored by Stephen Burg - u7146285, but the system of coordinates it instantiates was created collaboratively
+     * Authored by Stephen Burg - u7146285 & modified by Manindra de mel (u7156805), but the system of coordinates it instantiates was created collaboratively
      * by the team and also Jonte before he left.
      */
     public Board(String turn, String oldScore) {
         coords = new Coordinate[54];
-        roads = new ArrayList<>();
+        this.roads = new ArrayList<>();
         this.tiles = new Tile[20];
         this.settlements = new Settlement[24]; // isn't there only 24 settlements?
         this.castles = new Castle[4];
@@ -135,6 +138,7 @@ public class Board {
      * Calculates the score of each player of a given boardstate
      * @param boardState
      * @return the scores with a character mapping to the given list [score, longestRoad = 1 if player has longest road else = 0, largestArmy = 1 if player has largest army else = 0]
+     * Authored by Manindra de Mel, u7156805
      */
     public static HashMap<Character, Integer[]> calculateScores(String boardState) { // calculates the points for each player [W,X] of this boardstate.
         HashMap<Character, Integer[]> scores = new HashMap<>(){{
@@ -216,6 +220,7 @@ public class Board {
      * helper method which gets the score from the calculateScores hashmap for each player and returns it as [Wscore, Xscore]
      * @param h
      * @return [Wscore, Xscore]
+     * Authored by Manindra de Mel, u7156805
      */
     public static int[] extractScoreFromNewScore(HashMap<Character, Integer[]> h) {
         return new int[]{h.get('W')[0], h.get('X')[0]};
@@ -269,17 +274,27 @@ public class Board {
         }
     }
 
+    /**
+     * Adds a new building to a new board given an existing boardState
+     * @param boardState
+     * @param action
+     * @param playerId the player
+     * @return a string of the new boardstate with the build added, resources removed and the scores updated.
+     * Authored by Manindra de Mel, u7156805
+     */
     public static String addNewBuild(String boardState, String action, String playerId) {
         Board board = new Board(Board.getTurnFromBoardState(boardState), Board.getScoreFromBoardState(boardState));
         board.applyBoardState(boardState);
         board.buildBuilding(action.substring(5), playerId);
-        return Board.toStringWithNewScore(board);
+        String newBoardState = Board.toStringWithNewScore(board);
+        return newBoardState;
     }
 
     /**
      * builds a new building and adds it to this board
      * @param actionSub the type of building
      * @param playerId which player owns it
+     * Authored by Manindra de Mel, u7156805
      */
     public void buildBuilding(String actionSub, String playerId) {
         turn = turn.substring(0, 3) + Board.removeResources(turn.substring(3), actionSub.charAt(0));
@@ -316,6 +331,7 @@ public class Board {
      * @param actionSub the type of building
      * @param playerId which player owns it
      * @param isCity is the settlement a city?
+     * Authored by Manindra de Mel, u7156805
      */
     private void buildSettlement(String actionSub, String playerId, boolean isCity) {
         for (int y = 0; y<this.settlements.length; y++) {
@@ -362,6 +378,7 @@ public class Board {
     /**
      * applys a whole boardstate to this board by applying both player boardStates
      * @param boardState
+     * Authored By Manindra de Mel, u7156805
      */
     public void applyBoardState(String boardState) {
         for (char p : new char[]{'W', 'X'}) {
@@ -417,7 +434,7 @@ public class Board {
     }
 
     /**
-     * Converts the Board object into a string
+     * Converts the Board object into a string but with the old score
      * @return returns the boardstate (a string representation of this Board)
      * Authored By Manindra de Mel, u7156805
      */
@@ -474,6 +491,7 @@ public class Board {
      * @param g the gamepiece
      * @param playerToMatch filter by this owner
      * @return a bool returning if this gamepiece is owned by the owner
+     * Authored By Manindra de Mel, u7156805
      */
     private static boolean filterCondition(GamePiece g, char playerToMatch) {
         if (g.Owner.name != "") {

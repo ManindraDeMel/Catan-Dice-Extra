@@ -67,10 +67,6 @@ public class Player {
         return false;
     }
 
-    public Action takeTurn() {
-        return null;
-    }
-
     @Override
     public String toString() {
         StringBuilder playerBoardState = new StringBuilder();

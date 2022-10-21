@@ -41,18 +41,36 @@ declaration: >-
 #
 # Add as many "url+licence+comment" entries as necessary
 # (or remove it altogether if you haven't used any external assets)
-# assets:
-#   - comment:
-#     url:
-#     licence:
-
+assets:
+  - comment: Board Tiles
+    url: https://www.pngegg.com/en/png-sbiwh
+    licence: free
+  - comment: Ore texture
+    url: https://www.shutterstock.com/image-vector/rock-mineral-deposits-pixel-art-set-2152364445
+    licence: free
+  - comment: Lumber texture
+    url: https://www.shutterstock.com/image-vector/forestry-logging-woodworking-pixel-art-set-2172317853
+    licence: free
+  - comment: Wool texture
+    url: https://www.dreamstime.com/pixel-sheep-image-game-bit-cross-stitch-pattern-vector-illustration-assets-image229232504
+    licence: free
+  - comment: Gold texture
+    url: https://www.shutterstock.com/image-vector/vector-pixel-art-gold-stick-isolated-1209030838
+    licence: free
+  - comment: Brick Texture
+    url: https://www.pixilart.com/art/brick-sprite-4d9fce8e33f17a0
+    licence: free
+  
+collaboration: Idea for tast 12
+  - name:Lachlan Braithwaite
+    comment: Got the idea to keep track of two seperate pools of resources in the buildphase to prevent redundant trades from him.
 
 # Sign *your* name and uids here. (Remove entries if you have fewer
 # than three members.)
 signatures:
   - name: Arjun Raj
     uid: u7526852
-  - name:
-    uid:
-  - name:
-    uid:
+  - name: Manindra de Mel
+    uid: u7156805
+  - name: Stephen Burg
+    uid: u7146285

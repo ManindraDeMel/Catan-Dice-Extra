@@ -11,7 +11,7 @@ public class Prices {
     public static final HashMap<ArrayList<Resource>, String> builds = new HashMap<>() {{
         put(new ArrayList<Resource>(Arrays.asList(Resource.brick, Resource.wood)), "Road"); // there is implicit ordering in Enums, therefore we can just sort the list and use it as a key for this hashmap
         put(new ArrayList<Resource>(Arrays.asList(Resource.brick, Resource.wood, Resource.sheep, Resource.wheat)), "Settlement");
-        put(new ArrayList<Resource>(Arrays.asList(Resource.sheep, Resource.stone, Resource.wheat)), "Solider");
+        put(new ArrayList<Resource>(Arrays.asList(Resource.sheep, Resource.stone, Resource.wheat)), "Solider"); // Solider = knight sorry.
         put(new ArrayList<Resource>(Arrays.asList(Resource.stone, Resource.stone, Resource.stone, Resource.wheat, Resource.wheat)), "City");
         // castles, (let me know if there is a better way to write this)
         put(new ArrayList<Resource>(Arrays.asList(Resource.brick, Resource.brick, Resource.brick, Resource.brick, Resource.brick)), "Castle");
@@ -24,7 +24,7 @@ public class Prices {
     /**
      * Given a list of resources, find the powerset of that list.
      * @param resources a list of resources owned by a player
-     * @param index a index used for recursion for the index of each set
+     * @param index an index used for recursion for the index of each set
      * @return powerset of that list
      * Authored By Manindra de Mel, u7156805
      */
@@ -52,7 +52,7 @@ public class Prices {
     /**
      * Given a list of resources, return a list of all the possible buildings that can be created from that list of resources
      * @param resources
-     * @return a list of resources that can be created from the list of resources
+     * @return a list of buildings that can be created from the list of resources
      * Authored By Manindra de Mel, u7156805
      */
     public static ArrayList<ArrayList<String>> findBuilds(ArrayList<Resource> resources) { // need to account for the case of two gold
@@ -122,7 +122,6 @@ public class Prices {
         }
         return findBuilds(resources);
     }
-    // Create one which finds the most efficient gold trade automatically (for the AI)
 
     /**
      * check if there is sufficient amount of gold for the gold trade
@@ -189,6 +188,9 @@ public class Prices {
         for (int i = 0; i < board.tiles.length; i++) {
             if (!(i == 9 || i == 10)) {
                 foundSpecificKnight = setUsedTrue(actionSub, playerId, convertToTileType, board, i);
+                if (foundSpecificKnight) {
+                    break;
+                }
             }
         }
         if (!(foundSpecificKnight)) {
@@ -198,23 +200,6 @@ public class Prices {
         }
         return Board.toStringWithNewScore(board);
     }
-
-    /**
-     * Applies the 'keep' action for task 9
-     * @param boardState the current boardstate
-     * @param action the action given
-     * @return a new boardstate with the action applied
-     * Authored By Manindra de Mel, u7156805
-     */
-    public static String keep(String boardState, String action) {
-        boardState = boardState.substring(0, 2) + String.valueOf(Integer.parseInt(boardState.substring(2, 3)) + 1) + boardState.substring(3); // +1 to roll counter
-        int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
-        String oldResources = boardState.substring(3, endOfResourcesIndex);
-        String newResources = Prices.modifyResources(oldResources, action.substring(4), Integer.parseInt(boardState.substring(1, 2)));
-        boardState = boardState.replace(oldResources, newResources);
-        return boardState;
-    }
-
     /**
      * A helper function for the 'swap' method. This method sets a knight from unused to used.
      * @param actionSub the action substring for keep. i.e. (keepbb) -> (bb)
@@ -240,6 +225,21 @@ public class Prices {
     }
 
     /**
+     * Applies the 'keep' action for task 9
+     * @param boardState the current boardstate
+     * @param action the action given
+     * @return a new boardstate with the action applied
+     * Authored By Manindra de Mel, u7156805
+     */
+    public static String keep(String boardState, String action) {
+        boardState = boardState.substring(0, 2) + String.valueOf(Integer.parseInt(boardState.substring(2, 3)) + 1) + boardState.substring(3); // +1 to roll counter
+        int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
+        String oldResources = boardState.substring(3, endOfResourcesIndex);
+        String newResources = Prices.modifyResources(oldResources, action.substring(4), Integer.parseInt(boardState.substring(1, 2)));
+        boardState = boardState.replace(oldResources, newResources);
+        return boardState;
+    }
+    /**
      * Applies the 'trade' action the the boardstate (for task 9)
      * @param boardState a String representation of the boardState
      * @param action the action
@@ -247,8 +247,7 @@ public class Prices {
      * Authored By Manindra de Mel, u7156805
      */
     public static String trade(String boardState, String action) {
-        int endOfResourcesIndex = 3 + Integer.parseInt(boardState.substring(1, 2));
-        String oldResources = boardState.substring(3, endOfResourcesIndex);
+        String oldResources = boardState.substring(3, boardState.indexOf('W', 2));
         String newResources = "";
         newResources = oldResources;
         for (char c : action.substring(5).toCharArray()) {
