@@ -817,7 +817,6 @@ public class CatanDiceExtra {
                         ));
                         for (int i = 0; i < 2; i++) {
                             for (int j = 0; j < 2; j ++) {
-                                System.out.println(Misc.getDistance(Misc.convertToCoordinate(actionLocations.get(i)), Misc.convertToCoordinate((boardLocations.get(j)))));
                                 if (Misc.getDistance(Misc.convertToCoordinate(actionLocations.get(i)), Misc.convertToCoordinate((boardLocations.get(j)))) < 5) { // here we check the distance between
                                                                                                                                                                 // the two roads are greater than 5 spaces away
                                     return false;
@@ -1130,7 +1129,7 @@ public class CatanDiceExtra {
                 return new String[]{firstCoord, secondCoord};
             }
             private static double getDistance(Coordinate a, Coordinate b) {
-                return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2)) / 2;
+                return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
             }
             public static String addZero(int n) {
                 if (n < 10) {
