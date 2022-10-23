@@ -8,18 +8,9 @@ import static comp1140.ass2.Board.getTurnFromBoardState;
 import static comp1140.ass2.CatanDiceExtra.validateClass.Misc.getPlayerBoardState;
 
 public class CatanDiceExtra {
-    ArrayList<Player> players = new ArrayList<>();
-    ArrayList<String> playersNames = new ArrayList<>(Arrays.asList("Manindra", "Stephen", "Arjun")); // changes when we add GUI stuff (max of 6 players?)
 
     public static char whoWon(String boardState) {
         return boardState.charAt(0);
-    }
-
-    public void startGame() {
-    }
-
-    public void newTurn(Player player) {
-
     }
 
     /**
@@ -814,7 +805,7 @@ public class CatanDiceExtra {
                     if (boardState == "W00WXW00X00" || boardState == "X00WXW00X00") { // in this case, its the first turn so we have to check if the road is just on the coast
                         return roadOnCoast(action);
                     }
-                    else if (boardState.length() == 16 && boardState.contains("R")) { // if the board length is 16 then its the second turn (first turn of second player)
+                    else if (boardState.length() == 16 && boardState.contains("R") && boardState.charAt(0) == 'X') { // if the board length is 16 then its the second turn (first turn of second player)
                         ArrayList<Integer> actionLocations = new ArrayList<>(Arrays.asList(
                                 Integer.parseInt(Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1))),
                                 Integer.parseInt(Character.toString(action.charAt(action.length() - 4)) + Character.toString(action.charAt(action.length() - 3)))
