@@ -1,7 +1,5 @@
 package comp1140.ass2;
 
-import java.util.HashMap;
-
 public class AI {
     /**
      * The AI written for this assignment uses the minimax algorithm to compete against the opponent.
@@ -29,10 +27,6 @@ public class AI {
                 return -10000;
             }
             else if (depth == 0 ) {
-                if (!AIturn) {
-                    HashMap<Character, Character> e = new HashMap<>(){{put('X', 'W');put('W', 'X');}}; // we don't want the enemy player's score so we get the AI's score.
-                    return heuristic(boardState, e.get(boardState.charAt(0)));
-                }
                 return heuristic(boardState);
             }
             String[][] actionsSequences = CatanDiceExtra.generateAllPossibleActionSequences(boardState);
@@ -79,17 +73,6 @@ public class AI {
         private static int heuristic(String boardState) {
             String score = Board.getScoreFromBoardState(boardState);
             char playerID = boardState.charAt(0);
-            return Integer.parseInt(score.substring(score.indexOf(playerID) + 1, score.indexOf(playerID) + 3));
-        }
-        /**
-         * A way to evaluate a boardState is to simply look at the score of the AI.
-         * @param boardState
-         * @param playerID, the current player
-         * @return the score of the AI/player's turn
-         * Authored by Manindra de Mel, u7156805.
-         */
-        private static int heuristic(String boardState, char playerID) {
-            String score = Board.getScoreFromBoardState(boardState);
             return Integer.parseInt(score.substring(score.indexOf(playerID) + 1, score.indexOf(playerID) + 3));
         }
     }
