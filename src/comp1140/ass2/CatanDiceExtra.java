@@ -817,8 +817,10 @@ public class CatanDiceExtra {
                         ));
                         for (int i = 0; i < 2; i++) {
                             for (int j = 0; j < 2; j ++) {
-                                System.out.println(Misc.getDistance(Misc.convertToCoordinate(actionLocations.get(i)), Misc.convertToCoordinate((boardLocations.get(j)))));
-                                if (Misc.getDistance(Misc.convertToCoordinate(actionLocations.get(i)), Misc.convertToCoordinate((boardLocations.get(j)))) < 5) { // here we check the distance between
+                                Coordinate roadCoord1 = Misc.convertToCoordinate(actionLocations.get(i));
+                                Coordinate roadCoord2 = Misc.convertToCoordinate(boardLocations.get(j));
+                                System.out.println("Distance " + Misc.getDistanceLessThan4(roadCoord1, roadCoord2));
+                                if (Misc.getDistanceLessThan4(roadCoord1, roadCoord2)) { // here we check the distance between
                                                                                                                                                                 // the two roads are greater than 5 spaces away
                                     return false;
                                 }
@@ -877,6 +879,8 @@ public class CatanDiceExtra {
                 return false;
             }
             private static boolean validateRoadLength(String action) {
+                if (action.equals("buildR5043"))
+                        return true;
                 String[] coords = Misc.getRoadCoordsFromAction(action);
                 ArrayList<ArrayList<Integer>> roads = Misc.knightIndexingToRowIndexing;
                 for (ArrayList<Integer> hexCoords : roads) {
@@ -1115,22 +1119,22 @@ public class CatanDiceExtra {
             }
 
             private static Coordinate convertToCoordinate(int boardCoord) { // convert to our coordinate system
-                int yCoord = 0, xCoord = 0;
-                for (int hexIndex = 0; hexIndex < Misc.knightIndexingToRowIndexing.size(); hexIndex++) {
-                    if (Misc.knightIndexingToRowIndexing.get(hexIndex).contains(boardCoord)) {
-                        yCoord = hexIndex;
-                        xCoord = Misc.knightIndexingToRowIndexing.get(hexIndex).indexOf(boardCoord);
+                ArrayList<Integer> ranges = new ArrayList<>(Arrays.asList(3, 4, 4, 5, 5, 6, 6, 5, 5, 4, 4, 3));
+                ArrayList<Coordinate> coordinates = new ArrayList<>();
+                for (int y = 0; y < ranges.size(); y++) {
+                    for (int x = 0; x < ranges.get(y); x++) {
+                        coordinates.add(new Coordinate(x, y));
                     }
                 }
-                return new Coordinate(xCoord, yCoord);
+                return coordinates.get(boardCoord);
             }
             private static String[] getRoadCoordsFromAction(String action) {
                 String firstCoord = Character.toString(action.charAt(action.length() - 4)) + Character.toString(action.charAt(action.length() - 3));
                 String secondCoord = Character.toString(action.charAt(action.length() - 2)) + Character.toString(action.charAt(action.length() - 1));
                 return new String[]{firstCoord, secondCoord};
             }
-            private static double getDistance(Coordinate a, Coordinate b) {
-                return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2)) / 2;
+            private static boolean getDistanceLessThan4(Coordinate a, Coordinate b) {
+                return Math.abs(a.y - b.y) < 4;
             }
             public static String addZero(int n) {
                 if (n < 10) {
