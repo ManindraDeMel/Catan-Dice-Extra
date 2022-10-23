@@ -832,7 +832,7 @@ public class Game extends Application {
                 String action = reRoll();
 
                 if (CatanDiceExtra.isActionValid(BOARD_STATE, action)) {
-                    BOARD_STATE = CatanDiceExtra.applyActionSequence(BOARD_STATE, new String[]{action});
+                    BOARD_STATE = CatanDiceExtra.applyAction(BOARD_STATE, action);
                     currentResources = new ArrayList<>();
                     playedActionSequences.add(action);
                     updateBoardUI(BOARD_STATE);
@@ -853,7 +853,7 @@ public class Game extends Application {
 //            System.out.println("-------");
 
             if (CatanDiceExtra.isActionValid(BOARD_STATE, action)) {
-                BOARD_STATE = CatanDiceExtra.applyActionSequence(BOARD_STATE, new String[]{action});
+                BOARD_STATE = CatanDiceExtra.applyAction(BOARD_STATE, action);
                 currentResources = new ArrayList<>();
                 playedActionSequences.add(action);
                 updateBoardUI(BOARD_STATE);
@@ -871,7 +871,7 @@ public class Game extends Application {
                 String action = "swap" + CatanDiceExtra.validateClass.Misc.coordinateToResource[RESOURCE_IN.id] + selectedOutResource().get(0).resourceChar;
 
                 if (CatanDiceExtra.isActionValid(BOARD_STATE, action)) {
-                    BOARD_STATE = CatanDiceExtra.applyActionSequence(BOARD_STATE, new String[]{action});
+                    BOARD_STATE = CatanDiceExtra.applyAction(BOARD_STATE, action);
                     currentResources = new ArrayList<>();
                     playedActionSequences.add(action);
                     updateBoardUI(BOARD_STATE);
@@ -937,6 +937,7 @@ public class Game extends Application {
 
                         // ACTUAL CODE
                         if (CatanDiceExtra.isActionValid(BOARD_STATE, action)) {
+                            System.out.println("HELLOO TRADE");
                             BOARD_STATE = CatanDiceExtra.applyAction(BOARD_STATE, action);
                             currentResources = new ArrayList<>();
                             playedActionSequences.add(action);
