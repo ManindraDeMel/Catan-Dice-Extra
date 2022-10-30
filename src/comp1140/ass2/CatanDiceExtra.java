@@ -1760,33 +1760,49 @@ public class CatanDiceExtra {
      * @return array of possible action sequences.
      */
     public static String[][] generateAllPossibleActionSequences(String boardState) {
-        ArrayList<String[]> acc = new ArrayList<String[]>();
-        String turn = getTurnFromBoardState(boardState);
-        String resources = turn.substring(2);
-        if (turn.charAt(1)=='1'||turn.charAt(1)=='2') {
-            for (int x=0; x<(2^(resources.length())); x++) {
-                String binary = Integer.toBinaryString(x);
-                String keep = "keep";
-                for (int i=0; i<binary.length(); i++) {
-                    if (binary.charAt(binary.length()-i)=='1') {
-                        keep+=resources.charAt(i);
-                    }
-                }
-                String[] keepArray = new String[1];
-                keepArray[0]= keep;
-                acc.add(keepArray);
-            }
+//        ArrayList<String[]> acc = new ArrayList<String[]>();
+//        String turn = getTurnFromBoardState(boardState);
+//        String resources = turn.substring(2);
+//        if (turn.charAt(1)=='1'||turn.charAt(1)=='2') {
+//            for (int x=0; x<(2^(resources.length())); x++) {
+//                String binary = Integer.toBinaryString(x);
+//                String keep = "keep";
+//                for (int i=0; i<binary.length(); i++) {
+//                    if (binary.charAt(binary.length()-i)=='1') {
+//                        keep+=resources.charAt(i);
+//                    }
+//                }
+//                String[] keepArray = new String[1];
+//                keepArray[0]= keep;
+//                acc.add(keepArray);
+//            }
+//        }
+//        Character playerId = turn.charAt(0);
+//        String playerBoardState = getPlayerBoardState(boardState, playerId);
+//        Board board = new Board(turn, getScoreFromBoardState(boardState));
+//        Board playerBuilds = board;
+//        board.applyBoardState(boardState);
+//        playerBuilds.applyPlayerBoardState(playerBoardState, Character.toString(playerId));
+//        String[][] accArray = new String[acc.size()][];
+//        accArray = acc.toArray(accArray);
+//        return accArray;
+
+
+        int gamePhase = Actions.getGamePhase(boardState);
+        String[][] allActions;
+
+        switch (gamePhase){
+            case 0 -> allActions = Actions.generateAllPossibleStartGameActionSequences(boardState);
+            case 1 -> allActions = Actions.generateAllPossibleRollPhaseActionSequences(boardState);
+            case 2 -> allActions = Actions.generateAllPossibleBuildPhaseActionSequences(boardState);
+
+            default -> allActions = null;
         }
-        Character playerId = turn.charAt(0);
-        String playerBoardState = getPlayerBoardState(boardState, playerId);
-        Board board = new Board(turn, getScoreFromBoardState(boardState));
-        Board playerBuilds = board;
-        board.applyBoardState(boardState);
-        playerBuilds.applyPlayerBoardState(playerBoardState, Character.toString(playerId));
-        String[][] accArray = new String[acc.size()][];
-        accArray = acc.toArray(accArray);
-        return accArray;
+
+        return allActions;
     }
+
+
 
     /**
      * Given a valid board state, return a valid action sequence.
