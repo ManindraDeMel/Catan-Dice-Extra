@@ -30,7 +30,6 @@ public class Board {
     public String turn = "";
     public static final Resource[] boardResources = {brick, wheat, wood, stone, sheep, gold};
     public static final Character[] resourceChars = {'b', 'g', 'l', 'o', 'w', 'm'};
-
     public String oldScore = "";
     /**
      * Instantiates all the array fields of a Board.
@@ -44,14 +43,22 @@ public class Board {
      * by the team and also Jonte before he left.
      */
     public Board(String turn, String oldScore) {
+        this.turn = turn;
+        this.oldScore = oldScore;
+        boardHelper();
+    }
+    public Board() {
+        this.turn = "";
+        this.oldScore = "";
+        boardHelper();
+    }
+    private void boardHelper() {
         coords = new Coordinate[54];
         this.roads = new ArrayList<>();
         this.tiles = new Tile[20];
         this.settlements = new Settlement[24]; // isn't there only 24 settlements?
         this.castles = new Castle[4];
         neighbours = new HashMap<>();
-        this.turn = turn;
-        this.oldScore = oldScore;
         for (int i = 0;i<4;i++) {
             this.castles[i] = new Castle(new Player(""), i);
         }
@@ -132,6 +139,7 @@ public class Board {
             neighbours.put(coord, acc);
         }
     }
+
 
     /**
      * Calculates the score of each player of a given boardstate
@@ -429,7 +437,6 @@ public class Board {
         }
         String newScore = wScore + xScore;
         return board.toString().replace(board.oldScore, newScore);
-
     }
 
     /**

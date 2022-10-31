@@ -1,7 +1,9 @@
 package comp1140.ass2;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import comp1140.ass2.gui.Game;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static comp1140.ass2.Board.getTurnFromBoardState;
 
@@ -76,12 +78,99 @@ public class Actions {
             keepArray[0] = action;
             acc.add(keepArray);
         }
-
         return (String[][]) acc.toArray();
     }
 
     public static String[][] generateAllPossibleBuildPhaseActionSequences(String boardState) {
-        // TODO
-        return null;
+        ArrayList<ArrayList<String>> possibleBuilds = new ArrayList<>();
+        Board board = new Board();
+        List<String> roadsList = Arrays.stream(roads).map(r -> "R" + r).collect(Collectors.toList());
+        List<String> castleList = Arrays.stream(board.castles).map(Castle::toString).collect(Collectors.toList());
+
+        for (String castle : castleList) { // checking castles first because if you build a castle then you can't build anything else
+            if (CatanDiceExtra.isActionValid(boardState, "build" + castle)) {
+                return new String[][]{new String[]{"build" + castle}};
+            }
+        }
+
+        ArrayList<List<String>> buildings = new ArrayList<>(Arrays.asList(
+                Arrays.stream(board.tiles).map(k -> k.toString().replace("J", "K")).collect(Collectors.toList()), // knights
+                Arrays.stream(board.settlements).map(Settlement::toString).collect(Collectors.toList()), // settlements
+                getCities(board.settlements), // cities
+                roadsList // roads
+        ));
+        ArrayList<Resource> resources = new ArrayList<>();
+        for (char c : CatanDiceExtra.validateClass.Misc.getResourcesFromBoardState(boardState)) {
+            resources.add(Prices.toResource.get(c));
+        }
+        if (Prices.findBuilds(resources).stream().filter(l -> l.size() == 3).collect(Collectors.toList()).size() > 0) { // check if there are any [road, road, road] possible buys
+            for (String road1 : roadsList) {
+                for (String road2 : roadsList) {
+                    for (String road3 : roadsList) {
+                        String[] actionSequence = new String[]{"build" + road1, "build" + road2, "build" + road3};
+                        if (CatanDiceExtra.isActionSequenceValid(boardState, actionSequence)) {
+                            possibleBuilds.add(new ArrayList<>(Arrays.asList(actionSequence)));
+                        }
+                    }
+                }
+            }
+        }
+        for (List<String> buildType : buildings) {
+            for (String build : buildType) {
+                if (CatanDiceExtra.isActionValid(boardState, "build" + build)) {
+                    possibleBuilds.add(new ArrayList<>(Arrays.asList("build" + build)));
+                }
+            }
+        }
+        ArrayList<ArrayList<String>> secondaryBuilds = new ArrayList<>();
+        ArrayList<List<String>> secondaryListOfBuildings = new ArrayList<>(Arrays.asList(roadsList, buildings.get(0))); // only roads or knights can be secondary builds
+        for (int i = 0; i < possibleBuilds.size(); i++) {
+            for (String build : possibleBuilds.get(i)) {
+                String tmpBoardState = removeResourcesFromBoardState(boardState, build);
+                for (List<String> buildType : secondaryListOfBuildings) {
+                    for (String build2 : buildType) {
+                        if (CatanDiceExtra.isActionValid(tmpBoardState, "build" + build2)) {
+                            secondaryBuilds.add(new ArrayList<>(Arrays.asList(build, build2)));
+                        }
+                    }
+                }
+            }
+        }
+        for (ArrayList<String> build : secondaryBuilds) {
+            if (!possibleBuilds.contains(build)) {
+                possibleBuilds.add(build);
+            }
+        }
+        return toStringArr(possibleBuilds);
+    }
+    private static List<String> getCities(Settlement[] settlements) {
+        List<Settlement> cities = Arrays.stream(settlements).filter(s -> Board.cityLocations.contains(s.intersectionIndex)).collect(Collectors.toList());
+        return cities.stream().map(t -> t.toString().replace("S", "T")).collect(Collectors.toList());
+    }
+    private static String[][] toStringArr(ArrayList<ArrayList<String>> builds) { // probably the most cringe, imperative thing ive written in a while
+        String[][] r = new String[builds.size()][];
+        for (int a = 0; a < builds.size(); a++) {
+            List<String> arr = builds.get(a);
+            String[] c = new String[arr.size()];
+            for (int b = 0; b < arr.size(); b++) {
+                c[b] = arr.get(b);
+            }
+            r[a] = c;
+        }
+        return r;
+    }
+    private static String removeResourcesFromBoardState(String boardState, String build) {
+        HashMap<Character, Character[]> buildToResources = new HashMap<>() {{
+            put('R', new Character[]{'b', 'l'});
+            put('S', new Character[]{'b', 'l', 'w', 'g'});
+            put('K', new Character[]{'o', 'w', 'g'});
+            put('T', new Character[]{'o', 'o', 'o', 'g', 'g'});
+
+        }};
+        Character[] resourcesToRemove = buildToResources.get(build.charAt(5));
+        for (char c : resourcesToRemove) {
+           boardState = boardState.replaceFirst(Character.toString(c), "");
+        }
+        return boardState;
     }
 }

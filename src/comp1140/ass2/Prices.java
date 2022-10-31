@@ -21,6 +21,15 @@ public class Prices {
         put(new ArrayList<Resource>(Arrays.asList(Resource.wheat, Resource.wheat, Resource.wheat, Resource.wheat, Resource.wheat)), "Castle");
     }};
 
+    public static HashMap<Character, Resource> toResource = new HashMap<>() {{
+        put('b', Resource.brick);
+        put('g', Resource.wheat);
+        put('m', Resource.gold);
+        put('o', Resource.stone);
+        put('w', Resource.sheep);
+        put('l', Resource.wood);
+    }};
+
     /**
      * Given a list of resources, find the powerset of that list.
      * @param resources a list of resources owned by a player
