@@ -1,7 +1,5 @@
 package comp1140.ass2;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -101,11 +99,12 @@ public class Actions {
         for (String[] s : findBuilds(boardState)) {
             sequences.add(s);
         }
-        String[][] sequencesArr = new String[sequences.size() + 1][];
+        String[][] sequencesArr = new String[sequences.size() + 2][];
         for (int i = 0; i < sequences.size(); i++) {
             sequencesArr[i] = sequences.get(i);
         }
-        sequencesArr[sequencesArr.length - 1] = new String[0]; // add the null case
+        sequencesArr[sequencesArr.length - 2] = new String[0]; // add the null case
+        sequencesArr[sequencesArr.length - 1] = new String[]{"keep"};
         return sequencesArr;
     }
     /**
@@ -116,6 +115,9 @@ public class Actions {
      */
     private static String[][] addTrades(String boardState) { // todo if the trade results in a knight being built then we have to call addSwaps() although unlikely to happen
         int numGold = Math.floorDiv(boardState.length() - boardState.replaceAll("m", "").length(), 2);
+        if (numGold < 1) {
+            return new String[0][];
+        }
         ArrayList<Resource> resources = new ArrayList<>(Arrays.asList(Board.boardResourcesWithoutGold));
         ArrayList<ArrayList<Resource>> allResourceCombinations = Prices.powerset(resources, resources.size() - 1);
         List<ArrayList<Resource>> filteredResourceCombinations = allResourceCombinations.stream().filter(l -> l.size() <= numGold && l.size() > 0).collect(Collectors.toList());
@@ -168,7 +170,7 @@ public class Actions {
         String[][] defaultBuilds = findBuilds(boardState);
         for (String action : actions) {
             String[][] buildsWithAppliedAction = findBuilds(CatanDiceExtra.applyAction(boardState, action));
-            if (!arraysEqual(buildsWithAppliedAction, defaultBuilds)) { // this means the builds have changed
+            if (!Arrays.deepEquals(defaultBuilds, buildsWithAppliedAction) && buildsWithAppliedAction.length != 0 && !(defaultBuilds.length > buildsWithAppliedAction.length)) { // this means the builds have changed
                 for (String[] s : buildsWithAppliedAction) {
                     ArrayList<String> tmpArr = new ArrayList<>(Arrays.asList(action));
                     tmpArr.addAll(new ArrayList<>(List.of(s)));
@@ -177,23 +179,6 @@ public class Actions {
             }
         }
         return toStringArr(sequences);
-    }
-
-    /**
-     * Checking if two arrays are equal because Arrays.equals doesn't work
-     * @param a
-     * @param b
-     * @return if the arrays are equal
-     * Authored By Manindra de Mel, u7156805
-     */
-    private static boolean arraysEqual(String[][] a, String[][] b) {
-        if (a.length != b.length)
-            return false;
-        for (int i = 0; i < a.length; i++) {
-            if (!Arrays.equals(a[i], b[i]))
-                return false;
-        }
-        return true;
     }
 
     /**
@@ -313,12 +298,9 @@ public class Actions {
         }};
         Character[] resourcesToRemove = buildToResources.get(build.charAt(5));
         for (char c : resourcesToRemove) {
-           boardState = boardState.replaceFirst(Character.toString(c), "");
+            boardState = boardState.replaceFirst(Character.toString(c), "");
         }
         return boardState;
     }
 
-    public static void main(String[] args) {
-        addSwaps("W61bbgmmwWJ15J19K18R4045R4549R4952R4953S45S53XK03R0711R1116R1621R1622R1722R2127R2228R2834S16W04AX03R");
-    }
 }
