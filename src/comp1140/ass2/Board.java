@@ -11,7 +11,6 @@ import static comp1140.ass2.TileType.*;
 public class Board {
     public Tile[] tiles;
     public static Coordinate[] coords;
-
     public static final TileType[] tileTypes= {
             wool, grain, ore,
             ore, bricks, timber, wool,
@@ -19,6 +18,14 @@ public class Board {
             wool, bricks, timber, ore,
             ore, grain, wool
     };
+    public static HashMap<Resource, String> resourceCharacterHashMap = new HashMap<>() {{
+        put(brick, "b");
+        put(wheat, "g");
+        put(wood, "l");
+        put(stone, "o");
+        put(sheep, "w");
+        put(gold, "m");
+    }};
     public static final ArrayList<Integer> cityLocations = new ArrayList<>(Arrays.asList(
             1, 7, 10, 17, 18, 19, 34, 35, 36, 43, 46, 52
     ));
@@ -28,7 +35,7 @@ public class Board {
     public static HashMap<Coordinate, ArrayList<Coordinate>> neighbours;
 
     public String turn = "";
-    public static final Resource[] boardResources = {brick, wheat, wood, stone, sheep, gold};
+    public static final Resource[] boardResourcesWithoutGold = {brick, wheat, wood, stone, sheep};
     public static final Character[] resourceChars = {'b', 'g', 'l', 'o', 'w', 'm'};
     public String oldScore = "";
     /**

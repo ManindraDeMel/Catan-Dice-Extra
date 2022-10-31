@@ -108,8 +108,54 @@ public class Actions {
      * Authored By Manindra de Mel, u7156805
      */
     private static String[][] addTrades(String boardState) {
-        return new String[0][0];
+        ArrayList<ArrayList<String>> sequences = new ArrayList<>();
+        int numGold = Math.floorDiv(boardState.length() - boardState.replaceAll("m", "").length(), 2);
+        ArrayList<Resource> resources = new ArrayList<>(Arrays.asList(Board.boardResourcesWithoutGold));
+        ArrayList<ArrayList<Resource>> allResourceCombinations = Prices.powerset(resources, resources.size() - 1);
+        List<ArrayList<Resource>> filteredResourceCombinations = allResourceCombinations.stream().filter(l -> l.size() <= numGold && l.size() > 0).collect(Collectors.toList());
+        ArrayList<List<String>> tmp = new ArrayList<>();
+        ArrayList<String> trades = new ArrayList<>();
+        for (ArrayList<Resource> r : filteredResourceCombinations) {
+            tmp.add(r.stream().map(e -> Board.resourceCharacterHashMap.get(e)).collect(Collectors.toList()));
+        }
+        for (List<String> f : tmp) {
+            String tmpString = "";
+            for (String s : f) {
+                tmpString += s;
+            }
+            trades.add("trade" + tmpString);
+        }
+        String[][] defaultBuilds = findBuilds(boardState);
+        for (String trade : trades) {
+            String[][] buildWithTrades = findBuilds(CatanDiceExtra.applyAction(boardState, trade));
+            if (!arraysEqual(buildWithTrades, defaultBuilds)) { // this means the builds have changed
+                for (String[] s : buildWithTrades) {
+                    ArrayList<String> tmpArr = new ArrayList<>(Arrays.asList(trade));
+                    tmpArr.addAll(new ArrayList<>(List.of(s)));
+                    sequences.add(tmpArr);
+                }
+            }
+        }
+        return toStringArr(sequences);
     }
+
+    private static boolean arraysEqual(String[][] a, String[][] b) {
+        if (a.length != b.length)
+            return false;
+        for (int i = 0; i < a.length; i++) {
+            if (!Arrays.equals(a[i], b[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns swaps made + then the builds which can be made with those trades
+     * @param boardState
+     * @return [[swap, build], [swap, swap, swap, build]]
+     * Authored By Manindra de Mel, u7156805
+     */
     private static String[][] addSwaps(String boardState) {
         return new String[0][0];
     }
@@ -117,7 +163,7 @@ public class Actions {
     /**
      * finds all the possible build combinations (checks price and location)
      * @param boardState
-     * @return an array of combinations
+     * @return an array of combinations of builds
      * Authored By Manindra de Mel, u7156805
      */
     private static String[][] findBuilds(String boardState) {
@@ -234,5 +280,9 @@ public class Actions {
            boardState = boardState.replaceFirst(Character.toString(c), "");
         }
         return boardState;
+    }
+
+    public static void main(String[] args) {
+        addTrades("X63blmmmmWK00K01R0003R0004R0104R0307R0408R0711R0712R0812S00S01S07XK02K05K06R0105R0206R0509R0610R0913R0914R1014R1015R1318R1419R1520S09S20T10W05RX06A");
     }
 }

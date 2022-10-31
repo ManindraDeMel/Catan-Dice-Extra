@@ -37,7 +37,7 @@ public class Prices {
      * @return powerset of that list
      * Authored By Manindra de Mel, u7156805
      */
-    private static ArrayList<ArrayList<Resource>> powerset(ArrayList<Resource> resources, int index) {
+    public static ArrayList<ArrayList<Resource>> powerset(ArrayList<Resource> resources, int index) {
         ArrayList<ArrayList<Resource>> subsets;
         if (index < 0) {
             subsets = new ArrayList<>();
