@@ -173,8 +173,4 @@ public class Actions {
         }
         return boardState;
     }
-
-    public static void main(String[] args) {
-        generateAllPossibleBuildPhaseActionSequences("X63bglmowWJ03K00K01R0003R0004R0104R0307R0408R0711R0712R0812S00S01S07XK02K04K05K06R0105R0206R0509R0610R0813R0913R0914R1014R1015R1318R1419R1520R2026S09S20T10W05RX06A");
-    }
 }
