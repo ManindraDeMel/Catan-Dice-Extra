@@ -1,5 +1,7 @@
 package comp1140.ass2;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -99,7 +101,12 @@ public class Actions {
         for (String[] s : findBuilds(boardState)) {
             sequences.add(s);
         }
-        return (String[][]) sequences.toArray();
+        String[][] sequencesArr = new String[sequences.size() + 1][];
+        for (int i = 0; i < sequences.size(); i++) {
+            sequencesArr[i] = sequences.get(i);
+        }
+        sequencesArr[sequencesArr.length - 1] = new String[0]; // add the null case
+        return sequencesArr;
     }
     /**
      * Returns the trades made + then the builds which can be made with those trades
@@ -107,8 +114,7 @@ public class Actions {
      * @return [[trade, build, build], [trade, trade, build]]...
      * Authored By Manindra de Mel, u7156805
      */
-    private static String[][] addTrades(String boardState) {
-        ArrayList<ArrayList<String>> sequences = new ArrayList<>();
+    private static String[][] addTrades(String boardState) { // todo if the trade results in a knight being built then we have to call addSwaps() although unlikely to happen
         int numGold = Math.floorDiv(boardState.length() - boardState.replaceAll("m", "").length(), 2);
         ArrayList<Resource> resources = new ArrayList<>(Arrays.asList(Board.boardResourcesWithoutGold));
         ArrayList<ArrayList<Resource>> allResourceCombinations = Prices.powerset(resources, resources.size() - 1);
@@ -125,29 +131,7 @@ public class Actions {
             }
             trades.add("trade" + tmpString);
         }
-        String[][] defaultBuilds = findBuilds(boardState);
-        for (String trade : trades) {
-            String[][] buildWithTrades = findBuilds(CatanDiceExtra.applyAction(boardState, trade));
-            if (!arraysEqual(buildWithTrades, defaultBuilds)) { // this means the builds have changed
-                for (String[] s : buildWithTrades) {
-                    ArrayList<String> tmpArr = new ArrayList<>(Arrays.asList(trade));
-                    tmpArr.addAll(new ArrayList<>(List.of(s)));
-                    sequences.add(tmpArr);
-                }
-            }
-        }
-        return toStringArr(sequences);
-    }
-
-    private static boolean arraysEqual(String[][] a, String[][] b) {
-        if (a.length != b.length)
-            return false;
-        for (int i = 0; i < a.length; i++) {
-            if (!Arrays.equals(a[i], b[i]))
-                return false;
-        }
-
-        return true;
+        return addBuilds(boardState, trades);
     }
 
     /**
@@ -157,7 +141,59 @@ public class Actions {
      * Authored By Manindra de Mel, u7156805
      */
     private static String[][] addSwaps(String boardState) {
-        return new String[0][0];
+        Board b = new Board();
+        b.applyBoardState(boardState);
+        List<Integer> knightCoords = b.getKnightLocationsOfPlayer(boardState.charAt(0));
+        List<Character> possibleSwapsWithKnights = knightCoords.stream().map(e -> Board.resourceCharacterHashMap.get(Board.tileToResource.get(Board.tileTypes[e])).charAt(0)).collect(Collectors.toList());
+        ArrayList<Character> resources = CatanDiceExtra.validateClass.Misc.getResourcesFromBoardState(boardState);
+        ArrayList<String> possibleSwaps = new ArrayList<>();
+        for (Character c : resources) {
+            for (Character e : possibleSwapsWithKnights) {
+                if (c != e && c != 'm') { // todo swap for center knights
+                    possibleSwaps.add("swap" + Character.toString(c) + Character.toString(e));
+                }
+            }
+        }
+        return addBuilds(boardState, possibleSwaps);
+    }
+
+    /**
+     * Applies either a trade or a swap and checks if that action was redundant or not
+     * @param boardState
+     * @param actions
+     * @return non-redundant trade/swap action builds with the associated trade/swap
+     */
+    private static String[][] addBuilds(String boardState, ArrayList<String> actions) {
+        ArrayList<ArrayList<String>> sequences = new ArrayList<>();
+        String[][] defaultBuilds = findBuilds(boardState);
+        for (String action : actions) {
+            String[][] buildsWithAppliedAction = findBuilds(CatanDiceExtra.applyAction(boardState, action));
+            if (!arraysEqual(buildsWithAppliedAction, defaultBuilds)) { // this means the builds have changed
+                for (String[] s : buildsWithAppliedAction) {
+                    ArrayList<String> tmpArr = new ArrayList<>(Arrays.asList(action));
+                    tmpArr.addAll(new ArrayList<>(List.of(s)));
+                    sequences.add(tmpArr);
+                }
+            }
+        }
+        return toStringArr(sequences);
+    }
+
+    /**
+     * Checking if two arrays are equal because Arrays.equals doesn't work
+     * @param a
+     * @param b
+     * @return if the arrays are equal
+     * Authored By Manindra de Mel, u7156805
+     */
+    private static boolean arraysEqual(String[][] a, String[][] b) {
+        if (a.length != b.length)
+            return false;
+        for (int i = 0; i < a.length; i++) {
+            if (!Arrays.equals(a[i], b[i]))
+                return false;
+        }
+        return true;
     }
 
     /**
@@ -283,6 +319,6 @@ public class Actions {
     }
 
     public static void main(String[] args) {
-        addTrades("X63blmmmmWK00K01R0003R0004R0104R0307R0408R0711R0712R0812S00S01S07XK02K05K06R0105R0206R0509R0610R0913R0914R1014R1015R1318R1419R1520S09S20T10W05RX06A");
+        addSwaps("W61bbgmmwWJ15J19K18R4045R4549R4952R4953S45S53XK03R0711R1116R1621R1622R1722R2127R2228R2834S16W04AX03R");
     }
 }

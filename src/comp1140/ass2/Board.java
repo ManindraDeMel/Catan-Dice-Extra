@@ -18,6 +18,14 @@ public class Board {
             wool, bricks, timber, ore,
             ore, grain, wool
     };
+    public static HashMap<TileType, Resource> tileToResource = new HashMap<>() {{
+        put(bricks, brick);
+        put(grain, wheat);
+        put(timber, wood);
+        put(ore, stone);
+        put(wool, sheep);
+        put(desert, gold);
+    }};
     public static HashMap<Resource, String> resourceCharacterHashMap = new HashMap<>() {{
         put(brick, "b");
         put(wheat, "g");
@@ -397,6 +405,22 @@ public class Board {
      */
     public static Boolean containsKnights(String boardState) {
         return CatanDiceExtra.validateClass.Misc.getPlayerBoardState(boardState).contains("J");
+    }
+
+    /**
+     * Gets the knights owned by a specific player
+     * @param player
+     * @return
+     * Authored By Manindra de Mel, u7156805
+     */
+    public ArrayList<Integer> getKnightLocationsOfPlayer(char player) {
+        List<Tile> untileList = Arrays.asList(tiles);
+        untileList = untileList.stream().filter(tile -> filterCondition(tile, player) && !tile.used).collect(Collectors.toList());
+        ArrayList<Integer> knightLocations = new ArrayList<>();
+        for (Tile knight : untileList) {
+            knightLocations.add(knight.tileIndex);
+        }
+        return knightLocations;
     }
 
     /**
