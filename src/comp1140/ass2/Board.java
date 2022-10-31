@@ -383,6 +383,16 @@ public class Board {
     }
 
     /**
+     * Checks if the player owns a knight
+     * @param boardState
+     * @return bool based on if a knight is owned
+     * Authored By Manindra de Mel, u7156805
+     */
+    public static Boolean containsKnights(String boardState) {
+        return CatanDiceExtra.validateClass.Misc.getPlayerBoardState(boardState).contains("J");
+    }
+
+    /**
      * applys a whole boardstate to this board by applying both player boardStates
      * @param boardState
      * Authored By Manindra de Mel, u7156805

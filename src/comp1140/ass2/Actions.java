@@ -1,14 +1,11 @@
 package comp1140.ass2;
 
-import comp1140.ass2.gui.Game;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static comp1140.ass2.Board.getTurnFromBoardState;
 
 public class Actions {
-
     static String[] roads = new String[]{
             "0307", "0003", "0004", "0408", "0812", "0712",
             "0104", "0105", "0509", "0913", "0813",
@@ -35,15 +32,14 @@ public class Actions {
      * Checks the game phase based on board state
      *
      * @param boardState: string representation of the board state.
-     * @return 0->start phase, 1->roll phase, 2->build phase
+     * @return returns the respective method for the current Gamestate
      */
-    public static int getGamePhase(String boardState){
-        if (boardState.charAt(1)=='0')
-            return 0;
-        else if (boardState.charAt(1)=='1'||boardState.charAt(1)=='2')
-            return 1;
-        else
-            return 2;
+    public static String[][] generate(String boardState){
+        return switch (boardState.charAt(0)) {
+            case '0' -> generateAllPossibleStartGameActionSequences(boardState);
+            case '1', '2' -> generateAllPossibleRollPhaseActionSequences(boardState);
+            default -> generateAllPossibleBuildPhaseActionSequences(boardState);
+        };
     }
 
     public static String[][] generateAllPossibleStartGameActionSequences(String boardState) {
@@ -81,7 +77,50 @@ public class Actions {
         return (String[][]) acc.toArray();
     }
 
+    /**
+     * Checks swaps, trades and normal builds given a boardstate
+     * @param boardState
+     * @return
+     * Authored By Manindra de Mel, u7156805
+     */
     public static String[][] generateAllPossibleBuildPhaseActionSequences(String boardState) {
+        ArrayList<String[]> sequences = new ArrayList<>();
+        String turn = getTurnFromBoardState(boardState);
+        if (turn.contains("m")) {
+            for (String[] s : addTrades(boardState)) {
+                sequences.add(s);
+            }
+        }
+        if (Board.containsKnights(boardState)) {
+            for (String[] s : addSwaps(boardState)) {
+                sequences.add(s);
+            }
+        }
+        for (String[] s : findBuilds(boardState)) {
+            sequences.add(s);
+        }
+        return (String[][]) sequences.toArray();
+    }
+    /**
+     * Returns the trades made + then the builds which can be made with those trades
+     * @param boardState
+     * @return [[trade, build, build], [trade, trade, build]]...
+     * Authored By Manindra de Mel, u7156805
+     */
+    private static String[][] addTrades(String boardState) {
+        return new String[0][0];
+    }
+    private static String[][] addSwaps(String boardState) {
+        return new String[0][0];
+    }
+
+    /**
+     * finds all the possible build combinations (checks price and location)
+     * @param boardState
+     * @return an array of combinations
+     * Authored By Manindra de Mel, u7156805
+     */
+    private static String[][] findBuilds(String boardState) {
         ArrayList<ArrayList<String>> possibleBuilds = new ArrayList<>();
         Board board = new Board();
         List<String> roadsList = Arrays.stream(roads).map(r -> "R" + r).collect(Collectors.toList());
@@ -126,7 +165,7 @@ public class Actions {
         ArrayList<List<String>> secondaryListOfBuildings = new ArrayList<>(Arrays.asList(roadsList, buildings.get(0))); // only roads or knights can be secondary builds
         for (int i = 0; i < possibleBuilds.size(); i++) {
             for (String build : possibleBuilds.get(i)) {
-                String tmpBoardState = removeResourcesFromBoardState(boardState, build);
+                String tmpBoardState = CatanDiceExtra.applyAction(boardState, build);
                 for (List<String> buildType : secondaryListOfBuildings) {
                     for (String build2 : buildType) {
                         if (CatanDiceExtra.isActionValid(tmpBoardState, "build" + build2)) {
@@ -143,10 +182,25 @@ public class Actions {
         }
         return toStringArr(possibleBuilds);
     }
+
+
+    /**
+     * Gets all the cities in string form
+     * @param settlements
+     * @return T0, T7, ...
+     * Authored By Manindra de Mel, u7156805
+     */
     private static List<String> getCities(Settlement[] settlements) {
         List<Settlement> cities = Arrays.stream(settlements).filter(s -> Board.cityLocations.contains(s.intersectionIndex)).collect(Collectors.toList());
         return cities.stream().map(t -> t.toString().replace("S", "T")).collect(Collectors.toList());
     }
+
+    /**
+     * Converts an Arraylist<Arraylist<String>> to a String[][]
+     * @param builds
+     * @return String[][]
+     * Authored By Manindra de Mel, u7156805
+     */
     private static String[][] toStringArr(ArrayList<ArrayList<String>> builds) { // probably the most cringe, imperative thing ive written in a while
         String[][] r = new String[builds.size()][];
         for (int a = 0; a < builds.size(); a++) {
@@ -159,6 +213,14 @@ public class Actions {
         }
         return r;
     }
+
+    /**
+     * Removes resources given a certain build
+     * @param boardState
+     * @param build "buildR050", "buildS0"
+     * @return a new boardstate with the new resources in the turn phase
+     * Authored By Manindra de Mel, u7156805
+     */
     private static String removeResourcesFromBoardState(String boardState, String build) {
         HashMap<Character, Character[]> buildToResources = new HashMap<>() {{
             put('R', new Character[]{'b', 'l'});

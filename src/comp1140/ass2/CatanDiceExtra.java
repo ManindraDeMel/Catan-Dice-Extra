@@ -1751,7 +1751,7 @@ public class CatanDiceExtra {
      * @return array of possible action sequences.
      */
     public static String[][] generateAllPossibleActionSequences(String boardState) {
-        return new String[4][4];
+        return Actions.generate(boardState);
     }
 
 
