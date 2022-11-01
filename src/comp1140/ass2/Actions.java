@@ -59,46 +59,6 @@ public class Actions {
         return (String[][]) actionPossible.toArray();
     }
 
-    public static List<List<String>> getIt(String[] args) {
-
-        List<List<String>> powerSet = new LinkedList<List<String>>();
-
-        for (int i = 1; i <= args.length; i++)
-            powerSet.addAll(combination(Arrays.asList(args), i));
-
-        return powerSet;
-    }
-
-    public static <T> List<List<T>> combination(List<T> values, int size) {
-
-        if (0 == size) {
-            return Collections.singletonList(Collections.<T> emptyList());
-        }
-
-        if (values.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<List<T>> combination = new LinkedList<List<T>>();
-
-        T actual = values.iterator().next();
-
-        List<T> subSet = new LinkedList<T>(values);
-        subSet.remove(actual);
-
-        List<List<T>> subSetCombination = combination(subSet, size - 1);
-
-        for (List<T> set : subSetCombination) {
-            List<T> newSet = new LinkedList<T>(set);
-            newSet.add(0, actual);
-            combination.add(newSet);
-        }
-
-        combination.addAll(combination(subSet, size));
-
-        return combination;
-    }
-
     public static String[][] generateAllPossibleRollPhaseActionSequences(String boardState) {
 
         String turn = getTurnFromBoardState(boardState);
@@ -110,11 +70,11 @@ public class Actions {
         for (int i = 0; i < resourceArray.length; i++) {
             resourceArray[i] = resources.substring(i, i+1);
         }
-        System.out.println("RESOURCES: " + resources);
+//        System.out.println("RESOURCES: " + resources);
 
         // GETTING ALL POSSIBLE COMBINATIONS
-        List<List<String>> allPossible = getIt(resourceArray);
-        System.out.println("FINAL: " + allPossible);
+        List<List<String>> allPossible = getAllResourceCombination(resourceArray);
+//        System.out.println("FINAL: " + allPossible);
         ArrayList<String[]> FINAL = new ArrayList<>();
         FINAL.add(new String[]{"keep"});
 
@@ -129,7 +89,7 @@ public class Actions {
 
         for (int i = 0; i < FINAL.size(); i++) {
             FINAL_ARRAY[i] = FINAL.get(i);
-            System.out.println(Arrays.toString(FINAL.get(i)));
+//            System.out.println(Arrays.toString(FINAL.get(i)));
         }
         return FINAL_ARRAY;
     }
@@ -164,6 +124,61 @@ public class Actions {
         sequencesArr[sequencesArr.length - 1] = new String[]{"keep"};
         return sequencesArr;
     }
+
+    /**
+     * Computes all the possible combinations of resources
+     *
+     * @param resources String array of individual resource
+     * @return Combination of all resources
+     */
+    public static List<List<String>> getAllResourceCombination(String[] resources) {
+
+        List<List<String>> powerSet = new LinkedList<List<String>>();
+
+        for (int i = 1; i <= resources.length; i++)
+            powerSet.addAll(combination(Arrays.asList(resources), i));
+
+        return powerSet;
+    }
+
+    /**
+     * Helper method for getAllResourceCombination()
+     *
+     * @param values List of values for combination is to be found
+     * @param size size is r in nCr
+     * @return Combination of values of items of length size
+     * @param <T> Any type
+     */
+    public static <T> List<List<T>> combination(List<T> values, int size) {
+
+        if (0 == size) {
+            return Collections.singletonList(Collections.<T> emptyList());
+        }
+
+        if (values.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<List<T>> combination = new LinkedList<List<T>>();
+
+        T actual = values.iterator().next();
+
+        List<T> subSet = new LinkedList<T>(values);
+        subSet.remove(actual);
+
+        List<List<T>> subSetCombination = combination(subSet, size - 1);
+
+        for (List<T> set : subSetCombination) {
+            List<T> newSet = new LinkedList<T>(set);
+            newSet.add(0, actual);
+            combination.add(newSet);
+        }
+
+        combination.addAll(combination(subSet, size));
+
+        return combination;
+    }
+
     /**
      * Returns the trades made + then the builds which can be made with those trades
      * @param boardState
