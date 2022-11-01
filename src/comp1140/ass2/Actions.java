@@ -56,7 +56,13 @@ public class Actions {
                 actionPossible.add(new String[]{action});
         }
 
-        return (String[][]) actionPossible.toArray();
+        String[][] allActions = new String[actionPossible.size()][];
+
+        for (int i = 0; i < allActions.length; i++) {
+            allActions[i] = actionPossible.get(i);
+        }
+
+        return allActions;
     }
 
     public static String[][] generateAllPossibleRollPhaseActionSequences(String boardState) {
