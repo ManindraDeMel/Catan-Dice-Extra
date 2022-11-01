@@ -31,11 +31,15 @@ public class Actions {
     /**
      * Checks the game phase based on board state
      *
-     * @param boardState: string representation of the board state.
-     * @return returns the respective method for the current Gamestate
+     * Given a valid board state, return all applicable player action sequences.
+     * The method should return an array of sequences, where each sequence is
+     * an array of action string representations.
+     *
+     * @param boardState: string representation of the current board state.
+     * @return array of possible action sequences. (returns the respective method for the current Gamestate)
      */
     public static String[][] generate(String boardState){
-        return switch (boardState.charAt(0)) {
+        return switch (boardState.charAt(2)) {
             case '0' -> generateAllPossibleStartGameActionSequences(boardState);
             case '1', '2' -> generateAllPossibleRollPhaseActionSequences(boardState);
             default -> generateAllPossibleBuildPhaseActionSequences(boardState);
@@ -55,26 +59,79 @@ public class Actions {
         return (String[][]) actionPossible.toArray();
     }
 
+    public static List<List<String>> getIt(String[] args) {
+
+        List<List<String>> powerSet = new LinkedList<List<String>>();
+
+        for (int i = 1; i <= args.length; i++)
+            powerSet.addAll(combination(Arrays.asList(args), i));
+
+        return powerSet;
+    }
+
+    public static <T> List<List<T>> combination(List<T> values, int size) {
+
+        if (0 == size) {
+            return Collections.singletonList(Collections.<T> emptyList());
+        }
+
+        if (values.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<List<T>> combination = new LinkedList<List<T>>();
+
+        T actual = values.iterator().next();
+
+        List<T> subSet = new LinkedList<T>(values);
+        subSet.remove(actual);
+
+        List<List<T>> subSetCombination = combination(subSet, size - 1);
+
+        for (List<T> set : subSetCombination) {
+            List<T> newSet = new LinkedList<T>(set);
+            newSet.add(0, actual);
+            combination.add(newSet);
+        }
+
+        combination.addAll(combination(subSet, size));
+
+        return combination;
+    }
+
     public static String[][] generateAllPossibleRollPhaseActionSequences(String boardState) {
 
-        ArrayList<String[]> acc = new ArrayList<String[]>();
         String turn = getTurnFromBoardState(boardState);
-        String resources = turn.substring(2);
-        for (int x = 0; x < (2 ^ (resources.length())); x++) {
+        String resources = turn.substring(3);
 
-            String binary = Integer.toBinaryString(x);
-            String action = "keep";
+        String[] resourceArray = new String[resources.length()];
 
-            for (int i = 0; i < binary.length(); i++) {
-                if (binary.charAt(binary.length() - i) == '1') {
-                    action += resources.charAt(i);
-                }
-            }
-            String[] keepArray = new String[1];
-            keepArray[0] = action;
-            acc.add(keepArray);
+        // CONVERTING STRING TO STRING ARRAY
+        for (int i = 0; i < resourceArray.length; i++) {
+            resourceArray[i] = resources.substring(i, i+1);
         }
-        return (String[][]) acc.toArray();
+        System.out.println("RESOURCES: " + resources);
+
+        // GETTING ALL POSSIBLE COMBINATIONS
+        List<List<String>> allPossible = getIt(resourceArray);
+        System.out.println("FINAL: " + allPossible);
+        ArrayList<String[]> FINAL = new ArrayList<>();
+        FINAL.add(new String[]{"keep"});
+
+        for (List<String> res : allPossible){
+            String toAdd = "";
+            for (String toAddEach : res)
+                toAdd += toAddEach;
+            FINAL.add(new String[]{"keep" + toAdd});
+        }
+
+        String[][] FINAL_ARRAY = new String[FINAL.size()][];
+
+        for (int i = 0; i < FINAL.size(); i++) {
+            FINAL_ARRAY[i] = FINAL.get(i);
+            System.out.println(Arrays.toString(FINAL.get(i)));
+        }
+        return FINAL_ARRAY;
     }
 
     /**
