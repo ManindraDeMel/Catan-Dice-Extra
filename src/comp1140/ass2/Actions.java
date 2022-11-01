@@ -116,12 +116,17 @@ public class Actions {
         for (String[] s : findBuilds(boardState)) {
             sequences.add(s);
         }
-        String[][] sequencesArr = new String[sequences.size() + 2][];
+        String[][] sequencesArr = new String[sequences.size() + 1][];
         for (int i = 0; i < sequences.size(); i++) {
             sequencesArr[i] = sequences.get(i);
+            System.out.print(i + ": ");
+            System.out.println(Arrays.toString(sequences.get(i)));
+//            System.out.println(i);
         }
-        sequencesArr[sequencesArr.length - 2] = new String[0]; // add the null case
-        sequencesArr[sequencesArr.length - 1] = new String[]{"keep"};
+//        System.out.println(Arrays.toString(sequences.toArray()));
+//        sequencesArr[sequencesArr.length - 2] = new String[0]; // add the null case
+        sequencesArr[sequencesArr.length-1] = new String[]{ };
+//        System.out.println(Arrays.toString(sequencesArr));
         return sequencesArr;
     }
 
@@ -315,7 +320,10 @@ public class Actions {
             }
         }
         for (ArrayList<String> build : secondaryBuilds) {
-            if (!possibleBuilds.contains(build) && !possibleBuilds.contains(new ArrayList<>(Arrays.asList(build.get(1), build.get(0))))) {
+//            if (!possibleBuilds.contains(build) && !possibleBuilds.contains(new ArrayList<>(Arrays.asList(build.get(1), build.get(0))))) {
+//                possibleBuilds.add(build);
+//            }
+            if (!possibleBuilds.contains(build)) {
                 possibleBuilds.add(build);
             }
         }
