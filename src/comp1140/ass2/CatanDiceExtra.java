@@ -1768,7 +1768,7 @@ public class CatanDiceExtra {
      * @return array of strings representing the actions the AI will take.
      */
     public static String[] generateAction(String boardState) {
-        return AI.basicAI(boardState);
+        return AI.advancedAI(boardState);
     }
 
     /**

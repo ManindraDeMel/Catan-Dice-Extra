@@ -111,7 +111,7 @@ public class Actions {
                 return toStringArr(new ArrayList<>(List.of(splicedCoastalRoads)));
             }
         }
-    }
+    } // this will be used for the actual game
 
     private static boolean isCoastalRoad(String road) {
         String firstCoord = road.substring(0, 2);

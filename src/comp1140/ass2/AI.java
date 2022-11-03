@@ -19,7 +19,7 @@ public class AI {
          * @return the max/min child score depending on who's turn it is and other factors
          * Authored by Manindra de Mel, u7156805.
          */
-        private int run(String boardState, int depth, int alpha, int beta, boolean AIturn) {
+        private int run(String boardState, int depth, int originalDepth, int alpha, int beta, boolean AIturn) {
             if (CatanDiceExtra.isGameOver(boardState)) {
                 if (AIturn) {
                     return 10000;
@@ -34,10 +34,12 @@ public class AI {
                 int max = -1;
                 for (String[] actionSequence : actionsSequences) {
                     String newBoardState = CatanDiceExtra.applyActionSequence(boardState, actionSequence);
-                    int childScore = run(newBoardState, depth - 1, alpha, beta, false); // Will have to be changed when we have more than 2 players
+                    int childScore = run(newBoardState, depth - 1, originalDepth, alpha, beta, false); // Will have to be changed when we have more than 2 players
                     if (childScore > max) {
                         max = childScore;
-                        bestMove = actionSequence;
+                        if (depth == originalDepth) {
+                            this.bestMove = actionSequence;
+                        }
                     }
                     alpha = Math.max(alpha, childScore);
                     if (beta <= alpha) {
@@ -50,7 +52,7 @@ public class AI {
                 int min = 1000;
                 for (String[] actionSequence : actionsSequences) {
                     String newBoardState = CatanDiceExtra.applyActionSequence(boardState, actionSequence);
-                    int childScore = run(newBoardState, depth - 1, alpha, beta, true);
+                    int childScore = run(newBoardState, depth - 1, originalDepth, alpha, beta, true);
                     if (childScore < min) {
                         min = childScore;
                     }
@@ -93,7 +95,7 @@ public class AI {
      * Authored By Manindra de Mel, u7156805
      */
     public static String[] advancedAI(String boardState) {
-        return runAI(boardState, 2);
+        return runAI(boardState, 5);
     }
     /**
      * A helper method for the advanced and basic AI, which just runs mini-max at a specified depth
@@ -104,8 +106,7 @@ public class AI {
      */
     private static String[] runAI(String boardState, int depth) {
         Minimax m = new Minimax();
-        m.run(boardState, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+        m.run(boardState, depth, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
         return m.bestMove;
     }
-
 }
