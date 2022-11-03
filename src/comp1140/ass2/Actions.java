@@ -92,9 +92,9 @@ public class Actions {
         else {
             int rIndex = boardState.indexOf('R');
             String[] wRoad = new String[]{boardState.substring(rIndex + 1, rIndex + 3), boardState.substring(rIndex+3, rIndex+5)};
-            int coastalIndex = coastalRoads.indexOf(wRoad[0] + wRoad[1]);
+            int coastalIndex = coastalRoads.indexOf("buildR" + wRoad[0] + wRoad[1]);
             if (coastalIndex == -1) {
-                coastalIndex = coastalRoads.indexOf(wRoad[1] + wRoad[0]);
+                coastalIndex = coastalRoads.indexOf("buildR" + wRoad[1] + wRoad[0]);
             }
             if (coastalIndex - 5 < 0) {
                 ArrayList<String> splicedCoastalRoads = new ArrayList<>(coastalRoads.subList(coastalIndex + 5, coastalRoads.size() - 5));
