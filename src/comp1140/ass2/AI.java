@@ -94,7 +94,7 @@ public class AI {
      * Authored By Manindra de Mel, u7156805
      */
     public static String[] advancedAI(String boardState) {
-        return runAI(boardState, 2);
+        return runAI(boardState, 5);
     }
     /**
      * A helper method for the advanced and basic AI, which just runs mini-max at a specified depth
