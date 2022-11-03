@@ -72,8 +72,8 @@ public class Actions {
      * @return array of possible action sequences. (returns the respective method for the current Gamestate)
      */
     public static String[][] generate(String boardState){
-        if (CatanDiceExtra.applyActionSequenceHelper.isStartingPhase(boardState))
-            return possibleStartingRoadBuilds(boardState);
+//        if (CatanDiceExtra.applyActionSequenceHelper.isStartingPhase(boardState))
+//            return possibleStartingRoadBuilds(boardState);
         return switch (boardState.charAt(2)) {
             case '0' -> generateAllPossibleStartGameActionSequences(boardState);
             case '1', '2' -> generateAllPossibleRollPhaseActionSequences(boardState);

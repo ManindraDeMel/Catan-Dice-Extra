@@ -53,7 +53,6 @@ public class AI {
                     int childScore = run(newBoardState, depth - 1, alpha, beta, true);
                     if (childScore < min) {
                         min = childScore;
-                        bestMove = actionSequence;
                     }
                     beta = Math.min(beta, childScore);
                     if (beta <= alpha) {
