@@ -9,7 +9,7 @@ public class AI {
         /**
          * bestMove is used to keep track of the bestMove throughout the minimax recursive calls.
          */
-        private String[] bestMove;
+        public String[] bestMove;
 
         /**
          * The minimax algorithm
@@ -94,11 +94,10 @@ public class AI {
      * Authored By Manindra de Mel, u7156805
      */
     public static String[] advancedAI(String boardState) {
-        return runAI(boardState, 7);
+        return runAI(boardState, 2);
     }
-
     /**
-     * A helper method for the advanced and basic ai, which just runs mini-max at a specified depth
+     * A helper method for the advanced and basic AI, which just runs mini-max at a specified depth
      * @param boardState
      * @param depth
      * @return
