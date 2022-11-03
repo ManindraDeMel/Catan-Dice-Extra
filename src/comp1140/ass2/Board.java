@@ -44,7 +44,7 @@ public class Board {
 
     public String turn = "";
     public static final Resource[] boardResourcesWithoutGold = {brick, wheat, wood, stone, sheep};
-    public static final Character[] resourceChars = {'b', 'g', 'l', 'o', 'w', 'm'};
+    public static final Character[] resourceChars = {'b', 'g', 'l', 'o', 'w'};
     public String oldScore = "";
     /**
      * Instantiates all the array fields of a Board.

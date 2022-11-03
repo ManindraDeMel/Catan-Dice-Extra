@@ -1754,8 +1754,6 @@ public class CatanDiceExtra {
         return Actions.generate(boardState);
     }
 
-
-
     /**
      * Given a valid board state, return a valid action sequence.
      *

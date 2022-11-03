@@ -70,11 +70,9 @@ public class Actions {
         for (int i = 0; i < resourceArray.length; i++) {
             resourceArray[i] = resources.substring(i, i+1);
         }
-//        System.out.println("RESOURCES: " + resources);
 
         // GETTING ALL POSSIBLE COMBINATIONS
         List<List<String>> allPossible = getAllResourceCombination(resourceArray);
-//        System.out.println("FINAL: " + allPossible);
         ArrayList<String[]> FINAL = new ArrayList<>();
         FINAL.add(new String[]{"keep"});
 
@@ -89,7 +87,6 @@ public class Actions {
 
         for (int i = 0; i < FINAL.size(); i++) {
             FINAL_ARRAY[i] = FINAL.get(i);
-//            System.out.println(Arrays.toString(FINAL.get(i)));
         }
         return FINAL_ARRAY;
     }
@@ -119,14 +116,8 @@ public class Actions {
         String[][] sequencesArr = new String[sequences.size() + 1][];
         for (int i = 0; i < sequences.size(); i++) {
             sequencesArr[i] = sequences.get(i);
-            System.out.print(i + ": ");
-            System.out.println(Arrays.toString(sequences.get(i)));
-//            System.out.println(i);
         }
-//        System.out.println(Arrays.toString(sequences.toArray()));
-//        sequencesArr[sequencesArr.length - 2] = new String[0]; // add the null case
-        sequencesArr[sequencesArr.length-1] = new String[]{ };
-//        System.out.println(Arrays.toString(sequencesArr));
+        sequencesArr[sequencesArr.length-1] = new String[]{};
         return sequencesArr;
     }
 
@@ -226,14 +217,64 @@ public class Actions {
         List<Character> possibleSwapsWithKnights = knightCoords.stream().map(e -> Board.resourceCharacterHashMap.get(Board.tileToResource.get(Board.tileTypes[e])).charAt(0)).collect(Collectors.toList());
         ArrayList<Character> resources = CatanDiceExtra.validateClass.Misc.getResourcesFromBoardState(boardState);
         ArrayList<String> possibleSwaps = new ArrayList<>();
-        for (Character c : resources) {
-            for (Character e : possibleSwapsWithKnights) {
-                if (c != e && c != 'm') { // todo swap for center knights
-                    possibleSwaps.add("swap" + Character.toString(c) + Character.toString(e));
+        if (possibleSwapsWithKnights.contains('m')) {
+            for (Character a : resources) {
+                for (Character c : Board.resourceChars) { // possible
+                    String newSwap = "swap" + Character.toString(a) + Character.toString(c);
+                    if (a != c && !possibleSwaps.contains(newSwap)) {
+                        possibleSwaps.add(newSwap);
+                    }
                 }
             }
         }
-        return addBuilds(boardState, possibleSwaps);
+        if (possibleSwaps.size() > 0) {
+            for (Character c : resources) {
+                for (Character e : possibleSwapsWithKnights) {
+                    if (c != e && c != 'm') {
+                        possibleSwaps.add("swap" + Character.toString(c) + Character.toString(e));
+                    }
+                }
+            }
+            String[][] defaultStates = addBuilds(boardState, possibleSwaps);
+            //check for anymore swaps
+            ArrayList<String[]> newStates = new ArrayList<>();
+            for (String[] s : defaultStates) {
+                for (String st : s) {
+                    if (st.charAt(5) == 'K') {
+                        String tmpBoardState = new String(boardState);
+                        for (String st2 : s) {
+                            tmpBoardState = CatanDiceExtra.applyAction(tmpBoardState, st2);
+                        }
+                        String[][] nextSwaps = addSwaps(tmpBoardState);
+                        if (nextSwaps.length > 0) {
+                            ArrayList<String[]> extendedStates = new ArrayList<>(Arrays.asList(defaultStates));
+                            for (String[] action : nextSwaps) {
+                                extendedStates.add(concatArrays(s, action));
+                            }
+                            defaultStates = toStringArrB(extendedStates);
+                        }
+                    }
+                }
+            }
+
+            return defaultStates; // [swaplw, buildK10, swaplw, buildK17]
+            // X63ggllooWK00K01K02K03K04K05R0003R0004R0104R0105R0205R0206R0307R0408R0509R0711R0712R0812R0813R0913R0914R1217R1318S00S01S02S08S09T07XJ09K07K08K13K14R1116R1621R1622R1722R1723R1823R2127R2228R2329R2733R2833R2834R2934R2935R3338R3439R3843R3943R3944R4347R4751S16S17S33S34S43W09AX07R
+        }
+        return new String[0][];
+    }
+
+    /**
+     * concatenates two arrays together
+     * @param a a String[]
+     * @param b a String[]
+     * @return the concatenation of these two arrays
+     * Authored By Manindra de Mel, u7156805
+     */
+    private static String[] concatArrays(String[] a, String[] b) {
+        String[] newArr = new String[a.length + b.length];
+        System.arraycopy(a, 0, newArr, 0, a.length);
+        System.arraycopy(b, 0, newArr, a.length, b.length);
+        return newArr;
     }
 
     /**
@@ -320,9 +361,6 @@ public class Actions {
             }
         }
         for (ArrayList<String> build : secondaryBuilds) {
-//            if (!possibleBuilds.contains(build) && !possibleBuilds.contains(new ArrayList<>(Arrays.asList(build.get(1), build.get(0))))) {
-//                possibleBuilds.add(build);
-//            }
             if (!possibleBuilds.contains(build)) {
                 possibleBuilds.add(build);
             }
@@ -361,26 +399,11 @@ public class Actions {
         return r;
     }
 
-    /**
-     * Removes resources given a certain build
-     * @param boardState
-     * @param build "buildR050", "buildS0"
-     * @return a new boardstate with the new resources in the turn phase
-     * Authored By Manindra de Mel, u7156805
-     */
-    private static String removeResourcesFromBoardState(String boardState, String build) {
-        HashMap<Character, Character[]> buildToResources = new HashMap<>() {{
-            put('R', new Character[]{'b', 'l'});
-            put('S', new Character[]{'b', 'l', 'w', 'g'});
-            put('K', new Character[]{'o', 'w', 'g'});
-            put('T', new Character[]{'o', 'o', 'o', 'g', 'g'});
-
-        }};
-        Character[] resourcesToRemove = buildToResources.get(build.charAt(5));
-        for (char c : resourcesToRemove) {
-            boardState = boardState.replaceFirst(Character.toString(c), "");
+    private static String[][] toStringArrB(ArrayList<String[]> builds) {
+        String[][] newArr = new String[builds.size()][];
+        for (int i = 0; i < builds.size(); i++) {
+            newArr[i] = builds.get(i);
         }
-        return boardState;
+        return newArr;
     }
-
 }
