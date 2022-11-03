@@ -84,6 +84,7 @@ public class Actions {
     public static String[][] possibleStartingRoadBuilds(String boardState) {
         List<String> coastalRoads = List.of(roads);
         coastalRoads = coastalRoads.stream().filter(r -> isCoastalRoad(r)).collect(Collectors.toList());
+        coastalRoads = coastalRoads.stream().map(r -> "buildR" + r).collect(Collectors.toList());
         ArrayList<String> coastalRoadsArr = new ArrayList<>(coastalRoads);
         if (boardState.charAt(0) == 'W') {
             return toStringArr(new ArrayList<>(List.of(coastalRoadsArr)));
