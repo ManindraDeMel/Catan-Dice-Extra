@@ -28,6 +28,39 @@ public class Actions {
             "4650", "5053", "4953"
     };
 
+    final static ArrayList<String> allCoastalNodes = new ArrayList<>(Arrays.asList(
+            "00",
+            "03",
+            "07",
+            "11",
+            "16",
+            "21",
+            "27",
+            "33",
+            "38",
+            "43",
+            "47",
+            "51",
+            "48",
+            "52",
+            "49",
+            "53",
+            "50",
+            "46",
+            "42",
+            "37",
+            "32",
+            "26",
+            "20",
+            "15",
+            "10",
+            "06",
+            "02",
+            "05",
+            "01",
+            "04"
+    ));
+
     /**
      * Checks the game phase based on board state
      *
@@ -39,11 +72,50 @@ public class Actions {
      * @return array of possible action sequences. (returns the respective method for the current Gamestate)
      */
     public static String[][] generate(String boardState){
+        if (CatanDiceExtra.applyActionSequenceHelper.isStartingPhase(boardState))
+            return possibleStartingRoadBuilds(boardState);
         return switch (boardState.charAt(2)) {
             case '0' -> generateAllPossibleStartGameActionSequences(boardState);
             case '1', '2' -> generateAllPossibleRollPhaseActionSequences(boardState);
             default -> generateAllPossibleBuildPhaseActionSequences(boardState);
         };
+    }
+
+    public static String[][] possibleStartingRoadBuilds(String boardState) {
+        List<String> coastalRoads = List.of(roads);
+        coastalRoads = coastalRoads.stream().filter(r -> isCoastalRoad(r)).collect(Collectors.toList());
+        ArrayList<String> coastalRoadsArr = new ArrayList<>(coastalRoads);
+        if (boardState.charAt(0) == 'W') {
+            return toStringArr(new ArrayList<>(List.of(coastalRoadsArr)));
+        }
+        else {
+            int rIndex = boardState.indexOf('R');
+            String[] wRoad = new String[]{boardState.substring(rIndex + 1, rIndex + 3), boardState.substring(rIndex+3, rIndex+5)};
+            int coastalIndex = coastalRoads.indexOf(wRoad[0] + wRoad[1]);
+            if (coastalIndex == -1) {
+                coastalIndex = coastalRoads.indexOf(wRoad[1] + wRoad[0]);
+            }
+            if (coastalIndex - 5 < 0) {
+                ArrayList<String> splicedCoastalRoads = new ArrayList<>(coastalRoads.subList(coastalIndex + 5, coastalRoads.size() - 5));
+                return toStringArr(new ArrayList<>(List.of(splicedCoastalRoads)));
+            }
+            else if (coastalIndex + 5 > coastalRoads.size()) {
+                ArrayList<String> splicedCoastalRoads = new ArrayList<>(coastalRoads.subList(5, coastalIndex - 5));
+                return toStringArr(new ArrayList<>(List.of(splicedCoastalRoads)));
+            }
+            else {
+                ArrayList<String> splicedCoastalRoads = new ArrayList<>(coastalRoads.subList(coastalIndex + 5, coastalRoads.size()));
+                ArrayList<String> splicedCoastalRoadsLOWER = new ArrayList<>(coastalRoads.subList(0, coastalIndex - 5));
+                splicedCoastalRoads.addAll(splicedCoastalRoadsLOWER);
+                return toStringArr(new ArrayList<>(List.of(splicedCoastalRoads)));
+            }
+        }
+    }
+
+    private static boolean isCoastalRoad(String road) {
+        String firstCoord = road.substring(0, 2);
+        String secondCoord = road.substring(2);
+        return allCoastalNodes.contains(firstCoord) && allCoastalNodes.contains(secondCoord);
     }
 
     public static String[][] generateAllPossibleStartGameActionSequences(String boardState) {
@@ -263,8 +335,7 @@ public class Actions {
                 }
             }
 
-            return defaultStates; // [swaplw, buildK10, swaplw, buildK17]
-            // X63ggllooWK00K01K02K03K04K05R0003R0004R0104R0105R0205R0206R0307R0408R0509R0711R0712R0812R0813R0913R0914R1217R1318S00S01S02S08S09T07XJ09K07K08K13K14R1116R1621R1622R1722R1723R1823R2127R2228R2329R2733R2833R2834R2934R2935R3338R3439R3843R3943R3944R4347R4751S16S17S33S34S43W09AX07R
+            return defaultStates;
         }
         return new String[0][];
     }
