@@ -40,7 +40,6 @@ public class GenerateActionSanityTimeTest {
     @Test
     public void testFullGame1() {
         for (String[][] step : ExampleGames.FULL_GAME_WITH_ACTIONS1) {
-
             long start = System.nanoTime();
             String action = testGenerateActionSanity(step[0][0]);
             long diff = System.nanoTime() - start;
@@ -56,7 +55,6 @@ public class GenerateActionSanityTimeTest {
     @Test
     public void testFullGame2() {
         for (String[][] step : ExampleGames.FULL_GAME_WITH_ACTIONS2) {
-
             long start = System.nanoTime();
             String action = testGenerateActionSanity(step[0][0]);
             long diff = System.nanoTime() - start;
@@ -72,7 +70,6 @@ public class GenerateActionSanityTimeTest {
     @Test
     public void testFullGame3() {
         for (String[][] step : ExampleGames.FULL_GAME_WITH_ACTIONS3) {
-
             long start = System.nanoTime();
             String action = testGenerateActionSanity(step[0][0]);
             long diff = System.nanoTime() - start;
