@@ -95,13 +95,13 @@ public class ToStringTests {
 
 
         // Adding Cities
-        coord1 = new Coordinate(35);
-        structuresTest.get(4).add(new Settlement(playerTest, coord1, true, 35));
-        expString.get(4).add("T35");
-
-        coord1 = new Coordinate(34);
-        structuresTest.get(4).add(new Settlement(playerTest, coord1, true, 34));
-        expString.get(4).add("T34");
+//        coord1 = new Coordinate(35);
+//        structuresTest.get(4).add(new Settlement(playerTest, coord1, true, 35));
+//        expString.get(4).add("T35");
+//
+//        coord1 = new Coordinate(34);
+//        structuresTest.get(4).add(new Settlement(playerTest, coord1, true, 34));
+//        expString.get(4).add("T34");
     }
 
     @Test

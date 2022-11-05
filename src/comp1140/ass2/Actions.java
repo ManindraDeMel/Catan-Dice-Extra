@@ -123,7 +123,7 @@ public class Actions {
         ArrayList<String[]> actionPossible = new ArrayList<>();
 
         for (var road : roads) {
-            String action = "buil" + "R" + road;
+            String action = "build" + "R" + road;
 
             if (CatanDiceExtra.isActionValid(boardState, action))
                 actionPossible.add(new String[]{action});
